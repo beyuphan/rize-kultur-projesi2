@@ -1,0 +1,24 @@
+{
+    "@@locale": "en",
+    "title": "Rize Culture Project",
+    "@title": {
+        "description": "App bar title for the project"
+    },
+    "welcome": "Welcome to Rize!",
+    "@welcome": {
+        "description": "Welcome message on the home screen"
+    },
+    "explore": "Explore",
+    "map": "Map",
+    "routes": "Routes",
+    "settings": "Settings",
+    "settingsTitle": "Settings",
+    "appTheme": "App Theme",
+    "yaylaGreen": "Yayla Green",
+    "fogCloud": "Fog Cloud",
+    "language": "Language",
+    "turkish": "Türkçe",
+    "english": "English",
+    "selectThemeTitle": "Select App Theme",
+    "selectLanguageTitle": "Select App Language"
+}

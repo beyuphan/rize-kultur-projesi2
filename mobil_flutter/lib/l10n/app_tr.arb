@@ -1,0 +1,18 @@
+{
+    "@@locale": "tr",
+    "title": "Rize Kültür Projesi",
+    "welcome": "Rize’ye hoş geldiniz!",
+    "explore": "Keşfet",
+    "map": "Harita",
+    "routes": "Rotalar",
+    "settings": "Ayarlar",
+    "settingsTitle": "Ayarlar",
+    "appTheme": "Uygulama Teması",
+    "yaylaGreen": "Yayla Yeşili",
+    "fogCloud": "Sis Bulutu",
+    "language": "Dil",
+    "turkish": "Türkçe",
+    "english": "English",
+    "selectThemeTitle": "Uygulama Temasını Seç",
+    "selectLanguageTitle": "Uygulama Dilini Seç"
+}
