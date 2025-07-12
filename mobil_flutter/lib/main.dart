@@ -7,7 +7,7 @@ import 'package:mobil_flutter/l10n/app_localizations.dart';
 
 // UYGULAMANIN GENEL DURUMUNU YÖNETEN PROVIDER'LAR
 // Artık tüm provider'lar, uygulamanın başlangıç noktasında, merkezi bir yerde.
-final themeProvider = StateProvider<AppTheme>((ref) => AppTheme.yaylaYesili);
+final themeProvider = StateProvider<AppTheme>((ref) => AppTheme.firtinaYesili);
 final localeProvider = StateProvider<Locale>((ref) => const Locale('tr'));
 
 void main() {

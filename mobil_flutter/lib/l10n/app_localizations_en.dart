@@ -33,12 +33,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appTheme => 'App Theme';
 
   @override
-  String get yaylaGreen => 'Yayla Green';
-
-  @override
-  String get fogCloud => 'Fog Cloud';
-
-  @override
   String get language => 'Language';
 
   @override
@@ -52,4 +46,51 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get selectLanguageTitle => 'Select App Language';
+
+  @override
+  String get themeFirtinaYesili => 'Fırtına Green';
+
+  @override
+  String get themeKackarSisi => 'Kaçkar Mist';
+
+  @override
+  String get searchHint => 'Search plateaus, waterfalls and more...';
+
+  @override
+  String get categories => 'Categories';
+
+  @override
+  String get popularVenues => 'Popular Venues';
+
+  @override
+  String get seeAll => 'See All';
+
+  @override
+  String get categoryAll => 'All';
+
+  @override
+  String get categoryPlateaus => 'Plateaus';
+
+  @override
+  String get categoryWaterfalls => 'Waterfalls';
+
+  @override
+  String get categoryRestaurants => 'Restaurants';
+
+  @override
+  String get categoryHistorical => 'Historical';
+
+  @override
+  String get categoryNature => 'Nature';
+
+  @override
+  String get getDirections => 'Get Directions';
+
+  @override
+  String get reviews => 'Reviews';
+
+  @override
+  String reviewsCount(String count) {
+    return '($count Reviews)';
+  }
 }

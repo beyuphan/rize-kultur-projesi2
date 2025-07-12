@@ -98,13 +98,13 @@ abstract class AppLocalizations {
     Locale('tr'),
   ];
 
-  /// App bar title for the project
+  /// No description provided for @title.
   ///
   /// In en, this message translates to:
   /// **'Rize Culture Project'**
   String get title;
 
-  /// Welcome message on the home screen
+  /// No description provided for @welcome.
   ///
   /// In en, this message translates to:
   /// **'Welcome to Rize!'**
@@ -146,18 +146,6 @@ abstract class AppLocalizations {
   /// **'App Theme'**
   String get appTheme;
 
-  /// No description provided for @yaylaGreen.
-  ///
-  /// In en, this message translates to:
-  /// **'Yayla Green'**
-  String get yaylaGreen;
-
-  /// No description provided for @fogCloud.
-  ///
-  /// In en, this message translates to:
-  /// **'Fog Cloud'**
-  String get fogCloud;
-
   /// No description provided for @language.
   ///
   /// In en, this message translates to:
@@ -187,6 +175,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Select App Language'**
   String get selectLanguageTitle;
+
+  /// No description provided for @themeFirtinaYesili.
+  ///
+  /// In en, this message translates to:
+  /// **'Fırtına Green'**
+  String get themeFirtinaYesili;
+
+  /// No description provided for @themeKackarSisi.
+  ///
+  /// In en, this message translates to:
+  /// **'Kaçkar Mist'**
+  String get themeKackarSisi;
+
+  /// No description provided for @searchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search plateaus, waterfalls and more...'**
+  String get searchHint;
+
+  /// No description provided for @categories.
+  ///
+  /// In en, this message translates to:
+  /// **'Categories'**
+  String get categories;
+
+  /// No description provided for @popularVenues.
+  ///
+  /// In en, this message translates to:
+  /// **'Popular Venues'**
+  String get popularVenues;
+
+  /// No description provided for @seeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'See All'**
+  String get seeAll;
+
+  /// No description provided for @categoryAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get categoryAll;
+
+  /// No description provided for @categoryPlateaus.
+  ///
+  /// In en, this message translates to:
+  /// **'Plateaus'**
+  String get categoryPlateaus;
+
+  /// No description provided for @categoryWaterfalls.
+  ///
+  /// In en, this message translates to:
+  /// **'Waterfalls'**
+  String get categoryWaterfalls;
+
+  /// No description provided for @categoryRestaurants.
+  ///
+  /// In en, this message translates to:
+  /// **'Restaurants'**
+  String get categoryRestaurants;
+
+  /// No description provided for @categoryHistorical.
+  ///
+  /// In en, this message translates to:
+  /// **'Historical'**
+  String get categoryHistorical;
+
+  /// No description provided for @categoryNature.
+  ///
+  /// In en, this message translates to:
+  /// **'Nature'**
+  String get categoryNature;
+
+  /// No description provided for @getDirections.
+  ///
+  /// In en, this message translates to:
+  /// **'Get Directions'**
+  String get getDirections;
+
+  /// No description provided for @reviews.
+  ///
+  /// In en, this message translates to:
+  /// **'Reviews'**
+  String get reviews;
+
+  /// The number of reviews for a place
+  ///
+  /// In en, this message translates to:
+  /// **'({count} Reviews)'**
+  String reviewsCount(String count);
 }
 
 class _AppLocalizationsDelegate

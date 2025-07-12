@@ -8,11 +8,32 @@
     "settings": "Ayarlar",
     "settingsTitle": "Ayarlar",
     "appTheme": "Uygulama Teması",
-    "yaylaGreen": "Yayla Yeşili",
-    "fogCloud": "Sis Bulutu",
     "language": "Dil",
     "turkish": "Türkçe",
     "english": "English",
     "selectThemeTitle": "Uygulama Temasını Seç",
-    "selectLanguageTitle": "Uygulama Dilini Seç"
+    "selectLanguageTitle": "Uygulama Dilini Seç",
+    "themeFirtinaYesili": "Fırtına Yeşili",
+    "themeKackarSisi": "Kaçkar Sisi",
+    "searchHint": "Yaylaları, şelaleleri ve daha fazlasını ara...",
+    "categories": "Kategoriler",
+    "popularVenues": "Popüler Mekanlar",
+    "seeAll": "Tümünü Gör",
+    "categoryAll": "Tümü",
+    "categoryPlateaus": "Yaylalar",
+    "categoryWaterfalls": "Şelaleler",
+    "categoryRestaurants": "Restoranlar",
+    "categoryHistorical": "Tarihi",
+    "categoryNature": "Doğa",
+    "getDirections": "Yol Tarifi Al",
+        "reviews": "Değerlendirmeler",
+        "reviewsCount": "({count} Değerlendirme)",
+        "@reviewsCount": {
+            "description": "Bir mekan için yapılan değerlendirme sayısı",
+            "placeholders": {
+                "count": {
+                    "type": "String"
+                }
+            }
+        }
 }

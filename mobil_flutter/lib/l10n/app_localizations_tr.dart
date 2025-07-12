@@ -33,12 +33,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get appTheme => 'Uygulama Teması';
 
   @override
-  String get yaylaGreen => 'Yayla Yeşili';
-
-  @override
-  String get fogCloud => 'Sis Bulutu';
-
-  @override
   String get language => 'Dil';
 
   @override
@@ -52,4 +46,51 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get selectLanguageTitle => 'Uygulama Dilini Seç';
+
+  @override
+  String get themeFirtinaYesili => 'Fırtına Yeşili';
+
+  @override
+  String get themeKackarSisi => 'Kaçkar Sisi';
+
+  @override
+  String get searchHint => 'Yaylaları, şelaleleri ve daha fazlasını ara...';
+
+  @override
+  String get categories => 'Kategoriler';
+
+  @override
+  String get popularVenues => 'Popüler Mekanlar';
+
+  @override
+  String get seeAll => 'Tümünü Gör';
+
+  @override
+  String get categoryAll => 'Tümü';
+
+  @override
+  String get categoryPlateaus => 'Yaylalar';
+
+  @override
+  String get categoryWaterfalls => 'Şelaleler';
+
+  @override
+  String get categoryRestaurants => 'Restoranlar';
+
+  @override
+  String get categoryHistorical => 'Tarihi';
+
+  @override
+  String get categoryNature => 'Doğa';
+
+  @override
+  String get getDirections => 'Yol Tarifi Al';
+
+  @override
+  String get reviews => 'Değerlendirmeler';
+
+  @override
+  String reviewsCount(String count) {
+    return '($count Değerlendirme)';
+  }
 }

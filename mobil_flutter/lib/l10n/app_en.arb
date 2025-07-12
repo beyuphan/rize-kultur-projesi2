@@ -1,24 +1,39 @@
 {
-    "@@locale": "en",
+   "@@locale": "en",
     "title": "Rize Culture Project",
-    "@title": {
-        "description": "App bar title for the project"
-    },
     "welcome": "Welcome to Rize!",
-    "@welcome": {
-        "description": "Welcome message on the home screen"
-    },
     "explore": "Explore",
     "map": "Map",
     "routes": "Routes",
     "settings": "Settings",
     "settingsTitle": "Settings",
     "appTheme": "App Theme",
-    "yaylaGreen": "Yayla Green",
-    "fogCloud": "Fog Cloud",
     "language": "Language",
     "turkish": "Türkçe",
     "english": "English",
     "selectThemeTitle": "Select App Theme",
-    "selectLanguageTitle": "Select App Language"
+    "selectLanguageTitle": "Select App Language",
+    "themeFirtinaYesili": "Fırtına Green",
+    "themeKackarSisi": "Kaçkar Mist",
+    "searchHint": "Search plateaus, waterfalls and more...",
+    "categories": "Categories",
+    "popularVenues": "Popular Venues",
+    "seeAll": "See All",
+    "categoryAll": "All",
+    "categoryPlateaus": "Plateaus",
+    "categoryWaterfalls": "Waterfalls",
+    "categoryRestaurants": "Restaurants",
+    "categoryHistorical": "Historical",
+    "categoryNature": "Nature",
+    "getDirections": "Get Directions",
+    "reviews": "Reviews",
+    "reviewsCount": "({count} Reviews)",
+    "@reviewsCount": {
+        "description": "The number of reviews for a place",
+        "placeholders": {
+            "count": {
+                "type": "String"
+            }
+        }
+    }
 }
