@@ -3,7 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobil_flutter/l10n/app_localizations.dart';
 import 'package:mobil_flutter/presentation/widgets/mekan_karti.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:mobil_flutter/presentation/screens/mekan_detay_ekrani.dart'; // Yeni ekranı import et
+import 'package:mobil_flutter/presentation/screens/mekan_detay_ekrani.dart';
+// DÜZELTME: Eksik olan provider dosyasını import ediyoruz.
+import 'package:mobil_flutter/presentation/providers/mekan_providers.dart'; 
+
 
 // Kategori verilerini tutmak için basit bir model sınıfı
 class Category {
@@ -16,6 +19,7 @@ class Category {
 // Seçili olan kategorinin index'ini tutacak olan provider
 final selectedCategoryIndexProvider = StateProvider<int>((ref) => 0);
 
+// Ekranımızı ConsumerWidget'a dönüştürüyoruz ki provider'ları dinleyebilsin.
 class KesfetEkrani extends ConsumerWidget {
   const KesfetEkrani({super.key});
 
@@ -24,6 +28,9 @@ class KesfetEkrani extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final selectedIndex = ref.watch(selectedCategoryIndexProvider);
+    
+    // Mekanlar provider'ını dinliyoruz.
+    final mekanlarAsyncValue = ref.watch(mekanlarProvider);
 
     final List<Category> categories = [
       Category(key: 'categoryAll', icon: Icons.public),
@@ -31,7 +38,6 @@ class KesfetEkrani extends ConsumerWidget {
       Category(key: 'categoryWaterfalls', icon: Icons.waterfall_chart),
       Category(key: 'categoryRestaurants', icon: Icons.restaurant),
       Category(key: 'categoryHistorical', icon: Icons.account_balance),
-      Category(key: 'categoryNature', icon: Icons.local_florist),
     ];
 
     String getTranslatedCategory(String key) {
@@ -41,141 +47,139 @@ class KesfetEkrani extends ConsumerWidget {
         case 'categoryWaterfalls': return l10n.categoryWaterfalls;
         case 'categoryRestaurants': return l10n.categoryRestaurants;
         case 'categoryHistorical': return l10n.categoryHistorical;
-        case 'categoryNature': return l10n.categoryNature;
-        default: return '';
+        default: return key; // Çeviri bulunamazsa anahtarı göster
       }
     }
 
-    // Örnek banner görselleri (Bunları sonra dinamik hale getirebiliriz)
     final List<String> bannerImages = [
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR8F4TyuflGd3x5a7D5vtj3xTo2RSwSDYZtlA&s',
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSM-sYc2p3e7f_J1YRpTk4Z_IfXiSCd1TvY7A&sr',
-      'https://iahbr.tmgrup.com.tr/album/2018/04/22/cumhurbaskani-erdoganin-istegi-uzerine-insaa-edilen-kibledag-camii-ziyaretci-akinina-ugruyor-1524391503895.jpg',
+      'https://blog.obilet.com/wp-content/uploads/2023/06/rize-yemekleri-1.jpg',
+      'https://www.kuzeydogu.net/wp-content/uploads/2018/05/rize-ayder-yaylasi-2.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Pokut_Yaylas%C4%B1.jpg/1280px-Pokut_Yaylas%C4%B1.jpg',
     ];
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.symmetric(vertical: 20.0),
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Text(l10n.welcome, style: theme.textTheme.headlineMedium),
+      // SafeArea yerine CustomScrollView kullanarak daha esnek bir yapı kuruyoruz.
+      body: CustomScrollView(
+        slivers: [
+          // Hoş Geldin Başlığı ve Arama Çubuğu
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 40, 20, 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(l10n.welcome, style: theme.textTheme.headlineMedium),
+                  const SizedBox(height: 24),
+                  TextField(
+                    decoration: InputDecoration(
+                      hintText: l10n.searchHint,
+                      prefixIcon: const Icon(Icons.search),
+                      filled: true,
+                      fillColor: theme.colorScheme.surface,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 24),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: l10n.searchHint,
-                  prefixIcon: const Icon(Icons.search),
-                  filled: true,
-                  fillColor: theme.colorScheme.surface,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none,
+          ),
+          
+          // Slider Banner
+          SliverToBoxAdapter(
+            child: CarouselSlider(
+              options: CarouselOptions(height: 150.0, autoPlay: true, enlargeCenterPage: true),
+              items: bannerImages.map((image) => Container(
+                margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  image: DecorationImage(image: NetworkImage(image), fit: BoxFit.cover),
+                ),
+              )).toList(),
+            ),
+          ),
+
+          // Kategoriler Başlığı ve Listesi
+          SliverToBoxAdapter(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 24),
+                _buildSectionHeader(context, l10n.categories, l10n.seeAll),
+                const SizedBox(height: 16),
+                SizedBox(
+                  height: 100,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.only(left: 20),
+                    itemCount: categories.length,
+                    itemBuilder: (context, index) {
+                      final category = categories[index];
+                      return _CategoryIcon(
+                        icon: category.icon,
+                        label: getTranslatedCategory(category.key),
+                        isActive: selectedIndex == index,
+                        onTap: () => ref.read(selectedCategoryIndexProvider.notifier).state = index,
+                      );
+                    },
                   ),
                 ),
-              ),
+              ],
             ),
-            const SizedBox(height: 20), // Arama alanı ile banner arası boşluk
-
-            // Slider Banner Alanı
-            CarouselSlider(
-              options: CarouselOptions(
-                height: 150.0,
-                autoPlay: true,
-                enlargeCenterPage: true,
-                aspectRatio: 16 / 9,
-                autoPlayCurve: Curves.fastOutSlowIn,
-                enableInfiniteScroll: true,
-                autoPlayAnimationDuration: const Duration(milliseconds: 800),
-                viewportFraction: 0.8,
-              ),
-              items: bannerImages.map((image) {
-                return Builder(
-                  builder: (BuildContext context) {
-                    return Container(
-                      width: MediaQuery.of(context).size.width,
-                      margin: const EdgeInsets.symmetric(horizontal: 5.0),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        image: DecorationImage(
-                          image: NetworkImage(image),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    );
-                  },
-                );
-              }).toList(),
+          ),
+          
+          // Popüler Mekanlar Başlığı
+          SliverToBoxAdapter(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 24),
+                _buildSectionHeader(context, l10n.popularVenues, l10n.seeAll),
+                const SizedBox(height: 16),
+              ],
             ),
+          ),
 
-            const SizedBox(height: 24), // Banner ile kategoriler arası boşluk
-
-            _buildSectionHeader(context, l10n.categories, l10n.seeAll),
-            const SizedBox(height: 16),
-            SizedBox(
-              height: 100,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.only(left: 20),
-                itemCount: categories.length,
-                itemBuilder: (context, index) {
-                  // DÜZELTME: Burada listenin tamamı yerine, o anki index'teki elemanı alıyoruz.
-                  final category = categories[index]; 
-                  return _CategoryIcon(
-                    icon: category.icon,
-                    label: getTranslatedCategory(category.key),
-                    isActive: selectedIndex == index,
-                    onTap: () {
-                      ref.read(selectedCategoryIndexProvider.notifier).state = index;
+          // Popüler Mekanlar Listesi - DİNAMİK
+          SliverToBoxAdapter(
+            child: SizedBox(
+              height: 280,
+              child: mekanlarAsyncValue.when(
+                loading: () => _buildLoadingSkeleton(),
+                error: (err, stack) => Center(child: Text('Hata: $err')),
+                data: (mekanlar) {
+                  return ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.only(left: 20, right: 20),
+                    itemCount: mekanlar.length,
+                    itemBuilder: (context, index) {
+                      final mekan = mekanlar[index];
+                      return MekanKarti(
+                        isim: mekan.isim,
+                        kategori: getTranslatedCategory(mekan.kategori), // Kategoriyi de çeviriyoruz
+                        puan: mekan.ortalamaPuan,
+                        imageUrl: mekan.fotograflar.isNotEmpty 
+                            ? mekan.fotograflar[0] 
+                            : 'https://placehold.co/600x400/EEE/31343C?text=Foto%C4%9Fraf\\nYok',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MekanDetayEkrani(mekanId: mekan.id),
+                            ),
+                          );
+                        },
+                      );
                     },
                   );
                 },
               ),
             ),
-            const SizedBox(height: 24),
-            _buildSectionHeader(context, l10n.popularVenues, l10n.seeAll),
-            const SizedBox(height: 16),
-            SizedBox(
-              height: 280,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.only(right: 20, left: 0),
-                children: [
-                  MekanKarti(
-                    isim: 'Zil Kale',
-                    kategori: getTranslatedCategory('categoryHistorical'),
-                    puan: 4.9,
-                    imageUrl: 'https://karadenizturlari.com.tr/uploads/2021/12/ayder-gezisi.jpg',
-                    onTap: () {
-                    // Kart'a tıklandığında yeni sayfayı açıyoruz
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const MekanDetayEkrani()),
-                    );
-                  },
-                  ),
-                  MekanKarti(
-                    isim: 'Palovit Şelalesi',
-                    kategori: getTranslatedCategory('categoryWaterfalls'),
-                    puan: 5.0,
-                    imageUrl: 'https://karadenizturlari.com.tr/uploads/2021/12/ayder-gezisi.jpg',
-                    onTap: () {
-                    // Kart'a tıklandığında yeni sayfayı açıyoruz
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const MekanDetayEkrani()),
-                    );
-                  },
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -195,6 +199,7 @@ class KesfetEkrani extends ConsumerWidget {
   }
 }
 
+// Kategori ikonu için özel, küçük bir widget
 class _CategoryIcon extends StatelessWidget {
   const _CategoryIcon({
     required this.icon,
@@ -253,4 +258,23 @@ class _CategoryIcon extends StatelessWidget {
       ),
     );
   }
+}
+
+// Yükleniyor durumunda gösterilecek şık bir iskelet görünümü
+Widget _buildLoadingSkeleton() {
+  return ListView.builder(
+    scrollDirection: Axis.horizontal,
+    padding: const EdgeInsets.only(left: 20),
+    itemCount: 3,
+    itemBuilder: (context, index) {
+      return Container(
+        width: 220,
+        margin: const EdgeInsets.only(right: 20),
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.04),
+          borderRadius: BorderRadius.circular(20),
+        ),
+      );
+    },
+  );
 }

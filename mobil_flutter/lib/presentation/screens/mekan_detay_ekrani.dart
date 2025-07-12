@@ -5,7 +5,10 @@ import 'package:mobil_flutter/presentation/widgets/puan_gostergesi.dart';
 import 'package:mobil_flutter/presentation/widgets/yorum_karti.dart';
 
 class MekanDetayEkrani extends StatelessWidget {
-  const MekanDetayEkrani({super.key});
+  final String mekanId;
+  const MekanDetayEkrani(
+  {super.key,
+  required this.mekanId, });
 
   @override
   Widget build(BuildContext context) {
