@@ -18,6 +18,29 @@ router.get('/', async (req, res) => {
     }
 });
 
+// @route   GET api/mekanlar
+// @desc    Tüm mekanları veya kategoriye göre filtrelenmiş mekanları getirir
+// @access  Public
+router.get('/', async (req, res) => {
+    try {
+        const { kategori } = req.query; // URL'den gelen ?kategori=... parametresini al
+
+        const filtre = {}; // Boş bir filtre nesnesi oluştur
+        if (kategori && kategori !== 'categoryAll') {
+            // Eğer bir kategori geldiyse ve bu 'Tümü' değilse, filtreye ekle
+            filtre.kategori = kategori;
+        }
+
+        // Veritabanında filtreye göre arama yap
+        const mekanlar = await Mekan.find(filtre).sort({ eklenmeTarihi: -1 });
+        
+        res.json(mekanlar);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Sunucu Hatası');
+    }
+});
+
 // @route   POST api/mekanlar
 // @desc    Yeni bir mekan oluşturur
 // @access  Private (Şimdilik Public, sonra admin yetkisi ekleyeceğiz)

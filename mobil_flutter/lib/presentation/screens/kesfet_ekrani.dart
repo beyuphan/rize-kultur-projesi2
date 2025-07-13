@@ -29,8 +29,10 @@ class KesfetEkrani extends ConsumerWidget {
     final theme = Theme.of(context);
     final selectedIndex = ref.watch(selectedCategoryIndexProvider);
     
+    final seciliKategoriKey = ref.watch(seciliKategoriProvider);
+
     // Mekanlar provider'ını dinliyoruz.
-    final mekanlarAsyncValue = ref.watch(mekanlarProvider);
+    final mekanlarAsyncValue = ref.watch(filtrelenmisMekanlarProvider(seciliKategoriKey));
 
     final List<Category> categories = [
       Category(key: 'categoryAll', icon: Icons.public),
@@ -121,8 +123,11 @@ class KesfetEkrani extends ConsumerWidget {
                       return _CategoryIcon(
                         icon: category.icon,
                         label: getTranslatedCategory(category.key),
-                        isActive: selectedIndex == index,
-                        onTap: () => ref.read(selectedCategoryIndexProvider.notifier).state = index,
+                        isActive: seciliKategoriKey == category.key,
+                         onTap: () {
+                          // Kategoriye tıklandığında, seciliKategoriProvider'ı güncelle
+                          ref.read(seciliKategoriProvider.notifier).state = category.key;
+                        },
                       );
                     },
                   ),
@@ -150,7 +155,10 @@ class KesfetEkrani extends ConsumerWidget {
               child: mekanlarAsyncValue.when(
                 loading: () => _buildLoadingSkeleton(),
                 error: (err, stack) => Center(child: Text('Hata: $err')),
-                data: (mekanlar) {
+                     data: (mekanlar) {
+                  if (mekanlar.isEmpty) {
+                    return const Center(child: Text('Bu kategoride henüz mekan bulunmuyor.'));
+                  }
                   return ListView.builder(
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.only(left: 20, right: 20),
@@ -159,7 +167,7 @@ class KesfetEkrani extends ConsumerWidget {
                       final mekan = mekanlar[index];
                       return MekanKarti(
                         isim: mekan.isim,
-                        kategori: getTranslatedCategory(mekan.kategori), // Kategoriyi de çeviriyoruz
+                        kategori: getTranslatedCategory(mekan.kategori),
                         puan: mekan.ortalamaPuan,
                         imageUrl: mekan.fotograflar.isNotEmpty 
                             ? mekan.fotograflar[0] 
