@@ -4,19 +4,6 @@ const express = require('express');
 const router = express.Router();
 const Mekan = require('../models/Mekan'); // Daha önce oluşturduğumuz Mekan modelini içeri alıyoruz
 
-// @route   GET api/mekanlar
-// @desc    Tüm mekanları getirir
-// @access  Public (Herkes erişebilir)
-router.get('/', async (req, res) => {
-    try {
-        // Veritabanındaki tüm Mekan'ları bul ve en yeniden eskiye doğru sırala
-        const mekanlar = await Mekan.find().sort({ eklenmeTarihi: -1 });
-        res.json(mekanlar); // Bulunan mekanları JSON formatında cevap olarak gönder
-    } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Sunucu Hatası');
-    }
-});
 
 // @route   GET api/mekanlar
 // @desc    Tüm mekanları veya kategoriye göre filtrelenmiş mekanları getirir
