@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobil_flutter/common/theme/app_themes.dart';
-import 'package:mobil_flutter/presentation/screens/main_navigation_screen.dart';
+// YENİ YÖNLENDİRİCİ WIDGET'INI IMPORT EDİYORUZ
+import 'package:mobil_flutter/presentation/widgets/auth_yonlendirici.dart';
 import 'package:mobil_flutter/l10n/app_localizations.dart';
 
 // UYGULAMANIN GENEL DURUMUNU YÖNETEN PROVIDER'LAR
-// Artık tüm provider'lar, uygulamanın başlangıç noktasında, merkezi bir yerde.
 final themeProvider = StateProvider<AppTheme>((ref) => AppTheme.firtinaYesili);
 final localeProvider = StateProvider<Locale>((ref) => const Locale('tr'));
 
@@ -31,7 +31,7 @@ class RizeKulturProjesi extends ConsumerWidget {
       // Tema ve Dil Konfigürasyonu
       theme: appThemeData[currentTheme],
       locale: currentLocale,
-      
+
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -40,8 +40,9 @@ class RizeKulturProjesi extends ConsumerWidget {
       ],
       supportedLocales: AppLocalizations.supportedLocales,
 
-      // Fırlatma rampasının ateşlediği roket: Ana Navigasyon İskeletimiz
-      home: const MainNavigationScreen(),
+      // DEĞİŞİKLİK: Uygulama artık doğrudan ana ekrana değil,
+      // kullanıcının giriş durumunu kontrol eden AuthYonlendirici'ye gidiyor.
+      home: const AuthYonlendirici(),
     );
   }
 }

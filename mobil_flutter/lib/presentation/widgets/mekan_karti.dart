@@ -48,10 +48,53 @@ class MekanKarti extends StatelessWidget {
                 topRight: Radius.circular(20),
               ),
               child: Image.network(
-                imageUrl,
+                // 1. GÜNCELLEME: URL'nin başındaki/sonundaki boşlukları temizliyoruz.
+                // Bu, veritabanından gelebilecek gizli boşluk hatalarını önler.
+                imageUrl.trim(),
                 height: 140,
                 width: double.infinity,
                 fit: BoxFit.cover,
+                // 2. GÜNCELLEME: Resim yüklenirken bir yüklenme animasyonu gösteriyoruz.
+                // Bu, kullanıcı deneyimini iyileştirir.
+                loadingBuilder:
+                    (
+                      BuildContext context,
+                      Widget child,
+                      ImageChunkEvent? loadingProgress,
+                    ) {
+                      if (loadingProgress == null) return child;
+                      return SizedBox(
+                        height: 140,
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                : null,
+                          ),
+                        ),
+                      );
+                    },
+                // 3. GÜNCELLEME: Hata durumunda ne yapılacağını belirtiyoruz.
+                // Bu, URL geçersizse veya resim yüklenemezse uygulamanın çökmesini engeller.
+                errorBuilder:
+                    (
+                      BuildContext context,
+                      Object error,
+                      StackTrace? stackTrace,
+                    ) {
+                      // Hatanın ne olduğunu konsola yazdırarak sorunu anlamamızı sağlar.
+                      print('MekanKarti Resim Hatası: $error');
+                      // Hata durumunda kullanıcıya kırık bir resim ikonu gösteriyoruz.
+                      return const SizedBox(
+                        height: 140,
+                        child: Icon(
+                          Icons.broken_image_outlined,
+                          color: Colors.grey,
+                          size: 60,
+                        ),
+                      );
+                    },
               ),
             ),
             // Yazı Alanı
@@ -62,25 +105,25 @@ class MekanKarti extends StatelessWidget {
                 children: [
                   Text(
                     isim,
-                    style: theme.textTheme.titleLarge
-                        ?.copyWith(color: theme.colorScheme.onSurface),
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      color: theme.colorScheme.onSurface,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 6),
-                  Text(
-                    kategori,
-                    style: theme.textTheme.labelMedium,
-                  ),
+                  Text(kategori, style: theme.textTheme.labelMedium),
                   const SizedBox(height: 8),
-                  
+
                   // ESKİ PUAN SİSTEMİNİ SİLİP YENİSİNİ KOYUYORUZ
                   Row(
                     children: [
                       PuanGostergesi(puan: puan), // İşte yeni sistemimiz!
                       const SizedBox(width: 8),
                       Text(
-                        puan.toStringAsFixed(1), // 4.8 gibi sayıyı yine de yanında gösterelim
+                        puan.toStringAsFixed(
+                          1,
+                        ), // 4.8 gibi sayıyı yine de yanında gösterelim
                         style: theme.textTheme.bodyMedium,
                       ),
                     ],

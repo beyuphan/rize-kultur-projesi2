@@ -5,8 +5,7 @@ import 'package:mobil_flutter/presentation/widgets/mekan_karti.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:mobil_flutter/presentation/screens/mekan_detay_ekrani.dart';
 // DÜZELTME: Eksik olan provider dosyasını import ediyoruz.
-import 'package:mobil_flutter/presentation/providers/mekan_providers.dart'; 
-
+import 'package:mobil_flutter/presentation/providers/mekan_providers.dart';
 
 // Kategori verilerini tutmak için basit bir model sınıfı
 class Category {
@@ -28,11 +27,13 @@ class KesfetEkrani extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final selectedIndex = ref.watch(selectedCategoryIndexProvider);
-    
+
     final seciliKategoriKey = ref.watch(seciliKategoriProvider);
 
     // Mekanlar provider'ını dinliyoruz.
-    final mekanlarAsyncValue = ref.watch(filtrelenmisMekanlarProvider(seciliKategoriKey));
+    final mekanlarAsyncValue = ref.watch(
+      filtrelenmisMekanlarProvider(seciliKategoriKey),
+    );
 
     final List<Category> categories = [
       Category(key: 'categoryAll', icon: Icons.public),
@@ -44,20 +45,22 @@ class KesfetEkrani extends ConsumerWidget {
 
     String getTranslatedCategory(String key) {
       switch (key) {
-        case 'categoryAll': return l10n.categoryAll;
-        case 'categoryPlateaus': return l10n.categoryPlateaus;
-        case 'categoryWaterfalls': return l10n.categoryWaterfalls;
-        case 'categoryRestaurants': return l10n.categoryRestaurants;
-        case 'categoryHistorical': return l10n.categoryHistorical;
-        default: return key; // Çeviri bulunamazsa anahtarı göster
+        case 'categoryAll':
+          return l10n.categoryAll;
+        case 'categoryPlateaus':
+          return l10n.categoryPlateaus;
+        case 'categoryWaterfalls':
+          return l10n.categoryWaterfalls;
+        case 'categoryRestaurants':
+          return l10n.categoryRestaurants;
+        case 'categoryHistorical':
+          return l10n.categoryHistorical;
+        default:
+          return key; // Çeviri bulunamazsa anahtarı göster
       }
     }
 
-    final List<String> bannerImages = [
-      'https://blog.obilet.com/wp-content/uploads/2023/06/rize-yemekleri-1.jpg',
-      'https://www.kuzeydogu.net/wp-content/uploads/2018/05/rize-ayder-yaylasi-2.jpg',
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Pokut_Yaylas%C4%B1.jpg/1280px-Pokut_Yaylas%C4%B1.jpg',
-    ];
+    final List<String> bannerImages = [];
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -89,18 +92,29 @@ class KesfetEkrani extends ConsumerWidget {
               ),
             ),
           ),
-          
+
           // Slider Banner
           SliverToBoxAdapter(
             child: CarouselSlider(
-              options: CarouselOptions(height: 150.0, autoPlay: true, enlargeCenterPage: true),
-              items: bannerImages.map((image) => Container(
-                margin: const EdgeInsets.symmetric(horizontal: 5.0),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  image: DecorationImage(image: NetworkImage(image), fit: BoxFit.cover),
-                ),
-              )).toList(),
+              options: CarouselOptions(
+                height: 150.0,
+                autoPlay: true,
+                enlargeCenterPage: true,
+              ),
+              items: bannerImages
+                  .map(
+                    (image) => Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        image: DecorationImage(
+                          image: NetworkImage(image),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  )
+                  .toList(),
             ),
           ),
 
@@ -124,9 +138,10 @@ class KesfetEkrani extends ConsumerWidget {
                         icon: category.icon,
                         label: getTranslatedCategory(category.key),
                         isActive: seciliKategoriKey == category.key,
-                         onTap: () {
+                        onTap: () {
                           // Kategoriye tıklandığında, seciliKategoriProvider'ı güncelle
-                          ref.read(seciliKategoriProvider.notifier).state = category.key;
+                          ref.read(seciliKategoriProvider.notifier).state =
+                              category.key;
                         },
                       );
                     },
@@ -135,7 +150,7 @@ class KesfetEkrani extends ConsumerWidget {
               ],
             ),
           ),
-          
+
           // Popüler Mekanlar Başlığı
           SliverToBoxAdapter(
             child: Column(
@@ -155,13 +170,15 @@ class KesfetEkrani extends ConsumerWidget {
               child: mekanlarAsyncValue.when(
                 loading: () => _buildLoadingSkeleton(),
                 error: (err, stack) => Center(child: Text('Hata: $err')),
-                     data: (mekanlar) {
+                data: (mekanlar) {
                   if (mekanlar.isEmpty) {
-                    return const Center(child: Text('Bu kategoride henüz mekan bulunmuyor.'));
+                    return const Center(
+                      child: Text('Bu kategoride henüz mekan bulunmuyor.'),
+                    );
                   }
                   return ListView.builder(
                     scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.only(left: 20, right: 20),
+                    padding: const EdgeInsets.only(left: 0, right: 20),
                     itemCount: mekanlar.length,
                     itemBuilder: (context, index) {
                       final mekan = mekanlar[index];
@@ -169,14 +186,15 @@ class KesfetEkrani extends ConsumerWidget {
                         isim: mekan.isim,
                         kategori: getTranslatedCategory(mekan.kategori),
                         puan: mekan.ortalamaPuan,
-                        imageUrl: mekan.fotograflar.isNotEmpty 
-                            ? mekan.fotograflar[0] 
+                        imageUrl: mekan.fotograflar.isNotEmpty
+                            ? mekan.fotograflar[0]
                             : 'https://placehold.co/600x400/EEE/31343C?text=Foto%C4%9Fraf\\nYok',
                         onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => MekanDetayEkrani(mekanId: mekan.id),
+                              builder: (context) =>
+                                  MekanDetayEkrani(mekanId: mekan.id),
                             ),
                           );
                         },
@@ -192,7 +210,11 @@ class KesfetEkrani extends ConsumerWidget {
     );
   }
 
-  Widget _buildSectionHeader(BuildContext context, String title, String seeAllText) {
+  Widget _buildSectionHeader(
+    BuildContext context,
+    String title,
+    String seeAllText,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Row(
@@ -200,7 +222,12 @@ class KesfetEkrani extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Text(title, style: Theme.of(context).textTheme.titleLarge),
-          Text(seeAllText, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.primary)),
+          Text(
+            seeAllText,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ),
         ],
       ),
     );
@@ -235,19 +262,25 @@ class _CategoryIcon extends StatelessWidget {
               width: 60,
               height: 60,
               decoration: BoxDecoration(
-                color: isActive ? theme.colorScheme.primary : theme.colorScheme.surface,
+                color: isActive
+                    ? theme.colorScheme.primary
+                    : theme.colorScheme.surface,
                 borderRadius: BorderRadius.circular(16),
-                boxShadow: isActive ? [
-                  BoxShadow(
-                    color: theme.colorScheme.primary.withOpacity(0.3),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  )
-                ] : [],
+                boxShadow: isActive
+                    ? [
+                        BoxShadow(
+                          color: theme.colorScheme.primary.withOpacity(0.3),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ]
+                    : [],
               ),
               child: Icon(
                 icon,
-                color: isActive ? theme.colorScheme.onPrimary : theme.colorScheme.primary,
+                color: isActive
+                    ? theme.colorScheme.onPrimary
+                    : theme.colorScheme.primary,
                 size: 30,
               ),
             ),

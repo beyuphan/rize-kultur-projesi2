@@ -6,9 +6,7 @@ import 'package:mobil_flutter/presentation/widgets/yorum_karti.dart';
 
 class MekanDetayEkrani extends StatelessWidget {
   final String mekanId;
-  const MekanDetayEkrani(
-  {super.key,
-  required this.mekanId, });
+  const MekanDetayEkrani({super.key, required this.mekanId});
 
   @override
   Widget build(BuildContext context) {
@@ -19,11 +17,12 @@ class MekanDetayEkrani extends StatelessWidget {
     const mekanIsmi = 'Zil Kale';
     const mekanPuan = 4.8;
     const yorumSayisi = "500+";
-    const mekanAciklama = 'Fırtına Vadisi\'ne hakim bir tepede, muhteşem bir manzaraya sahip, 14. yüzyıldan kalma tarihi bir kale. Rize\'nin en önemli kültürel miraslarından biridir.';
-    
+    const mekanAciklama =
+        'Fırtına Vadisi\'ne hakim bir tepede, muhteşem bir manzaraya sahip, 14. yüzyıldan kalma tarihi bir kale. Rize\'nin en önemli kültürel miraslarından biridir.';
+
     // Örnek fotoğraf listesi
     final List<String> fotograflar = [
-     'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR8F4TyuflGd3x5a7D5vtj3xTo2RSwSDYZtlA&s',
+      'https://res.cloudinary.com/tasit-com/images/c_scale,w_448,h_249,dpr_2/f_webp,q_auto/v1689797829/carvak_blog_wordpress_assest/fransiz-araba/fransiz-araba.jpg?_i=AA',
       'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSM-sYc2p3e7f_J1YRpTk4Z_IfXiSCd1TvY7A&sr',
       'https://iahbr.tmgrup.com.tr/album/2018/04/22/cumhurbaskani-erdoganin-istegi-uzerine-insaa-edilen-kibledag-camii-ziyaretci-akinina-ugruyor-1524391503895.jpg',
     ];
@@ -91,7 +90,7 @@ class MekanDetayEkrani extends StatelessWidget {
               ),
             ),
           ),
-          
+
           // 3. BÖLÜM: FOTOĞRAF GALERİSİ
           SliverToBoxAdapter(
             child: Column(
@@ -100,7 +99,7 @@ class MekanDetayEkrani extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   // TODO: "Fotoğraflar" için l10n anahtarı ekle
-                  child: Text('Fotoğraflar', style: theme.textTheme.titleLarge), 
+                  child: Text('Fotoğraflar', style: theme.textTheme.titleLarge),
                 ),
                 const SizedBox(height: 16),
                 FotografGalerisi(imageUrls: fotograflar),
@@ -118,39 +117,39 @@ class MekanDetayEkrani extends StatelessWidget {
 
           // 5. BÖLÜM: Yorumlar Listesi
           SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (BuildContext context, int index) {
-                final yorumlar = [
-                  {
-                    "isim": "Ali Veli",
-                    "puan": 5.0,
-                    "yorum": "Hayatımda yediğim en güzel mıhlamaydı. Manzarası da cabası. Kesinlikle tavsiye ederim!"
-                  },
-                  {
-                    "isim": "Ayşe Fatma",
-                    "puan": 4.0,
-                    "yorum": "Çok güzel bir yer ama hafta sonu biraz kalabalık olabiliyor. Yine de beklediğimize değdi.",
-                    "foto": "https://randomuser.me/api/portraits/women/44.jpg"
-                  }
-                ];
-                final yorum = yorumlar[index];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: YorumKarti(
-                    kullaniciAdi: yorum["isim"] as String,
-                    puan: yorum["puan"] as double,
-                    yorum: yorum["yorum"] as String,
-                    kullaniciImageUrl: yorum["foto"] as String?,
-                  ),
-                );
-              },
-              childCount: 2,
-            ),
+            delegate: SliverChildBuilderDelegate((
+              BuildContext context,
+              int index,
+            ) {
+              final yorumlar = [
+                {
+                  "isim": "Ali Veli",
+                  "puan": 5.0,
+                  "yorum":
+                      "Hayatımda yediğim en güzel mıhlamaydı. Manzarası da cabası. Kesinlikle tavsiye ederim!",
+                },
+                {
+                  "isim": "Ayşe Fatma",
+                  "puan": 4.0,
+                  "yorum":
+                      "Çok güzel bir yer ama hafta sonu biraz kalabalık olabiliyor. Yine de beklediğimize değdi.",
+                  "foto": "https://randomuser.me/api/portraits/women/44.jpg",
+                },
+              ];
+              final yorum = yorumlar[index];
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: YorumKarti(
+                  kullaniciAdi: yorum["isim"] as String,
+                  puan: yorum["puan"] as double,
+                  yorum: yorum["yorum"] as String,
+                  kullaniciImageUrl: yorum["foto"] as String?,
+                ),
+              );
+            }, childCount: 2),
           ),
-          
-          const SliverToBoxAdapter(
-            child: SizedBox(height: 40),
-          )
+
+          const SliverToBoxAdapter(child: SizedBox(height: 40)),
         ],
       ),
     );
