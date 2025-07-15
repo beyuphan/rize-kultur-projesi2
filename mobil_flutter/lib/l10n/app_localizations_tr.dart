@@ -87,6 +87,15 @@ class AppLocalizationsTr extends AppLocalizations {
   String get getDirections => 'Yol Tarifi Al';
 
   @override
+  String get yourRating => 'Değerlendirmeniz';
+
+  @override
+  String get photos => 'Fotoğraflar';
+
+  @override
+  String get addComment => 'Yorum Ekle';
+
+  @override
   String get reviews => 'Değerlendirmeler';
 
   @override

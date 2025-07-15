@@ -26,6 +26,9 @@
     "categoryHistorical": "Historical",
     "categoryNature": "Nature",
     "getDirections": "Get Directions",
+    "yourRating": "Your Rating",
+    "photos": "Photos",
+    "addComment": "Add Comment",
     "reviews": "Reviews",
     "reviewsCount": "({count} Reviews)",
     "@reviewsCount": {

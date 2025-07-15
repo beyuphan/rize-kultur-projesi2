@@ -26,6 +26,11 @@
     "categoryHistorical": "Tarihi",
     "categoryNature": "Doğa",
     "getDirections": "Yol Tarifi Al",
+    "yourRating": "Değerlendirmeniz",
+    "photos": "Fotoğraflar",
+    "addComment": "Yorum Ekle",
+
+
         "reviews": "Değerlendirmeler",
         "reviewsCount": "({count} Değerlendirme)",
         "@reviewsCount": {
