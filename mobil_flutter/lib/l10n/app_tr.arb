@@ -36,14 +36,19 @@
     "photos": "Fotoğraflar",
     "addComment": "Yorum Ekle",
     "getDirections": "Yol Tarifi Al",
-    "reviews": "Değerlendirmeler",
-    "reviewsCount": "({count} Değerlendirme)",
-    "@reviewsCount": {
-        "description": "Bir mekan için yapılan değerlendirme sayısı",
-        "placeholders": {
-            "count": {
-                "type": "String"
+    "yourRating": "Değerlendirmeniz",
+    "photos": "Fotoğraflar",
+    "addComment": "Yorum Ekle",
+
+
+        "reviews": "Değerlendirmeler",
+        "reviewsCount": "({count} Değerlendirme)",
+        "@reviewsCount": {
+            "description": "Bir mekan için yapılan değerlendirme sayısı",
+            "placeholders": {
+                "count": {
+                    "type": "String"
+                }
             }
         }
-    }
 }

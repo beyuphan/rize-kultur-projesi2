@@ -254,6 +254,24 @@ abstract class AppLocalizations {
   /// **'Get Directions'**
   String get getDirections;
 
+  /// No description provided for @yourRating.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Rating'**
+  String get yourRating;
+
+  /// No description provided for @photos.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos'**
+  String get photos;
+
+  /// No description provided for @addComment.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Comment'**
+  String get addComment;
+
   /// No description provided for @reviews.
   ///
   /// In en, this message translates to:

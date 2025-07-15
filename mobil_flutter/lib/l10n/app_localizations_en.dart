@@ -87,6 +87,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get getDirections => 'Get Directions';
 
   @override
+  String get yourRating => 'Your Rating';
+
+  @override
+  String get photos => 'Photos';
+
+  @override
+  String get addComment => 'Add Comment';
+
+  @override
   String get reviews => 'Reviews';
 
   @override
