@@ -4,8 +4,8 @@ import 'package:mobil_flutter/data/models/mekan_model.dart';
 
 class ApiService {
   // Sunucumuzun ana adresi.
-  final String _baseUrl = 'http://192.168.1.149:3000/api';
-
+  final String _baseUrl = 'https://rize-kultur-api.onrender.com/api';
+  
   // Tüm mekanları getiren fonksiyon
   Future<List<Mekan>> getMekanlar({String kategori = 'categoryAll'}) async {
     // URL'yi başlangıçta ana adres olarak ayarlıyoruz.

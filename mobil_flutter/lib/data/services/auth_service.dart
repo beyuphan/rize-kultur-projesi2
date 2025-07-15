@@ -3,8 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
-  final String _baseUrl = 'http://192.168.1.149:3000/api/auth';
-
+  final String _baseUrl = 'https://rize-kultur-api.onrender.com/api/auth';
 Future<String?> kayitOl(String kullaniciAdi, String email, String sifre) async {
   print('--- KAYIT OLMA İSTEĞİ BAŞLADI ---');
   try {

@@ -1,22 +1,39 @@
-// index.js
-require('dotenv').config(); // .env dosyasını yüklemek için
+// .env dosyasındaki değişkenleri yükler
+require('dotenv').config();
 
-const cors = require('cors');
 const express = require('express');
-const mongoose = require('mongoose'); // mongoose'u dahil et
+const cors = require('cors');
+const mongoose = require('mongoose');
+
+// Rota dosyalarını en başta dahil ediyoruz
+const authRoutes = require('./routes/authRoutes');
+const mekanRoutes = require('./routes/mekanRoutes');
+const yorumRoutes = require('./routes/yorumRoutes');
 
 const app = express();
-const PORT = process.env.PORT || 3000; // Render'ın verdiği portu kullan, yoksa 3000'i kullan
+const PORT = process.env.PORT || 3000;
 
-app.use(cors()); // Gelen tüm isteklere izin ver
-// JSON verilerini okuyabilmek için middleware
+// Middleware'ler
+app.use(cors());
 app.use(express.json());
 
-// Veritabanı bağlantısı
+// Rotaları Doğru Şekilde Kullanma
+// Her rotayı kendi dosyasına doğru bir şekilde yönlendiriyoruz
+app.use('/api/auth', authRoutes);
+app.use('/api/mekanlar', mekanRoutes); // DÜZELTİLDİ: Artık mekanRoutes'e gidiyor
+app.use('/api/yorumlar', yorumRoutes);
+
+// Ana yol için bir GET isteği
+app.get('/', (req, res) => {
+  res.send('Rize Kültür Projesi API Çalışıyor!');
+});
+
+// Veritabanı Bağlantısı ve Sunucuyu Başlatma
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log('MongoDB veritabanına başarıyla bağlanıldı.');
-    // Veritabanı bağlantısı başarılı olursa sunucuyu başlat
+    // Sunucuyu SADECE veritabanı bağlantısı başarılı olursa başlatıyoruz.
+    // Bu, en doğru ve güvenli yöntemdir.
     app.listen(PORT, () => {
       console.log(`API sunucusu http://localhost:${PORT} adresinde başlatıldı`);
     });
@@ -24,21 +41,3 @@ mongoose.connect(process.env.MONGO_URI)
   .catch((err) => {
     console.error('Veritabanı bağlantı hatası:', err);
   });
-
-
-
-
-// Ana yol için bir GET isteği oluşturuyoruz
-app.get('/', (req, res) => {
-  res.send('Rize Kültür Projesi API Çalışıyor ve Veritabanına Bağlı!!');
-});
-
-// Sunucuyu dinlemeye başlıyoruz
-app.listen(PORT, () => {
-  console.log(`API sunucusu http://localhost:${PORT} adresinde başlatıldı`);
-});
-
-// Rotaları Kullan
-app.use('/api/mekanlar', require('./routes/authRoutes'));
-app.use('/api/auth', require('./routes/authRoutes')); 
-app.use('/api/yorumlar', require('./routes/yorumRoutes')); 
