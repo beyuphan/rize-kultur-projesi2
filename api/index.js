@@ -17,8 +17,8 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log('MongoDB veritabanına başarıyla bağlanıldı.');
     // Veritabanı bağlantısı başarılı olursa sunucuyu başlat
-    app.listen(port, () => {
-      console.log(`API sunucusu http://localhost:${port} adresinde başlatıldı`);
+    app.listen(PORT, () => {
+      console.log(`API sunucusu http://localhost:${PORT} adresinde başlatıldı`);
     });
   })
   .catch((err) => {
