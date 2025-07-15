@@ -60,7 +60,9 @@ class KesfetEkrani extends ConsumerWidget {
       }
     }
 
-    final List<String> bannerImages = [];
+    final List<String> bannerImages = ['https://www.tourturka.com/images/blog/medium/wc3nsc/wc3nsc_830.webp',
+    'https://www.ribiad.com/tema/ribiad/uploads/sayfalar/rize.jpg',
+    'https://www.doka.org.tr/dosyalar/page_109/1554895355_1.png'];
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,

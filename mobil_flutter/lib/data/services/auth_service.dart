@@ -3,35 +3,52 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
-  final String _baseUrl = 'http://10.0.2.2:3000/api/auth';
+  final String _baseUrl = 'http://192.168.1.149:3000/api/auth';
 
-  Future<String?> kayitOl(String kullaniciAdi, String email, String sifre) async {
-    try {
-      final response = await http.post(
-        Uri.parse('$_baseUrl/kayit'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(<String, String>{
-          'kullaniciAdi': kullaniciAdi,
-          'email': email,
-          'sifre': sifre,
-        }),
-      );
+Future<String?> kayitOl(String kullaniciAdi, String email, String sifre) async {
+  print('--- KAYIT OLMA İSTEĞİ BAŞLADI ---');
+  try {
+    final url = Uri.parse('$_baseUrl/kayit');
+    final body = jsonEncode(<String, String>{
+      'kullaniciAdi': kullaniciAdi,
+      'email': email,
+      'sifre': sifre,
+    });
 
-      if (response.statusCode == 200) {
-        final body = jsonDecode(response.body);
-        final token = body['token'];
-        await _tokenKaydet(token);
-        return null;
-      } else {
-        final body = jsonDecode(response.body);
-        return body['msg'] ?? 'Bilinmeyen bir hata oluştu.';
-      }
-    } catch (e) {
-      return 'Sunucuya bağlanılamadı: $e';
+    print('İSTEK GÖNDERİLİYOR: $url');
+    print('İSTEK BODY: $body');
+
+    final response = await http.post(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: body,
+    );
+
+    print('CEVAP GELDİ: Status Kodu = ${response.statusCode}');
+    print('CEVAP BODY: ${response.body}');
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      final responseBody = jsonDecode(response.body);
+      final token = responseBody['token'];
+      await _tokenKaydet(token);
+      print('Token başarıyla kaydedildi.');
+      print('--- KAYIT OLMA İSTEĞİ BAŞARIYLA BİTTİ ---');
+      return null; // Başarılı, hata mesajı yok.
+    } else {
+      final responseBody = jsonDecode(response.body);
+      final hataMesaji = responseBody['msg'] ?? 'Bilinmeyen bir sunucu hatası.';
+      print('HATA MESAJI (from server): $hataMesaji');
+      return hataMesaji;
     }
+  } catch (e) {
+    print('!!! HATA YAKALANDI (catch bloğu) !!!');
+    print(e.toString());
+    print('--- KAYIT OLMA İSTEĞİ HATAYLA BİTTİ ---');
+    return 'Sunucuya bağlanılamadı. Lütfen internet bağlantınızı ve sunucunun çalıştığını kontrol edin.';
   }
+}
 
   Future<String?> girisYap(String email, String sifre) async {
     try {

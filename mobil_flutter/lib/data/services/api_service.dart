@@ -4,7 +4,7 @@ import 'package:mobil_flutter/data/models/mekan_model.dart';
 
 class ApiService {
   // Sunucumuzun ana adresi.
-  final String _baseUrl = 'http://192.1.1.111:3000/api';
+  final String _baseUrl = 'http://192.168.1.149:3000/api';
 
   // Tüm mekanları getiren fonksiyon
   Future<List<Mekan>> getMekanlar({String kategori = 'categoryAll'}) async {
@@ -32,5 +32,23 @@ class ApiService {
     }
   }
 
-  // TODO: Tek bir mekanı, yorumları vb. getiren fonksiyonlar buraya eklenecek.
+  Future<Mekan> getMekanDetay(String mekanId) async {
+  final url = '$_baseUrl/mekanlar/$mekanId';
+  print('Mekan detayı isteniyor: $url'); // Debug için
+
+  final response = await http.get(Uri.parse(url));
+
+  if (response.statusCode == 200) {
+    // Gelen cevap tek bir JSON nesnesi olduğu için direkt decode ediyoruz.
+    final Map<String, dynamic> mekanJson = json.decode(
+      utf8.decode(response.bodyBytes),
+    );
+    // JSON'ı Mekan modeline dönüştürüp döndürüyoruz.
+    return Mekan.fromJson(mekanJson);
+  } else {
+    throw Exception(
+      'Mekan detayı yüklenemedi. Hata Kodu: ${response.statusCode}',
+    );
+  }
+}
 }
