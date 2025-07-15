@@ -34,8 +34,8 @@ app.get('/', (req, res) => {
 });
 
 // Sunucuyu dinlemeye başlıyoruz
-app.listen(port, () => {
-  console.log(`API sunucusu http://localhost:${port} adresinde başlatıldı`);
+app.listen(PORT, () => {
+  console.log(`API sunucusu http://localhost:${PORT} adresinde başlatıldı`);
 });
 
 // Rotaları Kullan
