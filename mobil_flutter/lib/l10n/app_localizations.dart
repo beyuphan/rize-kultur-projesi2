@@ -265,6 +265,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'({count} Reviews)'**
   String reviewsCount(String count);
+
+  /// No description provided for @settingsProfileTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My Profile'**
+  String get settingsProfileTitle;
+
+  /// No description provided for @settingsProfileSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'View and edit your account information'**
+  String get settingsProfileSubtitle;
+
+  /// No description provided for @bottomNavExplore.
+  ///
+  /// In en, this message translates to:
+  /// **'Explore'**
+  String get bottomNavExplore;
+
+  /// No description provided for @bottomNavMap.
+  ///
+  /// In en, this message translates to:
+  /// **'Map'**
+  String get bottomNavMap;
+
+  /// No description provided for @bottomNavRoutes.
+  ///
+  /// In en, this message translates to:
+  /// **'Routes'**
+  String get bottomNavRoutes;
+
+  /// No description provided for @bottomNavSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get bottomNavSettings;
+
+  /// No description provided for @bottomNavProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'My Profile'**
+  String get bottomNavProfile;
+
+  /// No description provided for @yourRating.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Rating'**
+  String get yourRating;
+
+  /// No description provided for @photos.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos'**
+  String get photos;
+
+  /// No description provided for @addComment.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Comment'**
+  String get addComment;
 }
 
 class _AppLocalizationsDelegate

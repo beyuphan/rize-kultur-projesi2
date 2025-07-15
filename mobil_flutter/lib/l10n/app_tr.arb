@@ -1,7 +1,14 @@
 {
+    "bottomNavExplore": "Keşfet",
+    "bottomNavMap": "Harita",
+    "bottomNavRoutes": "Rotalar",
+    "bottomNavSettings": "Ayarlar",
+    "bottomNavProfile": "Profilim",
+    "settingsProfileTitle": "Profilim",
+    "settingsProfileSubtitle": "Hesap bilgilerinizi görüntüleyin ve düzenleyin",
     "@@locale": "tr",
     "title": "Rize Kültür Projesi",
-    "welcome": "Rize’ye hoş geldiniz!",
+    "welcome": "Rize'ye hoş geldiniz!",
     "explore": "Keşfet",
     "map": "Harita",
     "routes": "Rotalar",
@@ -25,15 +32,18 @@
     "categoryRestaurants": "Restoranlar",
     "categoryHistorical": "Tarihi",
     "categoryNature": "Doğa",
+    "yourRating": "Değerlendirmeniz",
+    "photos": "Fotoğraflar",
+    "addComment": "Yorum Ekle",
     "getDirections": "Yol Tarifi Al",
-        "reviews": "Değerlendirmeler",
-        "reviewsCount": "({count} Değerlendirme)",
-        "@reviewsCount": {
-            "description": "Bir mekan için yapılan değerlendirme sayısı",
-            "placeholders": {
-                "count": {
-                    "type": "String"
-                }
+    "reviews": "Değerlendirmeler",
+    "reviewsCount": "({count} Değerlendirme)",
+    "@reviewsCount": {
+        "description": "Bir mekan için yapılan değerlendirme sayısı",
+        "placeholders": {
+            "count": {
+                "type": "String"
             }
         }
+    }
 }

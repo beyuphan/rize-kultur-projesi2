@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobil_flutter/common/theme/app_themes.dart';
-// YENİ YÖNLENDİRİCİ WIDGET'INI IMPORT EDİYORUZ
 import 'package:mobil_flutter/presentation/widgets/auth_yonlendirici.dart';
 import 'package:mobil_flutter/l10n/app_localizations.dart';
 
@@ -10,8 +9,10 @@ import 'package:mobil_flutter/l10n/app_localizations.dart';
 final themeProvider = StateProvider<AppTheme>((ref) => AppTheme.firtinaYesili);
 final localeProvider = StateProvider<Locale>((ref) => const Locale('tr'));
 
-void main() {
-  // Uygulamayı, tüm widget'ların provider'lara erişebilmesi için ProviderScope ile sarmalıyoruz.
+// ===== KODUN DOĞRU HALİ =====
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   runApp(const ProviderScope(child: RizeKulturProjesi()));
 }
 
@@ -20,7 +21,6 @@ class RizeKulturProjesi extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Mevcut tema ve dil durumunu dinliyoruz.
     final currentTheme = ref.watch(themeProvider);
     final currentLocale = ref.watch(localeProvider);
 
@@ -28,10 +28,9 @@ class RizeKulturProjesi extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       title: 'Rize Kültür Projesi',
 
-      // Tema ve Dil Konfigürasyonu
+      // SİZİN MEVCUT L10N AYARLARINIZ OLDUĞU GİBİ KORUNUYOR
       theme: appThemeData[currentTheme],
       locale: currentLocale,
-
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -40,8 +39,6 @@ class RizeKulturProjesi extends ConsumerWidget {
       ],
       supportedLocales: AppLocalizations.supportedLocales,
 
-      // DEĞİŞİKLİK: Uygulama artık doğrudan ana ekrana değil,
-      // kullanıcının giriş durumunu kontrol eden AuthYonlendirici'ye gidiyor.
       home: const AuthYonlendirici(),
     );
   }

@@ -12,7 +12,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get title => 'Rize Kültür Projesi';
 
   @override
-  String get welcome => 'Rize’ye hoş geldiniz!';
+  String get welcome => 'Rize\'ye hoş geldiniz!';
 
   @override
   String get explore => 'Keşfet';
@@ -93,4 +93,35 @@ class AppLocalizationsTr extends AppLocalizations {
   String reviewsCount(String count) {
     return '($count Değerlendirme)';
   }
+
+  @override
+  String get settingsProfileTitle => 'Profilim';
+
+  @override
+  String get settingsProfileSubtitle =>
+      'Hesap bilgilerinizi görüntüleyin ve düzenleyin';
+
+  @override
+  String get bottomNavExplore => 'Keşfet';
+
+  @override
+  String get bottomNavMap => 'Harita';
+
+  @override
+  String get bottomNavRoutes => 'Rotalar';
+
+  @override
+  String get bottomNavSettings => 'Ayarlar';
+
+  @override
+  String get bottomNavProfile => 'Profilim';
+
+  @override
+  String get yourRating => 'Değerlendirmeniz';
+
+  @override
+  String get photos => 'Fotoğraflar';
+
+  @override
+  String get addComment => 'Yorum Ekle';
 }

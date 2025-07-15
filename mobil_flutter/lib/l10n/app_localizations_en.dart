@@ -93,4 +93,35 @@ class AppLocalizationsEn extends AppLocalizations {
   String reviewsCount(String count) {
     return '($count Reviews)';
   }
+
+  @override
+  String get settingsProfileTitle => 'My Profile';
+
+  @override
+  String get settingsProfileSubtitle =>
+      'View and edit your account information';
+
+  @override
+  String get bottomNavExplore => 'Explore';
+
+  @override
+  String get bottomNavMap => 'Map';
+
+  @override
+  String get bottomNavRoutes => 'Routes';
+
+  @override
+  String get bottomNavSettings => 'Settings';
+
+  @override
+  String get bottomNavProfile => 'My Profile';
+
+  @override
+  String get yourRating => 'Your Rating';
+
+  @override
+  String get photos => 'Photos';
+
+  @override
+  String get addComment => 'Add Comment';
 }

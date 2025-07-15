@@ -1,54 +1,60 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mobil_flutter/data/models/user_model.dart';
 
 class AuthService {
-  final String _baseUrl = 'http://192.168.1.149:3000/api/auth';
+  final String _baseUrl = 'https://rize-kultur-api.onrender.com/api/auth';
 
-Future<String?> kayitOl(String kullaniciAdi, String email, String sifre) async {
-  print('--- KAYIT OLMA İSTEĞİ BAŞLADI ---');
-  try {
-    final url = Uri.parse('$_baseUrl/kayit');
-    final body = jsonEncode(<String, String>{
-      'kullaniciAdi': kullaniciAdi,
-      'email': email,
-      'sifre': sifre,
-    });
+  Future<String?> kayitOl(
+    String kullaniciAdi,
+    String email,
+    String sifre,
+  ) async {
+    print('--- KAYIT OLMA İSTEĞİ BAŞLADI ---');
+    try {
+      final url = Uri.parse('$_baseUrl/kayit');
+      final body = jsonEncode(<String, String>{
+        'kullaniciAdi': kullaniciAdi,
+        'email': email,
+        'sifre': sifre,
+      });
 
-    print('İSTEK GÖNDERİLİYOR: $url');
-    print('İSTEK BODY: $body');
+      print('İSTEK GÖNDERİLİYOR: $url');
+      print('İSTEK BODY: $body');
 
-    final response = await http.post(
-      url,
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: body,
-    );
+      final response = await http.post(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: body,
+      );
 
-    print('CEVAP GELDİ: Status Kodu = ${response.statusCode}');
-    print('CEVAP BODY: ${response.body}');
+      print('CEVAP GELDİ: Status Kodu = ${response.statusCode}');
+      print('CEVAP BODY: ${response.body}');
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      final responseBody = jsonDecode(response.body);
-      final token = responseBody['token'];
-      await _tokenKaydet(token);
-      print('Token başarıyla kaydedildi.');
-      print('--- KAYIT OLMA İSTEĞİ BAŞARIYLA BİTTİ ---');
-      return null; // Başarılı, hata mesajı yok.
-    } else {
-      final responseBody = jsonDecode(response.body);
-      final hataMesaji = responseBody['msg'] ?? 'Bilinmeyen bir sunucu hatası.';
-      print('HATA MESAJI (from server): $hataMesaji');
-      return hataMesaji;
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final responseBody = jsonDecode(response.body);
+        final token = responseBody['token'];
+        await _tokenKaydet(token);
+        print('Token başarıyla kaydedildi.');
+        print('--- KAYIT OLMA İSTEĞİ BAŞARIYLA BİTTİ ---');
+        return null; // Başarılı, hata mesajı yok.
+      } else {
+        final responseBody = jsonDecode(response.body);
+        final hataMesaji =
+            responseBody['msg'] ?? 'Bilinmeyen bir sunucu hatası.';
+        print('HATA MESAJI (from server): $hataMesaji');
+        return hataMesaji;
+      }
+    } catch (e) {
+      print('!!! HATA YAKALANDI (catch bloğu) !!!');
+      print(e.toString());
+      print('--- KAYIT OLMA İSTEĞİ HATAYLA BİTTİ ---');
+      return 'Sunucuya bağlanılamadı. Lütfen internet bağlantınızı ve sunucunun çalıştığını kontrol edin.';
     }
-  } catch (e) {
-    print('!!! HATA YAKALANDI (catch bloğu) !!!');
-    print(e.toString());
-    print('--- KAYIT OLMA İSTEĞİ HATAYLA BİTTİ ---');
-    return 'Sunucuya bağlanılamadı. Lütfen internet bağlantınızı ve sunucunun çalıştığını kontrol edin.';
   }
-}
 
   Future<String?> girisYap(String email, String sifre) async {
     try {
@@ -57,10 +63,7 @@ Future<String?> kayitOl(String kullaniciAdi, String email, String sifre) async {
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
-        body: jsonEncode(<String, String>{
-          'email': email,
-          'sifre': sifre,
-        }),
+        body: jsonEncode(<String, String>{'email': email, 'sifre': sifre}),
       );
 
       if (response.statusCode == 200) {
@@ -90,5 +93,40 @@ Future<String?> kayitOl(String kullaniciAdi, String email, String sifre) async {
   Future<String?> tokenAl() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('token');
+  }
+
+  Future<UserModel> getMyProfile() async {
+    try {
+      // Cihazda saklanan token'ı al
+      final token = await tokenAl();
+      if (token == null) {
+        throw Exception('Giriş yapılmamış.');
+      }
+
+      // Backend'deki profil endpoint'inize token ile birlikte GET isteği atın
+      // TODO: '/me' veya '/profile' gibi kendi endpoint'inizi buraya yazın
+      final url = Uri.parse('$_baseUrl/me');
+
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token', // Token'ı header'a ekliyoruz
+        },
+      );
+
+      if (response.statusCode == 200) {
+        // Gelen JSON verisinden UserModel oluştur ve döndür
+        final data = jsonDecode(response.body);
+        return UserModel.fromJson(data);
+      } else {
+        // Sunucudan hata geldiyse
+        final body = jsonDecode(response.body);
+        throw Exception('Profil bilgileri alınamadı: ${body['msg']}');
+      }
+    } catch (e) {
+      // Genel bir hata durumunda
+      throw Exception('Profil alınırken bir hata oluştu: $e');
+    }
   }
 }

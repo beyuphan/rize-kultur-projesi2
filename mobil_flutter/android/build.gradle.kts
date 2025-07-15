@@ -1,3 +1,12 @@
+// Dosya Yolu: android/build.gradle.kts
+
+// ===== EKSİK OLAN VE EKLENEN BLOK =====
+plugins {
+    id("com.android.application") version "8.7.3" apply false  // Sürümü düzelttik
+    id("org.jetbrains.kotlin.android") version "2.1.0" apply false
+   
+}
+
 allprojects {
     repositories {
         google()

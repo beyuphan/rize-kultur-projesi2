@@ -35,5 +35,15 @@
                 "type": "String"
             }
         }
-    }
+    },
+    "settingsProfileTitle": "My Profile",
+    "settingsProfileSubtitle": "View and edit your account information",
+    "bottomNavExplore": "Explore",
+    "bottomNavMap": "Map",
+    "bottomNavRoutes": "Routes",
+    "bottomNavSettings": "Settings",
+    "bottomNavProfile": "My Profile",
+    "yourRating": "Your Rating",
+    "photos": "Photos",
+    "addComment":"Add Comment"
 }

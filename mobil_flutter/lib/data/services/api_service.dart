@@ -4,7 +4,7 @@ import 'package:mobil_flutter/data/models/mekan_model.dart';
 
 class ApiService {
   // Sunucumuzun ana adresi.
-  final String _baseUrl = 'http://192.168.1.149:3000/api';
+  final String _baseUrl = 'https://rize-kultur-api.onrender.com/api';
 
   // Tüm mekanları getiren fonksiyon
   Future<List<Mekan>> getMekanlar({String kategori = 'categoryAll'}) async {
@@ -33,22 +33,22 @@ class ApiService {
   }
 
   Future<Mekan> getMekanDetay(String mekanId) async {
-  final url = '$_baseUrl/mekanlar/$mekanId';
-  print('Mekan detayı isteniyor: $url'); // Debug için
+    final url = '$_baseUrl/mekanlar/$mekanId';
+    print('Mekan detayı isteniyor: $url'); // Debug için
 
-  final response = await http.get(Uri.parse(url));
+    final response = await http.get(Uri.parse(url));
 
-  if (response.statusCode == 200) {
-    // Gelen cevap tek bir JSON nesnesi olduğu için direkt decode ediyoruz.
-    final Map<String, dynamic> mekanJson = json.decode(
-      utf8.decode(response.bodyBytes),
-    );
-    // JSON'ı Mekan modeline dönüştürüp döndürüyoruz.
-    return Mekan.fromJson(mekanJson);
-  } else {
-    throw Exception(
-      'Mekan detayı yüklenemedi. Hata Kodu: ${response.statusCode}',
-    );
+    if (response.statusCode == 200) {
+      // Gelen cevap tek bir JSON nesnesi olduğu için direkt decode ediyoruz.
+      final Map<String, dynamic> mekanJson = json.decode(
+        utf8.decode(response.bodyBytes),
+      );
+      // JSON'ı Mekan modeline dönüştürüp döndürüyoruz.
+      return Mekan.fromJson(mekanJson);
+    } else {
+      throw Exception(
+        'Mekan detayı yüklenemedi. Hata Kodu: ${response.statusCode}',
+      );
+    }
   }
-}
 }
