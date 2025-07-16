@@ -4,7 +4,7 @@ import 'package:mobil_flutter/presentation/providers/auth_providers.dart'; // YE
 import 'package:mobil_flutter/presentation/screens/ayarlar_ekrani_misafir.dart';
 import 'package:mobil_flutter/presentation/screens/harita_ekrani.dart';
 import 'package:mobil_flutter/presentation/screens/kesfet_ekrani.dart';
-import 'package:mobil_flutter/presentation/screens/profil_ve_ayarlar_ekrani.dart';
+import 'package:mobil_flutter/presentation/screens/profil_ekrani.dart';
 import 'package:mobil_flutter/presentation/screens/rotalar_ekrani.dart';
 import 'package:mobil_flutter/l10n/app_localizations.dart';
 
@@ -28,7 +28,7 @@ class MainNavigationScreen extends ConsumerWidget {
       const KesfetEkrani(),
       const HaritaEkrani(),
       const RotalarEkrani(),
-      isLoggedIn ? const ProfilVeAyarlarEkrani() : const AyarlarEkraniMisafir(),
+      isLoggedIn ? const ProfilEkrani() : const AyarlarEkraniMisafir(),
     ];
 
     return Scaffold(

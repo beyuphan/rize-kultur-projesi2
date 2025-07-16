@@ -4,6 +4,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const auth = require('../middleware/auth'); // Auth middleware'ini dahil ediyoruz
 const Kullanici = require('../models/Kullanici'); // Kullanici modelimizi dahil ediyoruz
 
 // @route   POST api/auth/kayit
@@ -95,6 +96,53 @@ router.post('/giris', async (req, res) => {
                 res.json({ token }); // Cevap olarak token'ı dön
             }
         );
+
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Sunucu Hatası');
+    }
+});
+
+// @route   GET api/auth/me
+// @desc    Giriş yapmış kullanıcının kendi bilgilerini getirir
+// @access  Private
+router.get('/me', auth, async (req, res) => {
+    try {
+        // auth middleware'i, token'dan aldığı kullanıcı id'sini req.kullanici.id'ye koyar.
+        // Şifre hariç diğer tüm bilgileri seçerek kullanıcıyı buluyoruz.
+        const kullanici = await Kullanici.findById(req.kullanici.id).select('-sifre');
+        if (!kullanici) {
+            return res.status(404).json({ msg: 'Kullanıcı bulunamadı' });
+        }
+        res.json(kullanici);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Sunucu Hatası');
+    }
+});
+
+
+// @route   PUT api/auth/favorites/:mekanId
+// @desc    Bir mekanı kullanıcının favorilerine ekler/çıkarır
+// @access  Private
+router.put('/favorites/:mekanId', auth, async (req, res) => {
+    try {
+        const kullanici = await Kullanici.findById(req.kullanici.id);
+        const mekanId = req.params.mekanId;
+
+        // Kullanıcının favorilerinde bu mekan zaten var mı diye kontrol et
+        const favoriIndex = kullanici.favoriMekanlar.indexOf(mekanId);
+
+        if (favoriIndex > -1) {
+            // Eğer varsa, favorilerden çıkar
+            kullanici.favoriMekanlar.splice(favoriIndex, 1);
+        } else {
+            // Eğer yoksa, favorilere ekle
+            kullanici.favoriMekanlar.push(mekanId);
+        }
+
+        await kullanici.save();
+        res.json(kullanici.favoriMekanlar);
 
     } catch (err) {
         console.error(err.message);

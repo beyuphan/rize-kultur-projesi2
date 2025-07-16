@@ -269,7 +269,7 @@ abstract class AppLocalizations {
   /// No description provided for @addComment.
   ///
   /// In en, this message translates to:
-  /// **'Add Comment'**
+  /// **'Add Comment'**
   String get addComment;
 
   /// No description provided for @reviews.
@@ -325,24 +325,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'My Profile'**
   String get bottomNavProfile;
-
-  /// No description provided for @yourRating.
-  ///
-  /// In en, this message translates to:
-  /// **'Your Rating'**
-  String get yourRating;
-
-  /// No description provided for @photos.
-  ///
-  /// In en, this message translates to:
-  /// **'Photos'**
-  String get photos;
-
-  /// No description provided for @addComment.
-  ///
-  /// In en, this message translates to:
-  /// **'Add Comment'**
-  String get addComment;
 }
 
 class _AppLocalizationsDelegate

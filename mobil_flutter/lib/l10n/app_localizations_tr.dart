@@ -124,13 +124,4 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get bottomNavProfile => 'Profilim';
-
-  @override
-  String get yourRating => 'Değerlendirmeniz';
-
-  @override
-  String get photos => 'Fotoğraflar';
-
-  @override
-  String get addComment => 'Yorum Ekle';
 }
