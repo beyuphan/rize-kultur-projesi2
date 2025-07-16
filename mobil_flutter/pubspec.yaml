@@ -20,6 +20,7 @@ dependencies:
   url_launcher: ^6.3.2
   geolocator: ^14.0.2
   widget_marker_google_maps_flutter: ^1.0.2
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:
