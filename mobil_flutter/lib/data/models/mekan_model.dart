@@ -17,7 +17,7 @@ class Konum {
 }
 
 // 2. Mekan sınıfı (Null kontrolleri ile daha güvenli hale getirildi)
-class Mekan {
+class MekanModel {
   final String id;
   final String isim;
   final String aciklama;
@@ -26,7 +26,7 @@ class Mekan {
   final List<String> fotograflar;
   final double ortalamaPuan;
 
-  Mekan({
+  MekanModel({
     required this.id,
     required this.isim,
     required this.aciklama,
@@ -36,19 +36,22 @@ class Mekan {
     required this.ortalamaPuan,
   });
 
-  factory Mekan.fromJson(Map<String, dynamic> json) {
-    return Mekan(
+  factory MekanModel.fromJson(Map<String, dynamic> json) {
+    return MekanModel(
       // Diğer alanların da null gelme ihtimaline karşı varsayılan değerler atıyoruz.
       id: json['_id'] ?? '',
       isim: json['isim'] ?? 'İsim Yok',
       aciklama: json['aciklama'] ?? 'Açıklama Yok',
       kategori: json['kategori'] ?? 'Kategorisiz',
-      
+
       // EN ÖNEMLİ DÜZELTME: 'konum' objesinin kendisinin null olup olmadığını kontrol ediyoruz.
       konum: json['konum'] != null
           ? Konum.fromJson(json['konum'])
-          : Konum(enlem: 0.0, boylam: 0.0), // Eğer konum null ise, varsayılan bir Konum nesnesi oluştur.
-      
+          : Konum(
+              enlem: 0.0,
+              boylam: 0.0,
+            ), // Eğer konum null ise, varsayılan bir Konum nesnesi oluştur.
+
       fotograflar: List<String>.from(json['fotograflar'] ?? []),
       ortalamaPuan: (json['ortalamaPuan'] ?? 0.0).toDouble(),
     );
