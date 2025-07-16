@@ -150,4 +150,48 @@ router.put('/favorites/:mekanId', auth, async (req, res) => {
     }
 });
 
+
+
+
+// @route   PUT api/auth/update
+// @desc    Giriş yapmış kullanıcının profilini günceller
+// @access  Private
+router.put('/update', auth, async (req, res) => {
+    // 1. Güncellenecek bilgileri isteğin body'sinden al
+    const { kullaniciAdi, email } = req.body;
+
+    // 2. Güncellenecek alanları bir nesnede topla
+    const profilAlanlari = {};
+    if (kullaniciAdi) profilAlanlari.kullaniciAdi = kullaniciAdi;
+    if (email) profilAlanlari.email = email;
+
+    try {
+        // 3. auth middleware'inden gelen ID ile kullanıcıyı bul ve güncelle
+        // { new: true } -> güncellenmiş halini geri döndürmesini sağlar
+        // .select('-sifre') -> güvenlik için şifreyi cevaptan çıkarır
+        const kullanici = await Kullanici.findByIdAndUpdate(
+            req.kullanici.id,
+            { $set: profilAlanlari },
+            { new: true }
+        ).select('-sifre');
+
+        if (!kullanici) {
+            return res.status(404).json({ msg: 'Kullanıcı bulunamadı' });
+        }
+
+        // 4. Başarılı olursa güncellenmiş kullanıcı bilgisini geri dön
+        res.json(kullanici);
+
+    } catch (err) {
+        // Bu email'in veya kullanıcı adının başka bir kullanıcı tarafından
+        // alınıp alınmadığını kontrol edip daha spesifik bir hata dönebiliriz.
+        if (err.code === 11000) {
+             return res.status(400).json({ msg: 'Bu kullanıcı adı veya e-posta zaten kullanımda.' });
+        }
+        console.error(err.message);
+        res.status(500).send('Sunucu Hatası');
+    }
+});
+
+
 module.exports = router;

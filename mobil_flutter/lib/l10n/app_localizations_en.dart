@@ -96,6 +96,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addComment => 'Add Comment';
 
   @override
+  String get favorites => 'Favoriler';
+
+  @override
+  String get logout => 'Logout';
+
+  @override
+  String get editProfile => 'Edit Profile';
+
+  @override
+  String get profileUpdatedSuccessfully => 'Profile Updated Successfully';
+
+  @override
+  String get username => 'Username';
+
+  @override
+  String get usernameCannotBeEmpty => 'Username can not be empty';
+
+  @override
+  String get email => 'E-mail';
+
+  @override
+  String get enterAValidEmail => 'Enter a valid e-mail';
+
+  @override
+  String get saveChanges => 'Save Changes';
+
+  @override
   String get reviews => 'Reviews';
 
   @override

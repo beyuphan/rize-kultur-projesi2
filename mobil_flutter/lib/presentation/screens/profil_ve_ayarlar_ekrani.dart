@@ -1,13 +1,113 @@
+// lib/presentation/screens/profil_ekrani.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobil_flutter/presentation/providers/auth_providers.dart';
+import 'package:mobil_flutter/l10n/app_localizations.dart';
 import 'package:mobil_flutter/main.dart'; // Tema ve dil provider'ları için
 import 'package:mobil_flutter/common/theme/app_themes.dart';
-import 'package:mobil_flutter/l10n/app_localizations.dart';
 
-// Widget'ı StatefulWidget yerine ConsumerWidget yapıyoruz.
-class ProfilVeAyarlarEkrani extends ConsumerWidget {
-  const ProfilVeAyarlarEkrani({super.key});
+// Profil verisini getirmek için yeni bir FutureProvider
+final userProfileProvider = FutureProvider((ref) {
+  // authServiceProvider'ı direkt kullanıyoruz, bu zaten projemizde var.
+  final authService = ref.watch(authServiceProvider);
+  return authService.getMyProfile();
+});
+
+class ProfilEkrani extends ConsumerWidget {
+  const ProfilEkrani({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final userProfileAsync = ref.watch(userProfileProvider);
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
+
+    return Scaffold(
+      backgroundColor: theme.colorScheme.background,
+      body: userProfileAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, stack) => Center(child: Text('Profil yüklenemedi: $err')),
+        data: (kullanici) {
+          return DefaultTabController(
+            length: 2,
+            child: NestedScrollView(
+              headerSliverBuilder: (context, innerBoxIsScrolled) {
+                return [
+                  SliverAppBar(
+                    expandedHeight: 240.0,
+                    floating: false,
+                    pinned: true,
+                    backgroundColor: theme.colorScheme.surface,
+                    flexibleSpace: FlexibleSpaceBar(
+                      centerTitle: true,
+                      titlePadding: const EdgeInsets.only(bottom: 50),
+                      title: Text(
+                        kullanici.kullaniciAdi,
+                        style: TextStyle(color: theme.colorScheme.onSurface, fontWeight: FontWeight.bold),
+                      ),
+                      background: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const CircleAvatar(
+                            radius: 50,
+                            child: Icon(Icons.person, size: 50),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            kullanici.email,
+                            style: theme.textTheme.bodyLarge,
+                          ),
+                        ],
+                      ),
+                    ),
+                    actions: [
+                      IconButton(
+                        icon: const Icon(Icons.settings_outlined),
+                        tooltip: l10n.settings,
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) => const AyarlarEkrani()),
+                          );
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.logout),
+                        tooltip: l10n.logout,
+                        onPressed: () => ref.read(authProvider.notifier).cikisYap(),
+                      ),
+                    ],
+                  ),
+                  SliverPersistentHeader(
+                    delegate: _SliverAppBarDelegate(
+                      TabBar(
+                        tabs: [
+                          Tab(text: l10n.reviews),
+                          Tab(text: l10n.favorites),
+                        ],
+                      ),
+                    ),
+                    pinned: true,
+                  ),
+                ];
+              },
+              body: TabBarView(
+                children: [
+                  const Center(child: Text('Kullanıcının yaptığı yorumlar burada listelenecek.')),
+                  const Center(child: Text('Kullanıcının favori mekanları burada listelenecek.')),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+// AYARLAR EKRANI (ÇALIŞAN KODUNLA ENTEGRE EDİLDİ)
+class AyarlarEkrani extends ConsumerWidget {
+  const AyarlarEkrani({super.key});
 
   // Tema seçimi için diyalog penceresini gösteren fonksiyon
   void _temaSecimiGoster(BuildContext context, WidgetRef ref) {
@@ -73,79 +173,67 @@ class ProfilVeAyarlarEkrani extends ConsumerWidget {
     final mevcutTema = ref.watch(themeProvider);
     final mevcutDil = ref.watch(localeProvider);
 
-    // Sekmeli yapı için DefaultTabController kullanıyoruz
-    return DefaultTabController(
-      length: 3, // 3 adet sekmemiz olacak
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Profilim'),
-          // AppBar'ın altına TabBar'ı ekliyoruz
-          bottom: const TabBar(
-            tabs: [
-              Tab(icon: Icon(Icons.article_outlined), text: "Gönderilerim"),
-              Tab(icon: Icon(Icons.favorite_border), text: "Favorilerim"),
-              Tab(icon: Icon(Icons.settings_outlined), text: "Ayarlar"),
-            ],
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(l10n.settings),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          ListTile(
+            leading: const Icon(Icons.edit_outlined),
+            title: Text(l10n.editProfile),
+            onTap: () {
+              // TODO: Profil düzenleme ekranına yönlendir
+            },
           ),
-          actions: [
-            // Çıkış yap butonu
-            IconButton(
-              icon: const Icon(Icons.logout),
-              tooltip: 'Çıkış Yap',
-              // YENİ: Artık AuthNotifier'daki cikisYap fonksiyonunu çağırıyoruz.
-              onPressed: () => ref.read(authProvider.notifier).cikisYap(),
+          ListTile(
+            leading: const Icon(Icons.palette_outlined),
+            title: Text(l10n.appTheme),
+            subtitle: Text(
+              mevcutTema == AppTheme.firtinaYesili
+                  ? l10n.themeFirtinaYesili
+                  : l10n.themeKackarSisi,
             ),
-          ],
-        ),
-        // TabBarView ile sekmelerin içeriğini belirliyoruz
-        body: TabBarView(
-          children: [
-            // 1. Sekme: Gönderilerim
-            const Center(
-              child: Text('Kullanıcının gönderileri burada listelenecek.'),
+            onTap: () => _temaSecimiGoster(context, ref),
+          ),
+          ListTile(
+            leading: const Icon(Icons.language_outlined),
+            title: Text(l10n.language),
+            subtitle: Text(
+              mevcutDil.languageCode == 'tr'
+                  ? l10n.turkish
+                  : l10n.english,
             ),
-
-            // 2. Sekme: Favorilerim
-            const Center(
-              child: Text('Kullanıcının favori mekanları burada listelenecek.'),
-            ),
-
-            // 3. Sekme: Ayarlar (Fonksiyonel hale getirildi)
-            ListView(
-              padding: const EdgeInsets.all(8.0),
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.palette_outlined),
-                  title: Text(l10n.appTheme),
-                  subtitle: Text(
-                    mevcutTema == AppTheme.firtinaYesili
-                        ? l10n.themeFirtinaYesili
-                        : l10n.themeKackarSisi,
-                  ),
-                  onTap: () => _temaSecimiGoster(context, ref),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.language_outlined),
-                  title: Text(l10n.language),
-                  subtitle: Text(
-                    mevcutDil.languageCode == 'tr'
-                        ? l10n.turkish
-                        : l10n.english,
-                  ),
-                  onTap: () => _dilSecimiGoster(context, ref),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.account_circle_outlined),
-                  title: const Text('Hesap Bilgileri'),
-                  onTap: () {
-                    // TODO: Ayrı bir hesap bilgileri ekranına yönlendirilebilir.
-                  },
-                ),
-              ],
-            ),
-          ],
-        ),
+            onTap: () => _dilSecimiGoster(context, ref),
+          ),
+        ],
       ),
     );
+  }
+}
+
+// TabBar'ı SliverAppBar içinde sabit tutmak için yardımcı bir sınıf (Değişiklik yok)
+class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
+  _SliverAppBarDelegate(this._tabBar);
+
+  final TabBar _tabBar;
+
+  @override
+  double get minExtent => _tabBar.preferredSize.height;
+  @override
+  double get maxExtent => _tabBar.preferredSize.height;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Container(
+      color: Theme.of(context).colorScheme.surface,
+      child: _tabBar,
+    );
+  }
+
+  @override
+  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
+    return false;
   }
 }

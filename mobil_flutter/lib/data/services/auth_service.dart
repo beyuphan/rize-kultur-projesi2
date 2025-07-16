@@ -95,6 +95,46 @@ class AuthService {
     return prefs.getString('token');
   }
 
+
+  Future<UserModel> updateProfile({
+    required String kullaniciAdi,
+    required String email,
+  }) async {
+    try {
+      final token = await tokenAl();
+      if (token == null) {
+        throw Exception('Giriş yapılmamış veya token bulunamadı.');
+      }
+
+      final url = Uri.parse('$_baseUrl/update');
+      final body = jsonEncode(<String, String>{
+        'kullaniciAdi': kullaniciAdi,
+        'email': email,
+      });
+
+      final response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $token',
+        },
+        body: body,
+      );
+
+      final responseBody = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        // Başarılı olursa, güncellenmiş kullanıcı modelini döndür
+        return UserModel.fromJson(responseBody);
+      } else {
+        // Sunucudan hata geldiyse
+        throw Exception('Profil güncellenemedi: ${responseBody['msg']}');
+      }
+    } catch (e) {
+      throw Exception('Profil güncellenirken bir hata oluştu: $e');
+    }
+  }
+  
   Future<UserModel> getMyProfile() async {
     try {
       // Cihazda saklanan token'ı al

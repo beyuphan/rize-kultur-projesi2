@@ -96,6 +96,33 @@ class AppLocalizationsTr extends AppLocalizations {
   String get addComment => 'Yorum Ekle';
 
   @override
+  String get favorites => 'Favoriler';
+
+  @override
+  String get logout => 'Çıkış Yap';
+
+  @override
+  String get editProfile => 'Profili Düzenle';
+
+  @override
+  String get profileUpdatedSuccessfully => 'Profil Düzenleme Başarılı';
+
+  @override
+  String get username => 'Kullanıcı Adı';
+
+  @override
+  String get usernameCannotBeEmpty => 'Username can not be empty';
+
+  @override
+  String get email => 'E-mail';
+
+  @override
+  String get enterAValidEmail => 'Geçerli bir e-mail giriniz.';
+
+  @override
+  String get saveChanges => 'Değişiklikleri Kaydet';
+
+  @override
   String get reviews => 'Değerlendirmeler';
 
   @override

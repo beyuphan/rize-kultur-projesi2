@@ -39,7 +39,15 @@
     "yourRating": "Değerlendirmeniz",
     "photos": "Fotoğraflar",
     "addComment": "Yorum Ekle",
-
+    "favorites": "Favoriler",
+    "logout": "Çıkış Yap",
+    "editProfile": "Profili Düzenle",
+    "profileUpdatedSuccessfully": "Profil Düzenleme Başarılı",
+    "username": "Kullanıcı Adı",
+    "usernameCannotBeEmpty": "Username can not be empty",
+    "email": "E-mail",
+    "enterAValidEmail": "Geçerli bir e-mail giriniz.",
+    "saveChanges": "Değişiklikleri Kaydet",
 
         "reviews": "Değerlendirmeler",
         "reviewsCount": "({count} Değerlendirme)",
