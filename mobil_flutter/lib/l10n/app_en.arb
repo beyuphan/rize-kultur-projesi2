@@ -38,6 +38,10 @@
     "email": "E-mail",
     "enterAValidEmail": "Enter a valid e-mail",
     "saveChanges": "Save Changes",
+    "changePassword": "Change Password",
+    "oldPassword": "Old Password",
+    "newPassword": "New Password",
+
     "reviews": "Reviews",
     "reviewsCount": "({count} Reviews)",
     "@reviewsCount": {

@@ -16,6 +16,14 @@ const KullaniciSchema = new Schema({
         type: String,
         required: true
     },
+
+    
+    // YENİ EKLENDİ
+    profilFotoUrl: {
+        type: String,
+        default: '' // Varsayılan olarak boş bir string
+    },
+    
     // YENİ EKLENDİ: Kullanıcının favori mekanlarının ID'lerini tutacak dizi.
     // 'ref' ile bu ID'lerin 'Mekan' koleksiyonuna ait olduğunu belirtiyoruz.
     favoriMekanlar: [{
@@ -26,6 +34,8 @@ const KullaniciSchema = new Schema({
         type: Date,
         default: Date.now
     }
+
+    
 });
 
 module.exports = mongoose.model('Kullanici', KullaniciSchema);

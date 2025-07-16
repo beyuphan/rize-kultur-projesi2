@@ -48,6 +48,9 @@
     "email": "E-mail",
     "enterAValidEmail": "Geçerli bir e-mail giriniz.",
     "saveChanges": "Değişiklikleri Kaydet",
+     "changePassword": "Şifreyi Değiştir",
+    "oldPassword": "Eski Şifre",
+    "newPassword": "Yeni Şifre",
 
         "reviews": "Değerlendirmeler",
         "reviewsCount": "({count} Değerlendirme)",

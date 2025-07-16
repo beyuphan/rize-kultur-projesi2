@@ -80,7 +80,13 @@ class ProfilEkrani extends ConsumerWidget {
                                 CircleAvatar(
                                   radius: 50,
                                   backgroundColor: theme.colorScheme.primaryContainer,
-                                  child: Icon(Icons.person, size: 50, color: theme.colorScheme.onPrimaryContainer),
+
+                                  backgroundImage: (kullanici.profilFotoUrl != null && kullanici.profilFotoUrl!.isNotEmpty)
+                                      ? NetworkImage(kullanici.profilFotoUrl!)
+                                      : null,
+                                  child: (kullanici.profilFotoUrl == null || kullanici.profilFotoUrl!.isEmpty)
+                                      ? Icon(Icons.person, size: 50, color: theme.colorScheme.onPrimaryContainer)
+                                      : null,
                                 ),
                                 const SizedBox(height: 16),
                                 // YENİ: Kullanıcı adı artık burada, sabit bir şekilde duruyor

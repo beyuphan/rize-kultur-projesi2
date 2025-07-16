@@ -2,6 +2,9 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mobil_flutter/data/models/user_model.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:http_parser/http_parser.dart';
+
 
 class AuthService {
   final String _baseUrl = 'https://rize-kultur-api.onrender.com/api/auth';
@@ -95,46 +98,78 @@ class AuthService {
     return prefs.getString('token');
   }
 
-
   Future<UserModel> updateProfile({
-    required String kullaniciAdi,
-    required String email,
+    String? kullaniciAdi,
+    XFile? profilFoto, // image_picker'dan gelen dosya
   }) async {
-    try {
-      final token = await tokenAl();
-      if (token == null) {
-        throw Exception('Giriş yapılmamış veya token bulunamadı.');
-      }
+    final token = await tokenAl();
+    if (token == null) throw Exception('Token bulunamadı.');
 
-      final url = Uri.parse('$_baseUrl/update');
-      final body = jsonEncode(<String, String>{
-        'kullaniciAdi': kullaniciAdi,
-        'email': email,
-      });
+    final url = Uri.parse('$_baseUrl/profile');
+    var request = http.MultipartRequest('PUT', url);
+    request.headers['Authorization'] = 'Bearer $token';
 
-      final response = await http.put(
-        url,
-        headers: {
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $token',
-        },
-        body: body,
+    // Kullanıcı adı doluysa isteğe ekle
+    if (kullaniciAdi != null && kullaniciAdi.isNotEmpty) {
+      request.fields['kullaniciAdi'] = kullaniciAdi;
+    }
+    
+    // Profil fotoğrafı seçildiyse isteğe ekle
+    if (profilFoto != null) {
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'profilFoto', // Backend'de beklenen alan adı
+          profilFoto.path,
+          contentType: MediaType('image', 'jpeg'), // veya png
+        ),
       );
-
+    }
+    
+    try {
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
       final responseBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
-        // Başarılı olursa, güncellenmiş kullanıcı modelini döndür
         return UserModel.fromJson(responseBody);
       } else {
-        // Sunucudan hata geldiyse
         throw Exception('Profil güncellenemedi: ${responseBody['msg']}');
       }
     } catch (e) {
       throw Exception('Profil güncellenirken bir hata oluştu: $e');
     }
   }
-  
+
+  // YENİ ŞİFRE DEĞİŞTİRME SERVİSİ
+  Future<String> changePassword({
+    required String eskiSifre,
+    required String yeniSifre,
+  }) async {
+    final token = await tokenAl();
+    if (token == null) throw Exception('Token bulunamadı.');
+
+    final url = Uri.parse('$_baseUrl/change-password');
+    final response = await http.put(
+      url,
+      headers: {
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({
+        'eskiSifre': eskiSifre,
+        'yeniSifre': yeniSifre,
+      }),
+    );
+    final responseBody = jsonDecode(response.body);
+    
+    if (response.statusCode == 200) {
+      return responseBody['msg']; // Başarı mesajı
+    } else {
+      throw Exception(responseBody['msg']); // Hata mesajı
+    }
+  }
+
+ 
   Future<UserModel> getMyProfile() async {
     try {
       // Cihazda saklanan token'ı al

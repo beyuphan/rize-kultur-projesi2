@@ -123,6 +123,15 @@ class AppLocalizationsTr extends AppLocalizations {
   String get saveChanges => 'Değişiklikleri Kaydet';
 
   @override
+  String get changePassword => 'Şifreyi Değiştir';
+
+  @override
+  String get oldPassword => 'Eski Şifre';
+
+  @override
+  String get newPassword => 'Yeni Şifre';
+
+  @override
   String get reviews => 'Değerlendirmeler';
 
   @override

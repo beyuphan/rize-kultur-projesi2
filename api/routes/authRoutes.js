@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const auth = require('../middleware/auth'); // Auth middleware'ini dahil ediyoruz
 const Kullanici = require('../models/Kullanici'); // Kullanici modelimizi dahil ediyoruz
+const upload = require('../config/cloudinaryConfig'); // Multer yapılandırmamızı import ediyoruz
 
 // @route   POST api/auth/kayit
 // @desc    Yeni bir kullanıcı kaydı oluşturur
@@ -153,41 +154,79 @@ router.put('/favorites/:mekanId', auth, async (req, res) => {
 
 
 
-// @route   PUT api/auth/update
-// @desc    Giriş yapmış kullanıcının profilini günceller
+// @route   PUT api/auth/profile
+// @desc    Kullanıcı adı ve profil fotoğrafını günceller
 // @access  Private
-router.put('/update', auth, async (req, res) => {
-    // 1. Güncellenecek bilgileri isteğin body'sinden al
-    const { kullaniciAdi, email } = req.body;
+router.put(
+    '/profile', 
+    auth, // Önce kimlik doğrula
+    upload.single('profilFoto'), // Sonra fotoğrafı 'profilFoto' alanından alıp yükle
+    async (req, res) => {
+        const { kullaniciAdi } = req.body;
+        
+        try {
+            const kullanici = await Kullanici.findById(req.kullanici.id);
+            if (!kullanici) {
+                return res.status(404).json({ msg: 'Kullanıcı bulunamadı' });
+            }
 
-    // 2. Güncellenecek alanları bir nesnede topla
-    const profilAlanlari = {};
-    if (kullaniciAdi) profilAlanlari.kullaniciAdi = kullaniciAdi;
-    if (email) profilAlanlari.email = email;
+            // Kullanıcı adını güncelle
+            if (kullaniciAdi) {
+                kullanici.kullaniciAdi = kullaniciAdi;
+            }
 
+            // Eğer yeni bir dosya yüklendiyse (req.file multer tarafından oluşturulur)
+            if (req.file) {
+                // Cloudinary'den gelen güvenli URL'yi ata
+                kullanici.profilFotoUrl = req.file.path;
+            }
+
+            await kullanici.save();
+            
+            // Güncellenmiş kullanıcıyı şifre olmadan geri dön
+            const updatedUser = await Kullanici.findById(req.kullanici.id).select('-sifre');
+            res.json(updatedUser);
+
+        } catch (err) {
+            console.error(err.message);
+            res.status(500).send('Sunucu Hatası');
+        }
+    }
+);
+
+
+// YENİ ŞİFRE DEĞİŞTİRME ROUTE'U
+// @route   PUT api/auth/change-password
+// @desc    Kullanıcının şifresini değiştirir
+// @access  Private
+router.put('/change-password', auth, async (req, res) => {
+    const { eskiSifre, yeniSifre } = req.body;
+
+    // Alanların dolu olduğunu kontrol et
+    if (!eskiSifre || !yeniSifre) {
+        return res.status(400).json({ msg: 'Lütfen tüm alanları doldurun' });
+    }
+    
     try {
-        // 3. auth middleware'inden gelen ID ile kullanıcıyı bul ve güncelle
-        // { new: true } -> güncellenmiş halini geri döndürmesini sağlar
-        // .select('-sifre') -> güvenlik için şifreyi cevaptan çıkarır
-        const kullanici = await Kullanici.findByIdAndUpdate(
-            req.kullanici.id,
-            { $set: profilAlanlari },
-            { new: true }
-        ).select('-sifre');
-
+        const kullanici = await Kullanici.findById(req.kullanici.id);
         if (!kullanici) {
             return res.status(404).json({ msg: 'Kullanıcı bulunamadı' });
         }
 
-        // 4. Başarılı olursa güncellenmiş kullanıcı bilgisini geri dön
-        res.json(kullanici);
+        // 1. Eski şifrenin doğruluğunu kontrol et
+        const isMatch = await bcrypt.compare(eskiSifre, kullanici.sifre);
+        if (!isMatch) {
+            return res.status(400).json({ msg: 'Eski şifreniz yanlış' });
+        }
+
+        // 2. Yeni şifreyi hash'le ve kaydet
+        const salt = await bcrypt.genSalt(10);
+        kullanici.sifre = await bcrypt.hash(yeniSifre, salt);
+        await kullanici.save();
+        
+        res.json({ msg: 'Şifreniz başarıyla güncellendi' });
 
     } catch (err) {
-        // Bu email'in veya kullanıcı adının başka bir kullanıcı tarafından
-        // alınıp alınmadığını kontrol edip daha spesifik bir hata dönebiliriz.
-        if (err.code === 11000) {
-             return res.status(400).json({ msg: 'Bu kullanıcı adı veya e-posta zaten kullanımda.' });
-        }
         console.error(err.message);
         res.status(500).send('Sunucu Hatası');
     }
