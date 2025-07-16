@@ -7,7 +7,9 @@ class ApiService {
   final String _baseUrl = 'https://rize-kultur-api.onrender.com/api';
 
   // Tüm mekanları getiren fonksiyon
-  Future<List<Mekan>> getMekanlar({String kategori = 'categoryAll'}) async {
+  Future<List<MekanModel>> getMekanlar({
+    String kategori = 'categoryAll',
+  }) async {
     // URL'yi başlangıçta ana adres olarak ayarlıyoruz.
     String url = '$_baseUrl/mekanlar';
 
@@ -24,7 +26,7 @@ class ApiService {
         utf8.decode(response.bodyBytes),
       );
       // Her bir JSON objesini Mekan modeline dönüştürüp bir liste yapıyoruz.
-      return mekanlarJson.map((json) => Mekan.fromJson(json)).toList();
+      return mekanlarJson.map((json) => MekanModel.fromJson(json)).toList();
     } else {
       throw Exception(
         'Mekanlar yüklenemedi. Hata Kodu: ${response.statusCode}',
@@ -32,7 +34,7 @@ class ApiService {
     }
   }
 
-  Future<Mekan> getMekanDetay(String mekanId) async {
+  Future<MekanModel> getMekanDetay(String mekanId) async {
     final url = '$_baseUrl/mekanlar/$mekanId';
     print('Mekan detayı isteniyor: $url'); // Debug için
 
@@ -44,7 +46,7 @@ class ApiService {
         utf8.decode(response.bodyBytes),
       );
       // JSON'ı Mekan modeline dönüştürüp döndürüyoruz.
-      return Mekan.fromJson(mekanJson);
+      return MekanModel.fromJson(mekanJson);
     } else {
       throw Exception(
         'Mekan detayı yüklenemedi. Hata Kodu: ${response.statusCode}',

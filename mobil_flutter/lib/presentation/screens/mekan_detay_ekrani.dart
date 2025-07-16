@@ -63,7 +63,10 @@ class _MekanDetayEkraniState extends ConsumerState<MekanDetayEkrani> {
                 right: 0,
                 child: Center(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.black.withOpacity(0.3),
                       borderRadius: BorderRadius.circular(20),
@@ -99,7 +102,7 @@ class _MekanDetayEkraniState extends ConsumerState<MekanDetayEkrani> {
 
 // --- SAYFA 1: ANA DETAY SAYFASI (Doğru Yerleşimle) ---
 class _AnaDetaySayfasi extends ConsumerStatefulWidget {
-  final Mekan mekan;
+  final MekanModel mekan;
   const _AnaDetaySayfasi({required this.mekan});
 
   @override
@@ -189,20 +192,24 @@ class __AnaDetaySayfasiState extends ConsumerState<_AnaDetaySayfasi> {
                     children: [
                       Text(
                         widget.mekan.ortalamaPuan.toStringAsFixed(1),
-                        style: theme.textTheme.displaySmall
-                            ?.copyWith(fontWeight: FontWeight.bold),
+                        style: theme.textTheme.displaySmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          PuanGostergesi(puan: widget.mekan.ortalamaPuan, iconSize: 24),
+                          PuanGostergesi(
+                            puan: widget.mekan.ortalamaPuan,
+                            iconSize: 24,
+                          ),
                           const SizedBox(height: 4),
                           Text(
                             l10n.reviewsCount("500+"),
                             style: theme.textTheme.bodyMedium,
                           ),
                         ],
-                      )
+                      ),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -213,7 +220,10 @@ class __AnaDetaySayfasiState extends ConsumerState<_AnaDetaySayfasi> {
                     child: ElevatedButton.icon(
                       icon: const Icon(Icons.directions_outlined),
                       label: Text(l10n.getDirections),
-                      onPressed: () => _haritayiAc(widget.mekan.konum.enlem, widget.mekan.konum.boylam),
+                      onPressed: () => _haritayiAc(
+                        widget.mekan.konum.enlem,
+                        widget.mekan.konum.boylam,
+                      ),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         textStyle: theme.textTheme.titleMedium,
@@ -230,7 +240,10 @@ class __AnaDetaySayfasiState extends ConsumerState<_AnaDetaySayfasi> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(l10n.yourRating, style: theme.textTheme.titleMedium),
+                        Text(
+                          l10n.yourRating,
+                          style: theme.textTheme.titleMedium,
+                        ),
                         const SizedBox(height: 10),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -286,7 +299,7 @@ class __AnaDetaySayfasiState extends ConsumerState<_AnaDetaySayfasi> {
 
 // --- SAYFA 2: YORUMLAR SAYFASI (Değişiklik yok) ---
 class _YorumlarSayfasi extends StatelessWidget {
-  final Mekan mekan;
+  final MekanModel mekan;
   const _YorumlarSayfasi({required this.mekan});
 
   @override
@@ -315,7 +328,8 @@ class _YorumlarSayfasi extends StatelessWidget {
                   child: YorumKarti(
                     kullaniciAdi: index.isEven ? "Ali Veli" : "Ayşe Fatma",
                     puan: index.isEven ? 5.0 : 4.0,
-                    yorum: "Bu, ${index + 1}. yorum. Mekan gerçekten harika, herkese tavsiye ederim!",
+                    yorum:
+                        "Bu, ${index + 1}. yorum. Mekan gerçekten harika, herkese tavsiye ederim!",
                     kullaniciImageUrl: index.isEven
                         ? null
                         : "https://randomuser.me/api/portraits/women/44.jpg",
@@ -351,9 +365,7 @@ class _YorumYazmaAlani extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const CircleAvatar(
-            child: Icon(Icons.person),
-          ),
+          const CircleAvatar(child: Icon(Icons.person)),
           const SizedBox(width: 12),
           Expanded(
             child: TextField(

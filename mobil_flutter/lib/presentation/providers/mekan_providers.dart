@@ -8,15 +8,18 @@ final apiServiceProvider = Provider<ApiService>((ref) => ApiService());
 // Tüm mekanları getiren ve durumu (yükleniyor, hata, başarılı) yöneten FutureProvider.
 // Arayüzümüz sadece bu provider'ı dinleyecek.
 
-
 final seciliKategoriProvider = StateProvider<String>((ref) => 'categoryAll');
 
-final filtrelenmisMekanlarProvider = FutureProvider.family<List<Mekan>, String>((ref, kategoriKey) async {
-  // API servis provider'ını okuyup, getMekanlar fonksiyonunu kategoriKey ile çağırıyoruz.
-  return ref.read(apiServiceProvider).getMekanlar(kategori: kategoriKey);
-});
+final filtrelenmisMekanlarProvider =
+    FutureProvider.family<List<MekanModel>, String>((ref, kategoriKey) async {
+      // API servis provider'ını okuyup, getMekanlar fonksiyonunu kategoriKey ile çağırıyoruz.
+      return ref.read(apiServiceProvider).getMekanlar(kategori: kategoriKey);
+    });
 
-final mekanDetayProvider = FutureProvider.family<Mekan, String>((ref, mekanId) {
+final mekanDetayProvider = FutureProvider.family<MekanModel, String>((
+  ref,
+  mekanId,
+) {
   // apiServiceProvider'ı okuyup, getMekanDetay fonksiyonunu mekanId ile çağırıyoruz.
   return ref.watch(apiServiceProvider).getMekanDetay(mekanId);
 });
