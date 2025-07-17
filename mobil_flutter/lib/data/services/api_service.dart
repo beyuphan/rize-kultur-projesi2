@@ -5,7 +5,7 @@ import 'package:mobil_flutter/data/models/yorum_model.dart';
 import 'package:mobil_flutter/data/services/auth_service.dart'; // Token almak için AuthService'e ihtiyacımız var
 
 class ApiService {
-  final String _baseUrl = 'https://rize-kultur-api.onrender.com/api';
+  final String _baseUrl = 'http://localhost:3000/api';
   // AuthService'i private bir değişken olarak tutalım.
   // Bu, her seferinde yeni bir instance oluşturmak yerine var olanı kullanmamızı sağlar.
   final AuthService _authService = AuthService();

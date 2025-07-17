@@ -4,21 +4,23 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const MekanSchema = new Schema({
+    // DÜZENLENDİ: Artık birer nesne
     isim: {
-        type: String,
-        required: true // Bu alanın zorunlu olduğunu belirtir
+        tr: { type: String, required: true },
+        en: { type: String, required: true }
     },
+    // DÜZENLENDİ: Artık birer nesne
     aciklama: {
-        type: String,
-        required: true
+        tr: { type: String, required: true },
+        en: { type: String, required: true }
     },
     kategori: {
         type: String,
         required: true
     },
     fotograflar: {
-        type: [String], // Bir String dizisi (birden fazla fotoğraf URL'si olabilir)
-        required: false // Zorunlu değil
+        type: [String],
+        required: false
     },
     konum: {
         enlem: { type: Number, required: true },
@@ -26,12 +28,15 @@ const MekanSchema = new Schema({
     },
     ortalamaPuan: {
         type: Number,
-        default: 0 // Varsayılan değeri 0 olacak
+        default: 0
     },
     eklenmeTarihi: {
         type: Date,
-        default: Date.now // Otomatik olarak eklenme tarihini atar
+        default: Date.now
     }
 });
+
+// İndeks tanımın aynı kalacak, ona dokunma
+MekanSchema.index({ mekan: 1 }); // Bu satır YorumSchema'daydı, burada değil. Karıştırmayalım.
 
 module.exports = mongoose.model('Mekan', MekanSchema);

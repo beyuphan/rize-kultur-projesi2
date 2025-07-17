@@ -173,10 +173,7 @@ class KesfetEkrani extends ConsumerWidget {
                     itemBuilder: (context, index) {
                       final mekan = mekanlar[index];
                       return MekanKarti(
-                        isim:
-                            mekan.isim[langCode] ??
-                            mekan.isim['tr'] ??
-                            l10n.noName, // l10n kullanımı
+                        isim: (langCode == 'tr' ? mekan.isim.tr : mekan.isim.en),
                         kategori: getTranslatedCategory(mekan.kategori),
                         puan: mekan.ortalamaPuan,
                         imageUrl: mekan.fotograflar.isNotEmpty

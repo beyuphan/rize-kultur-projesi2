@@ -155,10 +155,13 @@ class _HaritaEkraniState extends State<HaritaEkrani> {
   }
 
   // Her bir mekan için kart oluşturan widget
-  Widget _buildMekanKarti(MekanModel mekan) {
+   Widget _buildMekanKarti(MekanModel mekan) {
+    // DİL KODUNU ALMAK İÇİN YENİ BİR YÖNTEM KULLANACAĞIZ
+    final dilKodu = Localizations.localeOf(context).languageCode;
+
     return Container(
       width: 120,
-      margin: EdgeInsets.all(8.0),
+      margin: const EdgeInsets.all(8.0),
       child: Card(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -166,14 +169,14 @@ class _HaritaEkraniState extends State<HaritaEkrani> {
             Icon(
               Icons.location_pin,
               color: Theme.of(context).primaryColor,
-            ), // Örnek ikon
-            SizedBox(height: 8),
+            ),
+            const SizedBox(height: 8),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4.0),
               child: Text(
-                mekan.isim[Localizations.localeOf(context).languageCode] ??
-                    mekan.isim['tr'] ??
-                    'İsim Yok',
+                // --- DÜZELTME BURADA ---
+                // Köşeli parantez yerine nokta ile erişim
+                dilKodu == 'tr' ? mekan.isim.tr : mekan.isim.en,
                 textAlign: TextAlign.center,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,

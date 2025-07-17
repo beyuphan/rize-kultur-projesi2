@@ -182,11 +182,7 @@ class __AnaDetaySayfasiState extends ConsumerState<_AnaDetaySayfasi> {
                 ],
               ),
               title: Text(
-                widget.mekan.isim[Localizations.localeOf(
-                      context,
-                    ).languageCode] ??
-                    widget.mekan.isim['tr'] ??
-                    'İsim Yok',
+                  langCode == 'tr' ? widget.mekan.isim.tr : widget.mekan.isim.en,
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -236,10 +232,7 @@ class __AnaDetaySayfasiState extends ConsumerState<_AnaDetaySayfasi> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    widget.mekan.aciklama[langCode] ??
-                        widget.mekan.aciklama['tr'] ??
-                        "açıklama yok",
-                    style: theme.textTheme.bodyLarge,
+                      langCode == 'tr' ? widget.mekan.aciklama.tr : widget.mekan.aciklama.en,
                   ),
                   const SizedBox(height: 24),
                   SizedBox(
