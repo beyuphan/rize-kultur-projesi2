@@ -93,7 +93,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get photos => 'Photos';
 
   @override
-  String get addComment => 'Add Comment';
+  String get addComment => 'Add Comment';
 
   @override
   String get favorites => 'Favoriler';
@@ -135,6 +135,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noCommentsYet => 'No Comments Yet';
 
   @override
+  String get noName => 'No Name';
+
+  @override
+  String get noVenuesFound => 'No Venues Yet';
+
+  @override
   String get reviews => 'Reviews';
 
   @override
@@ -163,10 +169,4 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bottomNavProfile => 'My Profile';
-
-  @override
-  String get noVenuesFound => 'No venues found matching these criteria.';
-
-  @override
-  String get noName => 'No Name';
 }

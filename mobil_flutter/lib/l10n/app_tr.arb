@@ -51,6 +51,9 @@
   "changePassword": "Şifreyi Değiştir",
   "oldPassword": "Eski Şifre",
   "newPassword": "Yeni Şifre",
+  "noName": "İsim Yok",
+   "noVenuesFound": "Değer Bulunamadı.",
+
   "reviews": "Değerlendirmeler",
   "reviewsCount": "({count} Değerlendirme)",
   "@reviewsCount": {

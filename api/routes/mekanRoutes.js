@@ -2,6 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
+const Yorum = require('../models/Yorum'); 
 const Mekan = require('../models/Mekan'); // Daha önce oluşturduğumuz Mekan modelini içeri alıyoruz
 
 
@@ -60,29 +61,33 @@ router.post('/', async (req, res) => {
 // @access  Public
 router.get('/:id', async (req, res) => {
     try {
-        // ID ile mekanı bul ve bu mekana ait tüm yorumları getir.
-        // populate ile referanslı alanları gerçek verilerle dolduruyoruz.
+        // Adres çubuğundan gelen ID'yi kullanarak veritabanında mekanı bul
         const mekan = await Mekan.findById(req.params.id);
-        
-        const yorumlar = await Yorum.find({ mekan: req.params.id })
-            .populate({
-                path: 'yazar', // Yorum modelindeki 'yazar' alanını doldur
-                select: 'kullaniciAdi profilFotoUrl' // Yazardan sadece bu bilgileri al
-            })
-            .sort({ yorumTarihi: -1 });
 
         if (!mekan) {
             return res.status(404).json({ msg: 'Mekan bulunamadı' });
         }
 
-        // Mekan ve yorumları tek bir JSON nesnesinde birleştirip gönder
+        // Bu mekana ait tüm yorumları bul ve yazar bilgilerini ekle
+        const yorumlar = await Yorum.find({ mekan: req.params.id })
+            .populate({
+                path: 'yazar', // Yorum modelindeki 'yazar' alanını doldur
+                select: 'kullaniciAdi profilFotoUrl' // Yazardan sadece bu bilgileri al
+            })
+            .sort({ yorumTarihi: -1 }); // En yeni yorumlar en üstte
+
+        // DÜZELTME: Mekan ve yorumları tek bir JSON nesnesinde birleştirip gönder
         res.json({
             mekan: mekan,
             yorumlar: yorumlar
         });
 
     } catch (err) {
-        // ... mevcut catch bloğu aynı kalabilir ...
+        console.error(err.message);
+        if (err.kind === 'ObjectId') {
+            return res.status(404).json({ msg: 'Mekan bulunamadı' });
+        }
+        res.status(500).send('Sunucu Hatası');
     }
 });
 
