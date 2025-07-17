@@ -1,39 +1,33 @@
+// lib/presentation/screens/kesfet_ekrani.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobil_flutter/l10n/app_localizations.dart';
 import 'package:mobil_flutter/presentation/widgets/mekan_karti.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:mobil_flutter/presentation/screens/mekan_detay_ekrani.dart';
-// DÜZELTME: Eksik olan provider dosyasını import ediyoruz.
 import 'package:mobil_flutter/presentation/providers/mekan_providers.dart';
+import 'package:mobil_flutter/data/models/mekan_model.dart';
 
-// Kategori verilerini tutmak için basit bir model sınıfı
 class Category {
-  final String key; // .arb dosyasındaki anahtar
+  final String key;
   final IconData icon;
 
   Category({required this.key, required this.icon});
 }
 
-// Seçili olan kategorinin index'ini tutacak olan provider
-final selectedCategoryIndexProvider = StateProvider<int>((ref) => 0);
-
-// Ekranımızı ConsumerWidget'a dönüştürüyoruz ki provider'ları dinleyebilsin.
 class KesfetEkrani extends ConsumerWidget {
   const KesfetEkrani({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
+    final locale = Localizations.localeOf(context);
+    final langCode = locale.languageCode;
     final theme = Theme.of(context);
-    final selectedIndex = ref.watch(selectedCategoryIndexProvider);
-
     final seciliKategoriKey = ref.watch(seciliKategoriProvider);
 
-    // Mekanlar provider'ını dinliyoruz.
-    final mekanlarAsyncValue = ref.watch(
-      filtrelenmisMekanlarProvider(seciliKategoriKey),
-    );
+    final mekanlarAsyncValue = ref.watch(nihaiMekanlarProvider(locale));
 
     final List<Category> categories = [
       Category(key: 'categoryAll', icon: Icons.public),
@@ -56,20 +50,20 @@ class KesfetEkrani extends ConsumerWidget {
         case 'categoryHistorical':
           return l10n.categoryHistorical;
         default:
-          return key; // Çeviri bulunamazsa anahtarı göster
+          return key;
       }
     }
 
-    final List<String> bannerImages = ['https://www.tourturka.com/images/blog/medium/wc3nsc/wc3nsc_830.webp',
-    'https://www.ribiad.com/tema/ribiad/uploads/sayfalar/rize.jpg',
-    'https://www.doka.org.tr/dosyalar/page_109/1554895355_1.png'];
+    final List<String> bannerImages = [
+      'https://www.tourturka.com/images/blog/medium/wc3nsc/wc3nsc_830.webp',
+      'https://www.ribiad.com/tema/ribiad/uploads/sayfalar/rize.jpg',
+      'https://www.doka.org.tr/dosyalar/page_109/1554895355_1.png',
+    ];
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      // SafeArea yerine CustomScrollView kullanarak daha esnek bir yapı kuruyoruz.
       body: CustomScrollView(
         slivers: [
-          // Hoş Geldin Başlığı ve Arama Çubuğu
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 40, 20, 20),
@@ -79,6 +73,9 @@ class KesfetEkrani extends ConsumerWidget {
                   Text(l10n.welcome, style: theme.textTheme.headlineMedium),
                   const SizedBox(height: 24),
                   TextField(
+                    onChanged: (sorgu) {
+                      ref.read(aramaSorgusuProvider.notifier).state = sorgu;
+                    },
                     decoration: InputDecoration(
                       hintText: l10n.searchHint,
                       prefixIcon: const Icon(Icons.search),
@@ -94,8 +91,6 @@ class KesfetEkrani extends ConsumerWidget {
               ),
             ),
           ),
-
-          // Slider Banner
           SliverToBoxAdapter(
             child: CarouselSlider(
               options: CarouselOptions(
@@ -119,8 +114,6 @@ class KesfetEkrani extends ConsumerWidget {
                   .toList(),
             ),
           ),
-
-          // Kategoriler Başlığı ve Listesi
           SliverToBoxAdapter(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -141,7 +134,6 @@ class KesfetEkrani extends ConsumerWidget {
                         label: getTranslatedCategory(category.key),
                         isActive: seciliKategoriKey == category.key,
                         onTap: () {
-                          // Kategoriye tıklandığında, seciliKategoriProvider'ı güncelle
                           ref.read(seciliKategoriProvider.notifier).state =
                               category.key;
                         },
@@ -152,8 +144,6 @@ class KesfetEkrani extends ConsumerWidget {
               ],
             ),
           ),
-
-          // Popüler Mekanlar Başlığı
           SliverToBoxAdapter(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -164,28 +154,29 @@ class KesfetEkrani extends ConsumerWidget {
               ],
             ),
           ),
-
-          // Popüler Mekanlar Listesi - DİNAMİK
           SliverToBoxAdapter(
             child: SizedBox(
               height: 280,
               child: mekanlarAsyncValue.when(
                 loading: () => _buildLoadingSkeleton(),
                 error: (err, stack) => Center(child: Text('Hata: $err')),
-                data: (mekanlar) {
+                data: (List<MekanModel> mekanlar) {
                   if (mekanlar.isEmpty) {
-                    return const Center(
-                      child: Text('Bu kategoride henüz mekan bulunmuyor.'),
+                    return Center(
+                      child: Text(l10n.noVenuesFound), // l10n kullanımı
                     );
                   }
                   return ListView.builder(
                     scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.only(left: 0, right: 20),
+                    padding: const EdgeInsets.only(left: 20, right: 20),
                     itemCount: mekanlar.length,
                     itemBuilder: (context, index) {
                       final mekan = mekanlar[index];
                       return MekanKarti(
-                        isim: mekan.isim,
+                        isim:
+                            mekan.isim[langCode] ??
+                            mekan.isim['tr'] ??
+                            l10n.noName, // l10n kullanımı
                         kategori: getTranslatedCategory(mekan.kategori),
                         puan: mekan.ortalamaPuan,
                         imageUrl: mekan.fotograflar.isNotEmpty
@@ -236,7 +227,6 @@ class KesfetEkrani extends ConsumerWidget {
   }
 }
 
-// Kategori ikonu için özel, küçük bir widget
 class _CategoryIcon extends StatelessWidget {
   const _CategoryIcon({
     required this.icon,
@@ -303,7 +293,6 @@ class _CategoryIcon extends StatelessWidget {
   }
 }
 
-// Yükleniyor durumunda gösterilecek şık bir iskelet görünümü
 Widget _buildLoadingSkeleton() {
   return ListView.builder(
     scrollDirection: Axis.horizontal,

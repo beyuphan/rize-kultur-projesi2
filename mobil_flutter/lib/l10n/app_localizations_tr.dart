@@ -132,6 +132,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get newPassword => 'Yeni Şifre';
 
   @override
+  String get noCommentsYet => 'Henüz yorum yok.';
+
+  @override
   String get reviews => 'Değerlendirmeler';
 
   @override
@@ -160,4 +163,10 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get bottomNavProfile => 'Profilim';
+
+  @override
+  String get noVenuesFound => 'Bu kriterlere uygun mekan bulunamadı.';
+
+  @override
+  String get noName => 'İsim Yok';
 }

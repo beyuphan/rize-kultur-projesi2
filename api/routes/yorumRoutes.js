@@ -26,28 +26,40 @@ router.get('/:mekanId', async (req, res) => {
 
 
 // @route   POST api/yorumlar/:mekanId
-// @desc    Bir mekana yeni bir yorum ekler
-// @access  Private (Sadece giriş yapanlar)
+// @desc    Bir mekana yeni bir yorum/puan ekler
+// @access  Private
 router.post('/:mekanId', auth, async (req, res) => {
     try {
-        // Güvenlik görevlimiz sayesinde isteğin içinde kullanıcı ID'si var
-        const kullanici = await Kullanici.findById(req.kullanici.id).select('-sifre');
         const mekan = await Mekan.findById(req.params.mekanId);
-
         if (!mekan) {
             return res.status(404).json({ msg: 'Mekan bulunamadı' });
         }
+        
+        // Önce kullanıcının bu mekana daha önce yorum yapıp yapmadığını kontrol et
+        const mevcutYorum = await Yorum.findOne({ mekan: req.params.mekanId, yazar: req.kullanici.id });
+        if (mevcutYorum) {
+            // Eğer sadece puan veya sadece yorumu güncellemek istiyorsa
+            if (req.body.puan) mevcutYorum.puan = req.body.puan;
+            if (req.body.icerik) mevcutYorum.icerik = req.body.icerik;
+            
+            const guncellenenYorum = await mevcutYorum.save();
+            return res.status(200).json(guncellenenYorum);
+        }
 
+        // Yeni yorum oluştur
         const yeniYorum = new Yorum({
             icerik: req.body.icerik,
             puan: req.body.puan,
-            yazar: req.kullanici.id, // Yorumu yapan kişi
-            mekan: req.params.mekanId // Yorumun yapıldığı mekan
+            yazar: req.kullanici.id,
+            mekan: req.params.mekanId
         });
 
         const yorum = await yeniYorum.save();
 
-        res.status(201).json(yorum);
+        // Yorumu döndürürken yazar bilgilerini de ekle
+        const populatedYorum = await yorum.populate('yazar', ['kullaniciAdi', 'profilFotoUrl']);
+
+        res.status(201).json(populatedYorum);
 
     } catch (err) {
         console.error(err.message);
