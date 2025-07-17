@@ -36,6 +36,9 @@
   "photos": "Fotoğraflar",
   "addComment": "Yorum Ekle",
   "getDirections": "Yol Tarifi Al",
+  "yourRating": "Değerlendirmeniz",
+  "photos": "Fotoğraflar",
+  "addComment": "Yorum Ekle",
   "favorites": "Favoriler",
   "logout": "Çıkış Yap",
   "editProfile": "Profili Düzenle",
@@ -50,8 +53,6 @@
   "newPassword": "Yeni Şifre",
   "reviews": "Değerlendirmeler",
   "reviewsCount": "({count} Değerlendirme)",
-  "noVenuesFound": "Bu kriterlere uygun mekan bulunamadı.",
-  "noName": "İsim Yok",
   "@reviewsCount": {
     "description": "Bir mekan için yapılan değerlendirme sayısı",
     "placeholders": {

@@ -344,6 +344,12 @@ abstract class AppLocalizations {
   /// **'New Password'**
   String get newPassword;
 
+  /// No description provided for @noCommentsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No Comments Yet'**
+  String get noCommentsYet;
+
   /// No description provided for @reviews.
   ///
   /// In en, this message translates to:

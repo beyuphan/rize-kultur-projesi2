@@ -58,6 +58,7 @@
   "bottomNavRoutes": "Routes",
   "bottomNavSettings": "Settings",
   "bottomNavProfile": "My Profile",
-  "noVenuesFound": "No venues found matching these criteria.",
-  "noName": "No Name"
+  "yourRating": "Your Rating",
+  "photos": "Photos",
+  "addComment": "Add Comment"
 }

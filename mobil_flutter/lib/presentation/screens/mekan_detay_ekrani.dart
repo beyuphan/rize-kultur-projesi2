@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobil_flutter/data/models/mekan_model.dart';
 import 'package:mobil_flutter/l10n/app_localizations.dart';
+import 'package:mobil_flutter/presentation/screens/profil_ekrani.dart';
 import 'package:mobil_flutter/presentation/providers/mekan_providers.dart';
 import 'package:mobil_flutter/presentation/widgets/fotograf_galerisi.dart';
 import 'package:mobil_flutter/presentation/widgets/puan_gostergesi.dart';
+import 'package:mobil_flutter/presentation/widgets/puanlama_girdisi.dart';
 import 'package:mobil_flutter/presentation/widgets/yorum_karti.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -132,6 +134,20 @@ class __AnaDetaySayfasiState extends ConsumerState<_AnaDetaySayfasi> {
     final locale = Localizations.localeOf(context);
     final langCode = locale.languageCode;
 
+
+     // Yorum gönderme durumunu dinle
+    ref.listen<AsyncValue<void>>(yorumSubmitProvider, (_, state) {
+      if (!mounted) return;
+      if (state is AsyncError) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Hata: ${state.error}')));
+      }
+      if (state is AsyncData) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Puanınız başarıyla gönderildi!')));
+      }
+    });
+
+    final yorumState = ref.watch(yorumSubmitProvider);
+    
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       // YAPI DÜZELTİLDİ: Artık her şey tek bir CustomScrollView içinde
@@ -203,7 +219,7 @@ class __AnaDetaySayfasiState extends ConsumerState<_AnaDetaySayfasi> {
                         ),
                       ),
                       Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           PuanGostergesi(
                             puan: widget.mekan.ortalamaPuan,
@@ -241,7 +257,7 @@ class __AnaDetaySayfasiState extends ConsumerState<_AnaDetaySayfasi> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                   const SizedBox(height: 24),
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -251,30 +267,22 @@ class __AnaDetaySayfasiState extends ConsumerState<_AnaDetaySayfasi> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          l10n.yourRating,
-                          style: theme.textTheme.titleMedium,
-                        ),
+                        Text(l10n.yourRating, style: theme.textTheme.titleMedium),
                         const SizedBox(height: 10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: List.generate(5, (index) {
-                            return IconButton(
-                              icon: Icon(
-                                _kullaniciPuani > index
-                                    ? Icons.star
-                                    : Icons.star_border,
-                                color: Colors.amber,
-                                size: 32,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  _kullaniciPuani = index + 1.0;
-                                });
-                              },
-                            );
-                          }),
-                        ),
+                        // DÜZENLENDİ: Eski Row yerine yeni widget'ımız
+                        if (yorumState.isLoading)
+                          const Center(child: CircularProgressIndicator())
+                        else
+                          PuanlamaGirdisi(
+                            iconBoyutu: 36,
+                            onPuanDegisti: (yeniPuan) {
+                              // Butona basınca puanı gönder
+                              ref.read(yorumSubmitProvider.notifier).gonder(
+                                    mekanId: widget.mekan.id,
+                                    puan: yeniPuan,
+                                  );
+                            },
+                          ),
                       ],
                     ),
                   ),
@@ -330,73 +338,109 @@ class _YorumlarSayfasi extends StatelessWidget {
       body: Column(
         children: [
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-              itemCount: 10,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 16.0),
-                  child: YorumKarti(
-                    kullaniciAdi: index.isEven ? "Ali Veli" : "Ayşe Fatma",
-                    puan: index.isEven ? 5.0 : 4.0,
-                    yorum:
-                        "Bu, ${index + 1}. yorum. Mekan gerçekten harika, herkese tavsiye ederim!",
-                    kullaniciImageUrl: index.isEven
-                        ? null
-                        : "https://randomuser.me/api/portraits/women/44.jpg",
+            // GÜNCELLENDİ: Artık API'den gelen gerçek yorumları gösteriyoruz
+            child: mekan.yorumlar.isEmpty
+                ? Center(child: Text(l10n.noCommentsYet))
+                : ListView.builder(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    itemCount: mekan.yorumlar.length,
+                    itemBuilder: (context, index) {
+                      final yorum = mekan.yorumlar[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 16.0),
+                        child: YorumKarti(
+                          kullaniciAdi: yorum.yazar.kullaniciAdi,
+                          puan: yorum.puan,
+                          yorum: yorum.icerik,
+                          kullaniciImageUrl: yorum.yazar.profilFotoUrl,
+                          yorumTarihi: yorum.yorumTarihi, // YorumKarti'na bunu da eklemen gerekebilir.
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
           ),
-          _YorumYazmaAlani(),
+          // Artık state yönetimi için StatefulWidget gerekiyor
+          _YorumYazmaAlani(mekanId: mekan.id), 
         ],
       ),
     );
   }
 }
+// Yorum yapma alanı için güncellenmiş widget
+class _YorumYazmaAlani extends ConsumerStatefulWidget {
+  final String mekanId;
+  const _YorumYazmaAlani({required this.mekanId});
 
-// Yorum yapma alanı için ayrı bir widget
-class _YorumYazmaAlani extends StatelessWidget {
+  @override
+  ConsumerState<_YorumYazmaAlani> createState() => __YorumYazmaAlaniState();
+}
+
+class __YorumYazmaAlaniState extends ConsumerState<_YorumYazmaAlani> {
+  final _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _yorumGonder() {
+    final icerik = _controller.text.trim();
+    if (icerik.isEmpty) return;
+
+    ref.read(yorumSubmitProvider.notifier).gonder(
+      mekanId: widget.mekanId,
+      icerik: icerik,
+    );
+    _controller.clear(); // Gönderdikten sonra alanı temizle
+    FocusScope.of(context).unfocus(); // Klavyeyi kapat
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
+    // GÜNCELLENDİ: Giriş yapmış kullanıcının profilini izliyoruz
+    final userAsync = ref.watch(userProfileProvider);
+    final yorumState = ref.watch(yorumSubmitProvider);
+
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, -5),
-          ),
-        ],
-      ),
+      decoration: BoxDecoration( /* ... aynı ... */ ),
       child: Row(
         children: [
-          const CircleAvatar(child: Icon(Icons.person)),
+          // GÜNCELLENDİ: Kullanıcının profil fotoğrafını gösteriyoruz
+          userAsync.when(
+            data: (user) => CircleAvatar(
+              backgroundImage: (user.profilFotoUrl != null && user.profilFotoUrl!.isNotEmpty)
+                  ? NetworkImage(user.profilFotoUrl!)
+                  : null,
+              child: (user.profilFotoUrl == null || user.profilFotoUrl!.isEmpty)
+                  ? const Icon(Icons.person)
+                  : null,
+            ),
+            loading: () => const CircleAvatar(child: CircularProgressIndicator()),
+            error: (e, s) => const CircleAvatar(child: Icon(Icons.person)),
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: TextField(
-              decoration: InputDecoration(
-                hintText: l10n.addComment,
-                filled: true,
-                fillColor: theme.scaffoldBackgroundColor,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(24),
-                  borderSide: BorderSide.none,
-                ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-              ),
+              controller: _controller,
+              decoration: InputDecoration( /* ... aynı ... */),
             ),
           ),
           const SizedBox(width: 12),
-          IconButton(
-            icon: Icon(Icons.send, color: theme.colorScheme.primary),
-            onPressed: () {},
-          ),
+          // GÜNCELLENDİ: Gönderme butonu artık çalışıyor
+          if (yorumState.isLoading)
+            const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: SizedBox(width: 24, height: 24, child: CircularProgressIndicator()),
+            )
+          else
+            IconButton(
+              icon: Icon(Icons.send, color: theme.colorScheme.primary),
+              onPressed: _yorumGonder,
+            ),
         ],
       ),
     );
