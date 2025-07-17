@@ -41,7 +41,7 @@
     "changePassword": "Change Password",
     "oldPassword": "Old Password",
     "newPassword": "New Password",
-
+    "noCommentsYet": "No Comments Yet",
     "reviews": "Reviews",
     "reviewsCount": "({count} Reviews)",
     "@reviewsCount": {

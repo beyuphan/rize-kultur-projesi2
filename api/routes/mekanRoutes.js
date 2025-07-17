@@ -56,28 +56,33 @@ router.post('/', async (req, res) => {
 
 
 // @route   GET api/mekanlar/:id
-// @desc    ID ile tek bir mekanın detayını getirir
+// @desc    ID ile tek bir mekanın detayını ve YORUMLARINI getirir
 // @access  Public
 router.get('/:id', async (req, res) => {
     try {
-        // Adres çubuğundan gelen ID'yi kullanarak veritabanında mekanı bul
+        // ID ile mekanı bul ve bu mekana ait tüm yorumları getir.
+        // populate ile referanslı alanları gerçek verilerle dolduruyoruz.
         const mekan = await Mekan.findById(req.params.id);
+        
+        const yorumlar = await Yorum.find({ mekan: req.params.id })
+            .populate({
+                path: 'yazar', // Yorum modelindeki 'yazar' alanını doldur
+                select: 'kullaniciAdi profilFotoUrl' // Yazardan sadece bu bilgileri al
+            })
+            .sort({ yorumTarihi: -1 });
 
-        // Eğer o ID ile bir mekan bulunamazsa, 404 Not Found hatası dön
         if (!mekan) {
             return res.status(404).json({ msg: 'Mekan bulunamadı' });
         }
 
-        // Mekan bulunduysa, JSON olarak cevap dön
-        res.json(mekan);
+        // Mekan ve yorumları tek bir JSON nesnesinde birleştirip gönder
+        res.json({
+            mekan: mekan,
+            yorumlar: yorumlar
+        });
+
     } catch (err) {
-        console.error(err.message);
-        // Eğer gelen ID formatı geçersizse (örn: çok kısa veya çok uzunsa)
-        // bu da bir "bulunamadı" hatasıdır.
-        if (err.kind === 'ObjectId') {
-            return res.status(404).json({ msg: 'Mekan bulunamadı' });
-        }
-        res.status(500).send('Sunucu Hatası');
+        // ... mevcut catch bloğu aynı kalabilir ...
     }
 });
 

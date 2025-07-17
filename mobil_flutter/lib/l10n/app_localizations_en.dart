@@ -132,6 +132,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newPassword => 'New Password';
 
   @override
+  String get noCommentsYet => 'No Comments Yet';
+
+  @override
   String get reviews => 'Reviews';
 
   @override
