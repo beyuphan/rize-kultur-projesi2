@@ -269,7 +269,7 @@ abstract class AppLocalizations {
   /// No description provided for @addComment.
   ///
   /// In en, this message translates to:
-  /// **'Add Comment'**
+  /// **'Add Comment'**
   String get addComment;
 
   /// No description provided for @favorites.
@@ -397,6 +397,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'My Profile'**
   String get bottomNavProfile;
+
+  /// No description provided for @noVenuesFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No venues found matching these criteria.'**
+  String get noVenuesFound;
+
+  /// No description provided for @noName.
+  ///
+  /// In en, this message translates to:
+  /// **'No Name'**
+  String get noName;
 }
 
 class _AppLocalizationsDelegate

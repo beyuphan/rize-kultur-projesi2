@@ -19,8 +19,8 @@ class Konum {
 // 2. Mekan sınıfı (Null kontrolleri ile daha güvenli hale getirildi)
 class MekanModel {
   final String id;
-  final String isim;
-  final String aciklama;
+  final Map<String, String> isim;
+  final Map<String, String> aciklama;
   final String kategori;
   final Konum konum;
   final List<String> fotograflar;
@@ -40,8 +40,12 @@ class MekanModel {
     return MekanModel(
       // Diğer alanların da null gelme ihtimaline karşı varsayılan değerler atıyoruz.
       id: json['_id'] ?? '',
-      isim: json['isim'] ?? 'İsim Yok',
-      aciklama: json['aciklama'] ?? 'Açıklama Yok',
+      isim: json['isim'] is Map
+          ? Map<String, String>.from(json['isim'])
+          : {'tr': 'İsim Yok', 'en': 'No Name'},
+      aciklama: json['aciklama'] is Map
+          ? Map<String, String>.from(json['aciklama'])
+          : {'tr': 'Açıklama Yok', 'en': 'No Description'},
       kategori: json['kategori'] ?? 'Kategorisiz',
 
       // EN ÖNEMLİ DÜZELTME: 'konum' objesinin kendisinin null olup olmadığını kontrol ediyoruz.

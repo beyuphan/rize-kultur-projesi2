@@ -171,7 +171,9 @@ class _HaritaEkraniState extends State<HaritaEkrani> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4.0),
               child: Text(
-                mekan.isim, // mekan.ad'ı kendi modelinize göre güncelleyin
+                mekan.isim[Localizations.localeOf(context).languageCode] ??
+                    mekan.isim['tr'] ??
+                    'İsim Yok',
                 textAlign: TextAlign.center,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,

@@ -129,6 +129,8 @@ class __AnaDetaySayfasiState extends ConsumerState<_AnaDetaySayfasi> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
+    final locale = Localizations.localeOf(context);
+    final langCode = locale.languageCode;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -164,7 +166,11 @@ class __AnaDetaySayfasiState extends ConsumerState<_AnaDetaySayfasi> {
                 ],
               ),
               title: Text(
-                widget.mekan.isim,
+                widget.mekan.isim[Localizations.localeOf(
+                      context,
+                    ).languageCode] ??
+                    widget.mekan.isim['tr'] ??
+                    'İsim Yok',
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -213,7 +219,12 @@ class __AnaDetaySayfasiState extends ConsumerState<_AnaDetaySayfasi> {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  Text(widget.mekan.aciklama, style: theme.textTheme.bodyLarge),
+                  Text(
+                    widget.mekan.aciklama[langCode] ??
+                        widget.mekan.aciklama['tr'] ??
+                        "açıklama yok",
+                    style: theme.textTheme.bodyLarge,
+                  ),
                   const SizedBox(height: 24),
                   SizedBox(
                     width: double.infinity,
