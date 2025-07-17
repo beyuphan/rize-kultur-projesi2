@@ -19,16 +19,10 @@ class ApiService {
 
     final response = await http.get(Uri.parse(url));
 
-    if (response.statusCode == 200) {
+     if (response.statusCode == 200) {
       final List<dynamic> mekanlarJson = json.decode(utf8.decode(response.bodyBytes));
-      // DİKKAT: Backend'den gelen liste `fromDetailJson` için uygun değil.
-      // Basit liste için MekanModel'e ayrı bir factory eklemek en iyisidir.
-      // Şimdilik fromJson ile devam edelim, detay sayfasında yorumları ayrıca çekeriz.
-      // VEYA getMekanDetay'deki gibi populate edilmiş veri bekleriz.
-      // Şimdilik basit tutalım.
-      // return mekanlarJson.map((json) => MekanModel.fromListJson(json)).toList();
-      throw UnimplementedError("MekanModel'e fromListJson gibi basit bir factory eklenmeli.");
-
+      // DÜZELTME: Artık UnimplementedError yerine yeni factory metodumuzu kullanıyoruz.
+      return mekanlarJson.map((json) => MekanModel.fromListJson(json)).toList();
     } else {
       throw Exception('Mekanlar yüklenemedi. Hata Kodu: ${response.statusCode}');
     }
