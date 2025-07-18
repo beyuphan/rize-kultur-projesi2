@@ -141,6 +141,12 @@ class AppLocalizationsTr extends AppLocalizations {
   String get noVenuesFound => 'Değer Bulunamadı.';
 
   @override
+  String get yourComment => 'Yorumunuz';
+
+  @override
+  String get edit => 'Düzenle';
+
+  @override
   String get reviews => 'Değerlendirmeler';
 
   @override

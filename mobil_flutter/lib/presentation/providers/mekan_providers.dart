@@ -11,6 +11,9 @@ import 'package:flutter/material.dart';
 // İSİM DEĞİŞİKLİĞİ: Provider'ın adını da servisle uyumlu hale getiriyoruz.
 final mekanServiceProvider = Provider<ApiService>((ref) => ApiService());
 
+
+final mesafeCapiProvider = StateProvider<double>((ref) => 5000.0);
+
 // --- YORUM/PUAN GÖNDERME İÇİN YENİ PROVIDER ---
 // YENİ EKLENDİ: Yorum/Puan gönderme işleminin durumunu (yükleniyor, başarılı, hata) yönetmek için.
 final yorumSubmitProvider =

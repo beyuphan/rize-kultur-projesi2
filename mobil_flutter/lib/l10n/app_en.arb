@@ -44,6 +44,9 @@
     "noCommentsYet": "No Comments Yet",
     "noName": "No Name",
     "noVenuesFound": "No Venues Yet",
+    "yourComment": "Your Comment",
+    "edit": "Edit",
+
 
     "reviews": "Reviews",
     "reviewsCount": "({count} Reviews)",

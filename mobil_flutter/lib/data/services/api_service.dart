@@ -5,7 +5,7 @@ import 'package:mobil_flutter/data/models/yorum_model.dart';
 import 'package:mobil_flutter/data/services/auth_service.dart'; // Token almak için AuthService'e ihtiyacımız var
 
 class ApiService {
-  final String _baseUrl = 'http://localhost:3000/api';
+  final String _baseUrl = 'https://rize-kultur-api.onrender.com/api';
   // AuthService'i private bir değişken olarak tutalım.
   // Bu, her seferinde yeni bir instance oluşturmak yerine var olanı kullanmamızı sağlar.
   final AuthService _authService = AuthService();
@@ -106,6 +106,24 @@ class ApiService {
       return YorumModel.fromJson(responseBody);
     } else {
       throw Exception(responseBody['msg'] ?? 'Yorum gönderilemedi');
+    }
+  }
+
+
+
+  Future<List<MekanModel>> getYakindakiMekanlar({
+    required double enlem,
+    required double boylam,
+        double mesafe = 500000, // Varsayılan olarak geniş bir alan
+  }) async {
+    final url = '$_baseUrl/mekanlar/yakinimdakiler?enlem=$enlem&boylam=$boylam&mesafe=${mesafe.toInt()}';    
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final List<dynamic> mekanlarJson = json.decode(utf8.decode(response.bodyBytes));
+      return mekanlarJson.map((json) => MekanModel.fromListJson(json)).toList();
+    } else {
+      throw Exception('Yakındaki mekanlar yüklenemedi.');
     }
   }
 }

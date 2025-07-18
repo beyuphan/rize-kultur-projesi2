@@ -53,6 +53,8 @@
   "newPassword": "Yeni Şifre",
   "noName": "İsim Yok",
    "noVenuesFound": "Değer Bulunamadı.",
+    "yourComment": "Yorumunuz",
+    "edit": "Düzenle",
 
   "reviews": "Değerlendirmeler",
   "reviewsCount": "({count} Değerlendirme)",

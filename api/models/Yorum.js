@@ -86,6 +86,6 @@ YorumSchema.post('findOneAndDelete', async function(doc) {
         await doc.constructor.hesaplaOrtalamaPuan(doc.mekan);
     }
 });
-
+YorumSchema.index({ mekan: 1 });
 
 module.exports = mongoose.model('Yorum', YorumSchema);

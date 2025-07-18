@@ -168,7 +168,7 @@ class KesfetEkrani extends ConsumerWidget {
                   }
                   return ListView.builder(
                     scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.only(left: 20, right: 20),
+                    padding: const EdgeInsets.only(left: 0, right: 20),
                     itemCount: mekanlar.length,
                     itemBuilder: (context, index) {
                       final mekan = mekanlar[index];

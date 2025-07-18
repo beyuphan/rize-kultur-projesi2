@@ -141,6 +141,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noVenuesFound => 'No Venues Yet';
 
   @override
+  String get yourComment => 'Your Comment';
+
+  @override
+  String get edit => 'Edit';
+
+  @override
   String get reviews => 'Reviews';
 
   @override

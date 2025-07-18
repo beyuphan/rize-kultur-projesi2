@@ -7,7 +7,7 @@ import 'package:http_parser/http_parser.dart';
 
 
 class AuthService {
-  final String _baseUrl = 'http://localhost:3000/api/auth';
+  final String _baseUrl = 'https://rize-kultur-api.onrender.com/api/auth';
 
   Future<String?> kayitOl(
     String kullaniciAdi,
