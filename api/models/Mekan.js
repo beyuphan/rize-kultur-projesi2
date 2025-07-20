@@ -70,5 +70,4 @@ MekanSchema.index({ 'konum': '2dsphere' });
 
 module.exports = mongoose.model('Mekan', MekanSchema);
 
-// İndeks tanımın aynı kalacak, ona dokunma
 
