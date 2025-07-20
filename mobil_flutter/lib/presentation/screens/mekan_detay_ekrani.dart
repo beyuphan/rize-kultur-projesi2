@@ -4,14 +4,13 @@ import 'package:mobil_flutter/data/models/mekan_model.dart';
 import 'package:mobil_flutter/data/models/yorum_model.dart';
 import 'package:mobil_flutter/l10n/app_localizations.dart';
 import 'package:mobil_flutter/presentation/providers/mekan_providers.dart';
-// --- İŞTE DOĞRU IMPORT ---
-import 'package:mobil_flutter/presentation/screens/profil_ekrani.dart'; 
-// -------------------------
 import 'package:mobil_flutter/presentation/widgets/fotograf_galerisi.dart';
 import 'package:mobil_flutter/presentation/widgets/puan_gostergesi.dart';
 import 'package:mobil_flutter/presentation/widgets/puanlama_girdisi.dart';
 import 'package:mobil_flutter/presentation/widgets/yorum_karti.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:mobil_flutter/presentation/providers/user_providers.dart';
+
 
 //--- ANA WIDGET: SAYFA GEÇİŞİNİ YÖNETİR ---
 class MekanDetayEkrani extends ConsumerStatefulWidget {
@@ -55,7 +54,7 @@ class _MekanDetayEkraniState extends ConsumerState<MekanDetayEkrani> {
         error: (err, stack) => Center(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Text('Mekan yüklenemedi: $err\n$stack'),
+            child: SingleChildScrollView(child: Text('Mekan yüklenemedi: $err')),
           ),
         ),
         data: (mekan) {
@@ -106,7 +105,7 @@ class _MekanDetayEkraniState extends ConsumerState<MekanDetayEkrani> {
   }
 }
 
-//--- SAYFA 1: ANA DETAY ---
+//--- SAYFA 1: ANA DETAY (SON TASARIM) ---
 class _AnaDetaySayfasi extends ConsumerStatefulWidget {
   final MekanModel mekan;
   const _AnaDetaySayfasi({required this.mekan});
@@ -121,8 +120,6 @@ class __AnaDetaySayfasiState extends ConsumerState<_AnaDetaySayfasi> {
     try {
       if (await canLaunchUrl(mapsUri)) {
         await launchUrl(mapsUri);
-      } else {
-        throw 'Harita uygulaması bulunamadı.';
       }
     } catch (e) {
       debugPrint('Harita açılamadı: $e');
@@ -137,6 +134,7 @@ class __AnaDetaySayfasiState extends ConsumerState<_AnaDetaySayfasi> {
 
     final userAsync = ref.watch(userProfileProvider);
     final userId = userAsync.value?.id;
+    final user = userAsync.value;
 
     final eslesenYorumlar = widget.mekan.yorumlar.where((yorum) => yorum.yazar.id == userId);
     final YorumModel? kullaniciYorumu = eslesenYorumlar.isNotEmpty ? eslesenYorumlar.first : null;
@@ -145,7 +143,7 @@ class __AnaDetaySayfasiState extends ConsumerState<_AnaDetaySayfasi> {
     ref.listen<AsyncValue<void>>(yorumSubmitProvider, (_, state) {
       if (!mounted) return;
       if (state is AsyncError) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Hata: ${state.error}')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Hata: ${state.error.toString()}')));
       } else if (state is AsyncData && !state.isLoading) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Değerlendirmeniz başarıyla gönderildi!')));
       }
@@ -187,20 +185,28 @@ class __AnaDetaySayfasiState extends ConsumerState<_AnaDetaySayfasi> {
               ),
               title: Text(
                 langCode == 'tr' ? widget.mekan.isim.tr : widget.mekan.isim.en,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  shadows: [Shadow(blurRadius: 2.0)],
-                ),
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, shadows: [Shadow(blurRadius: 2.0)]),
               ),
               titlePadding: const EdgeInsets.only(left: 50, bottom: 16),
             ),
             actions: [
-              IconButton(
-                icon: const Icon(Icons.favorite_border),
-                onPressed: () {},
-              ),
-            ],
+              if (user != null)
+              Consumer(builder: (context, ref, child) {
+                // Favori durumunu anlık olarak kontrol et
+                final isFavorited = user.favoriMekanlar.contains(widget.mekan.id);
+                
+                return IconButton(
+                  icon: Icon(
+                    isFavorited ? Icons.favorite : Icons.favorite_border,
+                    color: isFavorited ? Colors.redAccent : Colors.white,
+                  ),
+                  onPressed: () {
+                    // Butona basıldığında Notifier'daki metodu çağır
+                    ref.read(userProfileProvider.notifier).toggleFavorite(widget.mekan.id);
+                  },
+                );
+              }),
+                    ],
           ),
           SliverToBoxAdapter(
             child: Padding(
@@ -208,27 +214,60 @@ class __AnaDetaySayfasiState extends ConsumerState<_AnaDetaySayfasi> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        widget.mekan.ortalamaPuan.toStringAsFixed(1),
-                        style: theme.textTheme.displaySmall?.copyWith(fontWeight: FontWeight.bold),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Row(
+                          children: [
+                            Text(
+"ortalaama puan",
+                              style: theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                            ),
+                            const SizedBox(width: 8),
+                            PuanGostergesi(puan: widget.mekan.ortalamaPuan, iconSize: 22),
+                            const SizedBox(width: 8),
+                            Text(
+                              '${widget.mekan.ortalamaPuan.toStringAsFixed(1)} (${widget.mekan.yorumlar.length})',
+                              style: theme.textTheme.bodySmall,
+                            ),
+                          ],
+                        ),
                       ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          PuanGostergesi(puan: widget.mekan.ortalamaPuan, iconSize: 24),
-                          const SizedBox(height: 4),
-                          Text(
-                            l10n.reviewsCount(widget.mekan.yorumlar.length.toString()),
-                            style: theme.textTheme.bodyMedium,
+                      if (userId != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                l10n.yourRating,
+                                style: theme.textTheme.titleSmall,
+                              ),
+                              if (yorumState.isLoading)
+                                const Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 12.0),
+                                  child: SizedBox(height: 24, width: 24, child: CircularProgressIndicator(strokeWidth: 2)),
+                                )
+                              else
+                                PuanlamaGirdisi(
+                                  baslangicPuani: mevcutKullaniciPuani,
+                                  iconBoyutu: 36,
+                                  onPuanDegisti: (yeniPuan) {
+                                    ref.read(yorumSubmitProvider.notifier).gonder(
+                                      mekanId: widget.mekan.id,
+                                      puan: yeniPuan,
+                                    );
+                                  },
+                                ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
                     ],
                   ),
+                  const SizedBox(height: 16),
+                  Divider(),
                   const SizedBox(height: 16),
                   Text(
                     langCode == 'tr' ? widget.mekan.aciklama.tr : widget.mekan.aciklama.en,
@@ -241,38 +280,7 @@ class __AnaDetaySayfasiState extends ConsumerState<_AnaDetaySayfasi> {
                       icon: const Icon(Icons.directions_outlined),
                       label: Text(l10n.getDirections),
                       onPressed: () => _haritayiAc(widget.mekan.konum.enlem, widget.mekan.konum.boylam),
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        textStyle: theme.textTheme.titleMedium,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.surface,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(l10n.yourRating, style: theme.textTheme.titleMedium),
-                        const SizedBox(height: 10),
-                        if (yorumState.isLoading)
-                          const Center(child: CircularProgressIndicator())
-                        else
-                          PuanlamaGirdisi(
-                            baslangicPuani: mevcutKullaniciPuani,
-                            iconBoyutu: 36,
-                            onPuanDegisti: (yeniPuan) {
-                              ref.read(yorumSubmitProvider.notifier).gonder(
-                                    mekanId: widget.mekan.id,
-                                    puan: yeniPuan,
-                                  );
-                            },
-                          ),
-                      ],
+                      style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16), textStyle: theme.textTheme.titleMedium),
                     ),
                   ),
                 ],
@@ -283,7 +291,7 @@ class __AnaDetaySayfasiState extends ConsumerState<_AnaDetaySayfasi> {
             _buildSectionHeader(theme, l10n.photos),
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.only(bottom: 20.0),
+                padding: const EdgeInsets.only(bottom: 100.0),
                 child: FotografGalerisi(imageUrls: widget.mekan.fotograflar),
               ),
             ),
@@ -302,8 +310,9 @@ class __AnaDetaySayfasiState extends ConsumerState<_AnaDetaySayfasi> {
     );
   }
 }
-//--- SAYFA 2: YORUMLAR (DÜZENLEME MANTIĞIYLA YENİDEN YAZILDI) ---
-class _YorumlarSayfasi extends ConsumerStatefulWidget { // 1. TÜRÜ DEĞİŞTİ -> ConsumerStatefulWidget
+
+//--- SAYFA 2: YORUMLAR (AKILLI MANTIK) ---
+class _YorumlarSayfasi extends ConsumerStatefulWidget {
   final MekanModel mekan;
   const _YorumlarSayfasi({required this.mekan});
 
@@ -312,7 +321,6 @@ class _YorumlarSayfasi extends ConsumerStatefulWidget { // 1. TÜRÜ DEĞİŞTİ
 }
 
 class _YorumlarSayfasiState extends ConsumerState<_YorumlarSayfasi> {
-  // 2. "DÜZENLEME MODU" İÇİN BİR STATE DEĞİŞKENİ EKLEDİK
   bool _isEditing = false;
 
   @override
@@ -322,13 +330,16 @@ class _YorumlarSayfasiState extends ConsumerState<_YorumlarSayfasi> {
     final langCode = Localizations.localeOf(context).languageCode;
 
     final userAsync = ref.watch(userProfileProvider);
+    final user = userAsync.value;
     final userId = userAsync.value?.id;
 
-  final eslesenYorumlar = widget.mekan.yorumlar.where((yorum) => yorum.yazar.id == userId);
-final YorumModel? kullaniciYorumu = eslesenYorumlar.isNotEmpty ? eslesenYorumlar.first : null;
+    final eslesenYorumlar = widget.mekan.yorumlar.where((yorum) => yorum.yazar.id == userId);
+    final YorumModel? kullaniciYorumu = eslesenYorumlar.isNotEmpty ? eslesenYorumlar.first : null;
+    final bool kullaniciMetinliYorumYaptiMi = kullaniciYorumu != null && (kullaniciYorumu.icerik?.trim().isNotEmpty ?? false);
     final digerYorumlar = widget.mekan.yorumlar.where((yorum) => yorum.yazar.id != userId).toList();
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text('${langCode == 'tr' ? widget.mekan.isim.tr : widget.mekan.isim.en} - ${l10n.reviews}'),
@@ -340,54 +351,65 @@ final YorumModel? kullaniciYorumu = eslesenYorumlar.isNotEmpty ? eslesenYorumlar
       body: Column(
         children: [
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 80),
-              itemCount: digerYorumlar.length,
-              itemBuilder: (context, index) {
-                final yorum = digerYorumlar[index];
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 16.0),
-                  child: YorumKarti(
-                    kullaniciAdi: yorum.yazar.kullaniciAdi,
-                    puan: yorum.puan,
-                    yorum: yorum.icerik,
-                    kullaniciImageUrl: yorum.yazar.profilFotoUrl,
-                    yorumTarihi: yorum.yorumTarihi,
+            child: digerYorumlar.isEmpty
+                ? Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                      child: Text(
+                        "yorum yok şuan",
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.bodyLarge,
+                      ),
+                    ),
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    itemCount: digerYorumlar.length,
+                    itemBuilder: (context, index) {
+                      final yorum = digerYorumlar[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 16.0),
+                        child: YorumKarti(
+                          kullaniciAdi: yorum.yazar.kullaniciAdi,
+                          puan: yorum.puan,
+                          yorum: yorum.icerik,
+                          kullaniciImageUrl: yorum.yazar.profilFotoUrl,
+                          yorumTarihi: yorum.yorumTarihi,
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
           ),
-          // 3. ARAYÜZÜ BU STATE'E GÖRE KOŞULLU OLARAK ÇİZİYORUZ
-          if (kullaniciYorumu != null && !_isEditing)
-            _KullaniciYorumuGoster(
-              yorum: kullaniciYorumu,
-              onEditPressed: () {
-                setState(() {
-                  _isEditing = true;
-                });
-              },
-            )
-          else
-            _YorumYazmaAlani(
-              mekanId: widget.mekan.id,
-              duzenlenecekYorum: kullaniciYorumu,
-              onCommentSubmitted: () {
-                 setState(() {
-                   _isEditing = false;
-                 });
-              },
-            ),
+          if (userId != null)
+            if (kullaniciMetinliYorumYaptiMi && !_isEditing)
+              _KullaniciYorumuGoster(
+                yorum: kullaniciYorumu!,
+                onEditPressed: () {
+                  setState(() {
+                    _isEditing = true;
+                  });
+                },
+              )
+            else
+              _YorumYazmaAlani(
+                mekanId: widget.mekan.id,
+                duzenlenecekYorum: kullaniciYorumu,
+                onCommentSubmitted: () {
+                  setState(() {
+                    _isEditing = false;
+                  });
+                },
+              ),
         ],
       ),
     );
   }
 }
 
-//--- KULLANICININ KENDİ YORUMUNU GÖSTEREN WIDGET (GÜNCELLENDİ) ---
+//--- KULLANICININ KENDİ YORUMUNU GÖSTEREN WIDGET ---
 class _KullaniciYorumuGoster extends StatelessWidget {
   final YorumModel yorum;
-  final VoidCallback onEditPressed; // Parent'ı tetiklemek için callback
+  final VoidCallback onEditPressed;
   const _KullaniciYorumuGoster({required this.yorum, required this.onEditPressed});
 
   @override
@@ -406,7 +428,7 @@ class _KullaniciYorumuGoster extends StatelessWidget {
               TextButton.icon(
                 icon: const Icon(Icons.edit, size: 16),
                 label: Text(l10n.edit),
-                onPressed: onEditPressed, // 4. "DÜZENLE" BUTONUNA BASILDIĞINDA STATE'İ DEĞİŞTİRİYORUZ
+                onPressed: onEditPressed,
               )
             ],
           ),
@@ -424,7 +446,7 @@ class _KullaniciYorumuGoster extends StatelessWidget {
   }
 }
 
-//--- YORUM YAZMA ALANI WIDGET'I (GÜNCELLENDİ) ---
+//--- YORUM YAZMA ALANI WIDGET'I ---
 class _YorumYazmaAlani extends ConsumerStatefulWidget {
   final String mekanId;
   final YorumModel? duzenlenecekYorum;
@@ -446,7 +468,6 @@ class __YorumYazmaAlaniState extends ConsumerState<_YorumYazmaAlani> {
   @override
   void initState() {
     super.initState();
-    // 5. YORUM YAZMA ALANINI, BAŞLANGIÇ METNİYLE DOLDURUYORUZ
     _controller = TextEditingController(text: widget.duzenlenecekYorum?.icerik ?? '');
   }
 
@@ -461,10 +482,9 @@ class __YorumYazmaAlaniState extends ConsumerState<_YorumYazmaAlani> {
     if (icerik.isEmpty && widget.duzenlenecekYorum?.puan == null) return;
 
     ref.read(yorumSubmitProvider.notifier).gonder(
-      mekanId: widget.mekanId,
-      icerik: icerik,
-      // puan: ... // Puanlama da bu ekrandaysa, buradan gönderilecek.
-    );
+          mekanId: widget.mekanId,
+          icerik: icerik,
+        );
     
     _controller.clear();
     FocusScope.of(context).unfocus();

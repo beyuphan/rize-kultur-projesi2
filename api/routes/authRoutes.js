@@ -233,4 +233,36 @@ router.put('/change-password', auth, async (req, res) => {
 });
 
 
+
+
+// @route   PUT api/auth/favorites/:mekanId
+// @desc    Bir mekanı kullanıcının favorilerine ekler/çıkarır
+// @access  Private
+router.put('/favorites/:mekanId', auth, async (req, res) => {
+    try {
+        const kullanici = await Kullanici.findById(req.kullanici.id);
+        const mekanId = req.params.mekanId;
+
+        // Kullanıcının favorilerinde bu mekan zaten var mı diye kontrol et
+        const favoriIndex = kullanici.favoriMekanlar.indexOf(mekanId);
+
+        if (favoriIndex > -1) {
+            // Eğer varsa, favorilerden çıkar ($pull operatörü ile)
+            kullanici.favoriMekanlar.pull(mekanId);
+        } else {
+            // Eğer yoksa, favorilere ekle ($addToSet ile, bu duplike eklemeyi önler)
+            kullanici.favoriMekanlar.addToSet(mekanId);
+        }
+
+        await kullanici.save();
+        
+        // Cevap olarak güncellenmiş favori listesini (string dizisi olarak) dön
+        res.json(kullanici.favoriMekanlar);
+
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Sunucu Hatası' });
+    }
+});
+
 module.exports = router;

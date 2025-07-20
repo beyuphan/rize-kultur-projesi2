@@ -7,21 +7,9 @@ import 'package:mobil_flutter/l10n/app_localizations.dart';
 import 'package:mobil_flutter/main.dart'; // Tema ve dil provider'ları için
 import 'package:mobil_flutter/common/theme/app_themes.dart';
 import 'package:mobil_flutter/presentation/screens/profil_duzenle_ekrani.dart';
-// ÖNEMLİ: Kullanici modelini bu alanları içerecek şekilde güncellemen gerekebilir.
-// Örneğin:
-// class Kullanici {
-//   ...
-//   final String? profilFotoUrl;
-//   final int yorumSayisi;
-//   final int favoriSayisi;
-// }
+import 'package:mobil_flutter/presentation/providers/user_providers.dart';
 
-// Profil verisini getirmek için mevcut FutureProvider'ın
-final userProfileProvider = FutureProvider((ref) {
-  final authService = ref.watch(authServiceProvider);
-  // Bu getMyProfile() fonksiyonunun güncellenmiş Kullanici modelini döndürdüğünü varsayıyoruz.
-  return authService.getMyProfile();
-});
+
 
 
 class ProfilEkrani extends ConsumerWidget {

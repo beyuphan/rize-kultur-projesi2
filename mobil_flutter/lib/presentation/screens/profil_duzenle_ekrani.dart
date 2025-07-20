@@ -7,6 +7,9 @@ import 'package:mobil_flutter/data/models/user_model.dart';
 import 'package:mobil_flutter/l10n/app_localizations.dart';
 import 'package:mobil_flutter/presentation/providers/auth_providers.dart';
 import 'package:mobil_flutter/presentation/screens/profil_ekrani.dart';
+import 'package:mobil_flutter/presentation/providers/user_providers.dart';
+import 'package:mobil_flutter/presentation/providers/auth_providers.dart';
+
 
 // State Notifier'ları ve Provider'ları güncelleyelim
 final profileUpdateProvider = StateNotifierProvider.autoDispose<ProfileUpdateNotifier, AsyncValue<void>>((ref) {

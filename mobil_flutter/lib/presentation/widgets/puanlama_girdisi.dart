@@ -1,5 +1,3 @@
-// lib/presentation/widgets/puanlama_girdisi.dart
-
 import 'package:flutter/material.dart';
 
 class PuanlamaGirdisi extends StatefulWidget {
@@ -30,14 +28,13 @@ class _PuanlamaGirdisiState extends State<PuanlamaGirdisi> {
   @override
   void didUpdateWidget(PuanlamaGirdisi oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Eğer parent widget'tan gelen 'baslangicPuani' değiştiyse,
-    // bizim içimizdeki '_mevcutPuan'ı da bu yeni değerle güncelleyelim.
     if (widget.baslangicPuani != oldWidget.baslangicPuani) {
       setState(() {
         _mevcutPuan = widget.baslangicPuani;
       });
     }
   }
+
   @override
   Widget build(BuildContext context) {
     const cayYapragiDolu = Icons.eco;

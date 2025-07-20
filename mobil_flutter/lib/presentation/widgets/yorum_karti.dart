@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:mobil_flutter/presentation/widgets/puan_gostergesi.dart';
-// Tarih formatlamak için intl paketini eklemek en iyisidir.
-// Terminalde 'flutter pub add intl' komutunu çalıştır.
 import 'package:intl/intl.dart';
+import 'package:mobil_flutter/presentation/widgets/puan_gostergesi.dart';
 
 class YorumKarti extends StatelessWidget {
   final String kullaniciAdi;
   final String? kullaniciImageUrl;
-  final double? puan; // GÜNCELLENDİ: Artık null olabilir
-  final String? yorum; // GÜNCELLENDİ: Artık null olabilir
-  final DateTime? yorumTarihi; // YENİ: Tarih parametresi eklendi
+  final double? puan;
+  final String? yorum;
+  final DateTime? yorumTarihi;
 
   const YorumKarti({
     super.key,
@@ -29,6 +27,7 @@ class YorumKarti extends StatelessWidget {
       decoration: BoxDecoration(
         color: tema.colorScheme.surface,
         borderRadius: BorderRadius.circular(12.0),
+        border: Border.all(color: tema.dividerColor.withOpacity(0.1))
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,22 +52,19 @@ class YorumKarti extends StatelessWidget {
                       style: tema.textTheme.titleMedium,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    // YENİ: Yorum tarihi varsa, formatlayıp gösterelim.
                     if (yorumTarihi != null)
                       Text(
-                        DateFormat.yMMMMd('tr_TR').format(yorumTarihi!), // Ör: 17 Temmuz 2025
+                        DateFormat.yMMMMd('tr_TR').format(yorumTarihi!),
                         style: tema.textTheme.bodySmall,
                       ),
                   ],
                 ),
               ),
               const SizedBox(width: 12),
-              // GÜNCELLENDİ: Puan null değilse PuanGostergesi'ni göster.
               if (puan != null) PuanGostergesi(puan: puan!, iconSize: 16),
             ],
           ),
-          // GÜNCELLENDİ: Yorum null veya boş değilse göster.
-          if (yorum != null && yorum!.isNotEmpty) ...[
+          if (yorum != null && yorum!.trim().isNotEmpty) ...[
             const SizedBox(height: 12),
             Text(
               yorum!,
