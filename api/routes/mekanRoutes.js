@@ -116,7 +116,9 @@ router.get('/:id', async (req, res) => {
     console.log(`\n--- MEKAN DETAYI İSTEĞİ GELDİ: ID = ${req.params.id} ---`);
     try {
         console.log("[1] Mekan bilgisi aranıyor...");
-        const mekan = await Mekan.findById(req.params.id);
+        const mekan = await Mekan.findById(req.params.id)
+            .populate('kategori') // <-- ÖRNEK: KATEGORİ ALANINI POPULATE ET
+            .populate('ekleyenKullanici', 'kullaniciAdi'); // <-- ÖRNEK: BAŞKA BİR ALANI POPULATE ET
 
         if (!mekan) {
             console.log("[HATA] Mekan bulunamadı.");
