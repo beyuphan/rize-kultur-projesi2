@@ -1,13 +1,13 @@
-import 'package:mobil_flutter/data/models/user_model.dart'; // UserModel'ı import ediyoruz
+import 'package:mobil_flutter/data/models/user_model.dart';
 import 'package:mobil_flutter/data/models/mekan_model.dart';
 
 class YorumModel {
   final String id;
-  final String? icerik; // Artık null olabilir
-  final double? puan;   // Artık null olabilir
-  final UserModel yazar; // Yorumu yapan kişinin bilgileri
+  final String? icerik;
+  final double? puan;
+  final UserModel yazar;
   final DateTime yorumTarihi;
-  final MekanModel? mekan; // Yorumun yapıldığı mekan
+  final MekanModel? mekan;
 
   YorumModel({
     required this.id,
@@ -18,26 +18,34 @@ class YorumModel {
     this.mekan,
   });
 
+  // --- ANA DÜZELTME BU FONKSİYONDA ---
   factory YorumModel.fromJson(Map<String, dynamic> json) {
+    MekanModel? parsedMekan;
+
+    // ADIM 1: 'mekan' alanının tipini kontrol et.
+    // Bu, 'String' bir ID mi yoksa 'Map' bir obje mi diye bakar.
+    if (json['mekan'] != null && json['mekan'] is Map<String, dynamic>) {
+      // Eğer bir obje ise, MekanModel'e çevir.
+      parsedMekan = MekanModel.fromListJson(json['mekan']);
+    }
+    // Eğer String veya null ise, parsedMekan null olarak kalır ve uygulama ÇÖKMEZ.
+
     return YorumModel(
       id: json['_id'],
       icerik: json['icerik'],
-      puan: (json['puan'] != null) ? (json['puan'] as num).toDouble() : null,
-      yazar: UserModel.fromJson(json['yazar']), // İç içe model parse etme
+      // Küçük iyileştirme: puan'ı daha güvenli parse etme
+      puan: (json['puan'] as num?)?.toDouble(),
+      // 'yazar' alanının her zaman dolu bir obje geldiğini loglardan biliyoruz.
+      yazar: UserModel.fromJson(json['yazar']),
       yorumTarihi: DateTime.parse(json['yorumTarihi']),
-      mekan: json['mekan'] != null ? MekanModel.fromListJson(json['mekan']) : null,
+      // ADIM 2: Akıllıca parse edilmiş veya null bırakılmış mekanı ata.
+      mekan: parsedMekan,
     );
   }
 
-  // --- BU METODU EKLE ---
+  // --- BU METODU DAHA TEMİZ HALE GETİRİYORUZ ---
+  // Artık bu ayrı metoda gerek yok, ana metodu çağırması yeterli.
   factory YorumModel.fromJsonWithMekan(Map<String, dynamic> json) {
-    return YorumModel(
-      id: json['_id'],
-      icerik: json['icerik'],
-      puan: (json['puan'] != null) ? (json['puan'] as num).toDouble() : null,
-      yazar: UserModel.fromJson(json['yazar']),
-      yorumTarihi: DateTime.parse(json['yorumTarihi']),
-      mekan: json['mekan'] != null ? MekanModel.fromListJson(json['mekan']) : null,
-    );
+    return YorumModel.fromJson(json);
   }
 }

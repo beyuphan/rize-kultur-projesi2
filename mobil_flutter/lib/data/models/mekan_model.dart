@@ -58,28 +58,79 @@ class MekanModel {
     required this.yorumlar,
   });
 
-  factory MekanModel.fromDetailJson(Map<String, dynamic> json) {
+// HATA AYIKLAMA İÇİN ÖZEL OLARAK YAZILMIŞTIR
+factory MekanModel.fromDetailJson(Map<String, dynamic> json) {
+  try {
+    print("--- fromDetailJson BAŞLADI ---");
+
     var yorumListesi = <YorumModel>[];
     if (json['yorumlar'] != null) {
-      json['yorumlar'].forEach((v) {
-        yorumListesi.add(YorumModel.fromJson(v));
+      print("[+] Yorumlar parse ediliyor...");
+      (json['yorumlar'] as List).forEach((v) {
+        try {
+          yorumListesi.add(YorumModel.fromJson(v));
+        } catch (e, s) {
+          print("!!! BİR YORUM PARSE EDİLİRKEN HATA !!!");
+          print("Hata: $e");
+          print("Sorunlu Yorum JSON'ı: $v");
+          // Bu hatayı görmezden gelip devam et, belki sadece bir yorum bozuktur.
+        }
       });
+      print("[+] Yorumlar bitti.");
     }
+
     final mekanJson = json['mekan'];
-    return MekanModel(
+    if (mekanJson == null) {
+      print("!!! KRİTİK HATA: JSON içinde 'mekan' anahtarı bulunamadı! ---");
+      throw Exception("JSON'da 'mekan' anahtarı yok.");
+    }
+    print("[+] 'mekan' anahtarı bulundu, içi parse ediliyor...");
+
+    print("  [1] 'isim' parse ediliyor...");
+    final isim = CokDilliMetin.fromJson(mekanJson['isim']);
+
+    print("  [2] 'aciklama' parse ediliyor...");
+    final aciklama = CokDilliMetin.fromJson(mekanJson['aciklama']);
+
+    print("  [3] 'kategori' alınıyor...");
+    final kategori = mekanJson['kategori']?.toString() ?? 'Kategorisiz';
+
+    print("  [4] 'konum' parse ediliyor...");
+    final konum = mekanJson['konum'] != null
+        ? Konum.fromJson(mekanJson['konum'])
+        : Konum(enlem: 0.0, boylam: 0.0);
+
+    print("  [5] 'fotograflar' alınıyor...");
+    final fotograflar = List<String>.from(mekanJson['fotograflar'] ?? []);
+
+    print("  [6] 'ortalamaPuan' alınıyor...");
+    final ortalamaPuan = (mekanJson['ortalamaPuan'] ?? 0.0).toDouble();
+
+    print("  [7] MekanModel'in kendisi oluşturuluyor...");
+    final model = MekanModel(
       id: mekanJson['_id'] ?? '',
-      isim: CokDilliMetin.fromJson(mekanJson['isim']),
-      aciklama: CokDilliMetin.fromJson(mekanJson['aciklama']),
-      kategori: mekanJson['kategori'] ?? 'Kategorisiz',
-      konum: mekanJson['konum'] != null
-          ? Konum.fromJson(mekanJson['konum'])
-          : Konum(enlem: 0.0, boylam: 0.0),
-      fotograflar: List<String>.from(mekanJson['fotograflar'] ?? []),
-      ortalamaPuan: (mekanJson['ortalamaPuan'] ?? 0.0).toDouble(),
+      isim: isim,
+      aciklama: aciklama,
+      kategori: kategori,
+      konum: konum,
+      fotograflar: fotograflar,
+      ortalamaPuan: ortalamaPuan,
       yorumlar: yorumListesi,
     );
-  }
 
+    print("--- fromDetailJson BAŞARIYLA BİTTİ ---");
+    return model;
+
+  } catch (e, s) {
+    print("!!! MekanModel.fromDetailJson İÇİNDE BÜYÜK BİR HATA YAKALANDI !!!");
+    print("HATA TÜRÜ: ${e.runtimeType}");
+    print("HATA MESAJI: $e");
+    print("GELEN TOPLAM JSON: $json");
+    print("STACK TRACE: $s");
+    // Hatayı yukarı fırlat ki uygulama bilsin.
+    rethrow;
+  }
+}
   factory MekanModel.fromListJson(Map<String, dynamic> json) {
     return MekanModel(
       id: json['_id'] ?? '',
