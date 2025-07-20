@@ -169,4 +169,10 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get edit => 'Düzenle';
+
+  @override
+  String get noCommentsYet => 'Yorum Yok';
+
+  @override
+  String get noFavoritesYet => 'henüz Favori Eklenmedi';
 }

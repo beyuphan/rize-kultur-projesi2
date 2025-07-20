@@ -55,7 +55,8 @@
    "noVenuesFound": "Değer Bulunamadı.",
     "yourComment": "Yorumunuz",
     "edit": "Düzenle",
-
+    "noCommentsYet": "Henüz Yorum Yok",
+  "noFavoritesYet": "henüz Favori Eklenmedi",
   "noName": "İsim Yok",
   "noVenuesFound": "Değer Bulunamadı",
   "noCommentsYet": "Yorum Yok",

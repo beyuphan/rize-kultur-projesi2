@@ -2,6 +2,7 @@
 
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+require('./Mekan'); // MEKAN MODELİNİ BURADA TANITIYORUZ Kİ AŞAĞIDA TANIYALIM
 
 const YorumSchema = new Schema({
     icerik: {

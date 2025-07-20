@@ -1,15 +1,15 @@
-// lib/presentation/screens/profil_ekrani.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mobil_flutter/presentation/providers/auth_providers.dart';
-import 'package:mobil_flutter/l10n/app_localizations.dart';
-import 'package:mobil_flutter/main.dart'; // Tema ve dil provider'ları için
 import 'package:mobil_flutter/common/theme/app_themes.dart';
-import 'package:mobil_flutter/presentation/screens/profil_duzenle_ekrani.dart';
+import 'package:mobil_flutter/data/models/user_model.dart';
+import 'package:mobil_flutter/l10n/app_localizations.dart';
+import 'package:mobil_flutter/main.dart';
+import 'package:mobil_flutter/presentation/providers/auth_providers.dart';
+import 'package:mobil_flutter/presentation/providers/mekan_providers.dart';
 import 'package:mobil_flutter/presentation/providers/user_providers.dart';
-
-
+import 'package:mobil_flutter/presentation/screens/mekan_detay_ekrani.dart';
+import 'package:mobil_flutter/presentation/screens/profil_duzenle_ekrani.dart';
+import 'package:mobil_flutter/presentation/widgets/mekan_karti.dart';
 
 
 class ProfilEkrani extends ConsumerWidget {
@@ -27,9 +27,6 @@ class ProfilEkrani extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(child: Text('Profil yüklenemedi: $err')),
         data: (kullanici) {
-          final int yorumSayisi = 12; // kullanici.yorumSayisi
-          final int favoriSayisi = 8;  // kullanici.favoriSayisi
-
           return DefaultTabController(
             length: 2,
             child: NestedScrollView(
@@ -41,13 +38,9 @@ class ProfilEkrani extends ConsumerWidget {
                     pinned: true,
                     backgroundColor: theme.colorScheme.surface,
                     iconTheme: IconThemeData(color: theme.colorScheme.onSurface),
-                    // YENİ: AppBar başlığı sadece header kapalıyken görünecek
-                    title: innerBoxIsScrolled
-                        ? Text(kullanici.kullaniciAdi)
-                        : null,
-                    centerTitle: true, // AppBar başlığını ortalamak için
+                    title: innerBoxIsScrolled ? Text(kullanici.kullaniciAdi) : null,
+                    centerTitle: true,
                     flexibleSpace: FlexibleSpaceBar(
-                      // KALDIRILDI: Buradaki 'title' ve 'titlePadding' kaldırıldı.
                       background: Container(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
@@ -68,7 +61,6 @@ class ProfilEkrani extends ConsumerWidget {
                                 CircleAvatar(
                                   radius: 50,
                                   backgroundColor: theme.colorScheme.primaryContainer,
-
                                   backgroundImage: (kullanici.profilFotoUrl != null && kullanici.profilFotoUrl!.isNotEmpty)
                                       ? NetworkImage(kullanici.profilFotoUrl!)
                                       : null,
@@ -77,7 +69,6 @@ class ProfilEkrani extends ConsumerWidget {
                                       : null,
                                 ),
                                 const SizedBox(height: 16),
-                                // YENİ: Kullanıcı adı artık burada, sabit bir şekilde duruyor
                                 Text(
                                   kullanici.kullaniciAdi,
                                   style: theme.textTheme.headlineSmall?.copyWith(
@@ -89,16 +80,23 @@ class ProfilEkrani extends ConsumerWidget {
                                 Text(
                                   kullanici.email,
                                   style: theme.textTheme.bodyLarge?.copyWith(
-                                    color: theme.colorScheme.onSurface.withOpacity(0.9)
+                                    color: theme.colorScheme.onSurface.withOpacity(0.9),
                                   ),
                                 ),
                                 const SizedBox(height: 20),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    _StatWidget(count: yorumSayisi, label: l10n.reviews),
+                                    Consumer(builder: (context, ref, _) {
+                                      final yorumlarAsync = ref.watch(kullaniciYorumlariProvider);
+                                      return yorumlarAsync.when(
+                                        data: (yorumlar) => _StatWidget(count: yorumlar.length, label: l10n.reviews),
+                                        loading: () => _StatWidget(count: 0, label: l10n.reviews),
+                                        error: (e,s) => _StatWidget(count: 0, label: l10n.reviews),
+                                      );
+                                    }),
                                     const SizedBox(width: 32),
-                                    _StatWidget(count: favoriSayisi, label: l10n.favorites),
+                                    _StatWidget(count: kullanici.favoriMekanlar.length, label: l10n.favorites),
                                   ],
                                 ),
                               ],
@@ -138,9 +136,9 @@ class ProfilEkrani extends ConsumerWidget {
                 ];
               },
               body: TabBarView(
-                children: [
-                  _YorumlarListesi(),
-                  _FavorilerListesi(),
+                children: const [
+                  _DinamikYorumlarListesi(),
+                  _DinamikFavorilerListesi(),
                 ],
               ),
             ),
@@ -151,11 +149,101 @@ class ProfilEkrani extends ConsumerWidget {
   }
 }
 
+class _DinamikYorumlarListesi extends ConsumerWidget {
+  const _DinamikYorumlarListesi();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final yorumlarAsync = ref.watch(kullaniciYorumlariProvider);
+    final langCode = Localizations.localeOf(context).languageCode;
+
+    return yorumlarAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (err, stack) => Center(child: Text('Yorumlar yüklenemedi: $err')),
+      data: (yorumlar) => yorumlar.isEmpty
+          ? Center(child: Text(AppLocalizations.of(context)!.noCommentsYet))
+          : ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: yorumlar.length,
+              itemBuilder: (context, index) {
+                final yorum = yorumlar[index];
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  child: ListTile(
+                    title: Text(
+                      langCode == 'tr' ? yorum.mekan?.isim.tr ?? 'Mekan Silinmiş' : yorum.mekan?.isim.en ?? 'Deleted Place',
+                    ),
+                    subtitle: Text(
+                      yorum.icerik ?? "(Sadece puan verildi)",
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    trailing: yorum.puan != null
+                        ? Text("★ ${yorum.puan!.toStringAsFixed(1)}", style: const TextStyle(fontSize: 16, color: Colors.amber))
+                        : null,
+                    onTap: () {
+                      if (yorum.mekan != null) {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (context) => MekanDetayEkrani(mekanId: yorum.mekan!.id)),
+                        );
+                      }
+                    },
+                  ),
+                );
+              },
+            ),
+    );
+  }
+}
+
+class _DinamikFavorilerListesi extends ConsumerWidget {
+  const _DinamikFavorilerListesi();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final favorilerAsync = ref.watch(favoriMekanlarProvider);
+    final langCode = Localizations.localeOf(context).languageCode;
+    final l10n = AppLocalizations.of(context)!;
+
+    return favorilerAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (err, stack) => Center(child: Text('Favoriler yüklenemedi: $err')),
+      data: (mekanlar) => mekanlar.isEmpty
+          ? Center(child: Text(l10n.noFavoritesYet))
+          : GridView.builder(
+              padding: const EdgeInsets.all(16),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                childAspectRatio: 0.8,
+              ),
+              itemCount: mekanlar.length,
+              itemBuilder: (context, index) {
+                final mekan = mekanlar[index];
+                return InkWell(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => MekanDetayEkrani(mekanId: mekan.id)),
+                    );
+                  },
+                  child: MekanKarti(
+                    isim: langCode == 'tr' ? mekan.isim.tr : mekan.isim.en,
+                    kategori: mekan.kategori,
+                    puan: mekan.ortalamaPuan,
+                    imageUrl: mekan.fotograflar.isNotEmpty ? mekan.fotograflar[0] : null,
+                  ),
+                );
+              },
+            ),
+    );
+  }
+}
+
 // Profildeki istatistikleri göstermek için küçük bir widget
 class _StatWidget extends StatelessWidget {
   final int count;
   final String label;
-
   const _StatWidget({required this.count, required this.label});
 
   @override
@@ -181,67 +269,13 @@ class _StatWidget extends StatelessWidget {
   }
 }
 
-// Örnek yorum listesi widget'ı
-class _YorumlarListesi extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: 5, // Örnek veri
-      itemBuilder: (context, index) {
-        return Card(
-          margin: const EdgeInsets.only(bottom: 16),
-          child: ListTile(
-            leading: const Icon(Icons.rate_review_outlined),
-            title: Text('Mekan Adı ${index + 1}'),
-            subtitle: Text('Harika bir yerdi, kesinlikle tavsiye ederim...'),
-            trailing: const Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.star, color: Colors.amber, size: 16),
-                SizedBox(width: 4),
-                Text('4.5'),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-// Örnek favori listesi widget'ı
-class _FavorilerListesi extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: 3, // Örnek veri
-      itemBuilder: (context, index) {
-        return Card(
-          margin: const EdgeInsets.only(bottom: 16),
-          child: ListTile(
-            leading: const Icon(Icons.favorite_border_outlined, color: Colors.redAccent),
-            title: Text('Favori Mekan ${index + 1}'),
-            subtitle: Text('Adres bilgisi veya kısa açıklama...'),
-            onTap: () {},
-          ),
-        );
-      },
-    );
-  }
-}
-
-// --- AYARLAR EKRANI (YENİLENMİŞ) ---
-
+// --- AYARLAR EKRANI ---
 class AyarlarEkrani extends ConsumerWidget {
   const AyarlarEkrani({super.key});
 
-  // Tema seçimi için daha gelişmiş diyalog
   void _temaSecimiGoster(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final mevcutTema = ref.watch(themeProvider);
-
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -279,11 +313,9 @@ class AyarlarEkrani extends ConsumerWidget {
     );
   }
 
-  // Dil seçimi için daha gelişmiş diyalog
   void _dilSecimiGoster(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final mevcutDil = ref.watch(localeProvider);
-
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -321,7 +353,6 @@ class AyarlarEkrani extends ConsumerWidget {
     );
   }
 
-  // Ayarlar ekranında bölümleri ayırmak için yardımcı widget
   Widget _buildSectionHeader(BuildContext context, String title) {
     return Padding(
       padding: const EdgeInsets.only(top: 24.0, bottom: 8.0, left: 16.0, right: 16.0),
@@ -358,25 +389,22 @@ class AyarlarEkrani extends ConsumerWidget {
                 ListTile(
                   leading: const Icon(Icons.edit_outlined),
                   title: Text(l10n.editProfile),
-                   onTap: () {
-                  // userProfileProvider'ın verisi yüklendiyse ve hata yoksa devam et
-                  if (userProfileAsync.hasValue && !userProfileAsync.isLoading) {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => ProfilDuzenleEkrani(
-                          mevcutKullanici: userProfileAsync.value!,
+                  onTap: () {
+                    if (userProfileAsync.hasValue && !userProfileAsync.isLoading) {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => ProfilDuzenleEkrani(
+                            mevcutKullanici: userProfileAsync.value!,
+                          ),
                         ),
-                      ),
-                    );
-                  }
-                },
-                // Veri yükleniyorsa butonu pasif yapabiliriz
-                enabled: userProfileAsync.hasValue,
+                      );
+                    }
+                  },
+                  enabled: userProfileAsync.hasValue,
                 ),
               ],
             ),
           ),
-          
           _buildSectionHeader(context, "UYGULAMA"),
           Card(
             margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -386,9 +414,7 @@ class AyarlarEkrani extends ConsumerWidget {
                   leading: const Icon(Icons.palette_outlined),
                   title: Text(l10n.appTheme),
                   subtitle: Text(
-                    mevcutTema == AppTheme.firtinaYesili
-                        ? l10n.themeFirtinaYesili
-                        : l10n.themeKackarSisi,
+                    mevcutTema == AppTheme.firtinaYesili ? l10n.themeFirtinaYesili : l10n.themeKackarSisi,
                   ),
                   onTap: () => _temaSecimiGoster(context, ref),
                 ),
@@ -396,9 +422,7 @@ class AyarlarEkrani extends ConsumerWidget {
                   leading: const Icon(Icons.language_outlined),
                   title: Text(l10n.language),
                   subtitle: Text(
-                    mevcutDil.languageCode == 'tr'
-                        ? l10n.turkish
-                        : l10n.english,
+                    mevcutDil.languageCode == 'tr' ? l10n.turkish : l10n.english,
                   ),
                   onTap: () => _dilSecimiGoster(context, ref),
                 ),
@@ -411,10 +435,9 @@ class AyarlarEkrani extends ConsumerWidget {
   }
 }
 
-// TabBar'ı SliverAppBar içinde sabit tutmak için yardımcı sınıf (Değişiklik yok)
+// TabBar'ı SliverAppBar içinde sabit tutmak için yardımcı sınıf
 class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   _SliverAppBarDelegate(this._tabBar);
-
   final TabBar _tabBar;
 
   @override
@@ -431,7 +454,5 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   }
 
   @override
-  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
-    return false;
-  }
+  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) => false;
 }

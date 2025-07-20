@@ -63,5 +63,7 @@
   "addComment": "Add Comment",
   "noVenuesFound": "No Venues Found",
   "yourComment": "Your Comment",
-  "edit": "Edit" 
+  "edit": "Edit",
+  "noCommentsYet": "No Comments Yet",
+  "noFavoritesYet": "No Favorites Yet"
 }

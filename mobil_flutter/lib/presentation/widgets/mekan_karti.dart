@@ -1,22 +1,21 @@
 import 'package:flutter/material.dart';
-// Yeni puan göstergemizi import ediyoruz
 import 'package:mobil_flutter/presentation/widgets/puan_gostergesi.dart';
 
 class MekanKarti extends StatelessWidget {
+  final String isim;
+  final String kategori;
+  final double puan;
+  final String? imageUrl;
+  final VoidCallback? onTap;
+
   const MekanKarti({
     super.key,
     required this.isim,
     required this.kategori,
     required this.puan,
-    required this.imageUrl,
+    this.imageUrl,
     this.onTap,
   });
-
-  final String isim;
-  final String kategori;
-  final double puan;
-  final String imageUrl;
-  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -42,59 +41,56 @@ class MekanKarti extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Resim Alanı
-            ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
-              ),
-              child: Image.network(
-                // 1. GÜNCELLEME: URL'nin başındaki/sonundaki boşlukları temizliyoruz.
-                // Bu, veritabanından gelebilecek gizli boşluk hatalarını önler.
-                imageUrl.trim(),
-                height: 140,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                // 2. GÜNCELLEME: Resim yüklenirken bir yüklenme animasyonu gösteriyoruz.
-                // Bu, kullanıcı deneyimini iyileştirir.
-                loadingBuilder:
-                    (
-                      BuildContext context,
-                      Widget child,
-                      ImageChunkEvent? loadingProgress,
-                    ) {
-                      if (loadingProgress == null) return child;
-                      return SizedBox(
+            Expanded(
+              child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+                // --- İŞTE DÜZELTME BURADA ---
+                child: (imageUrl != null && imageUrl!.isNotEmpty)
+                    ? Image.network(
+                        imageUrl!.trim(), // Artık '!' ile güvenli
                         height: 140,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return SizedBox(
+                            height: 140,
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                value: loadingProgress.expectedTotalBytes != null
+                                    ? loadingProgress.cumulativeBytesLoaded /
+                                        loadingProgress.expectedTotalBytes!
+                                    : null,
+                              ),
+                            ),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          print('MekanKarti Resim Hatası: $error');
+                          return const SizedBox(
+                            height: 140,
+                            child: Icon(
+                              Icons.broken_image_outlined,
+                              color: Colors.grey,
+                              size: 60,
+                            ),
+                          );
+                        },
+                      )
+                    : Container( // imageUrl null ise bunu göster
+                        height: 140,
+                        color: Colors.grey[200],
                         child: Center(
-                          child: CircularProgressIndicator(
-                            value: loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded /
-                                      loadingProgress.expectedTotalBytes!
-                                : null,
+                          child: Icon(
+                            Icons.camera_alt_outlined,
+                            color: Colors.grey[400],
+                            size: 50,
                           ),
                         ),
-                      );
-                    },
-                // 3. GÜNCELLEME: Hata durumunda ne yapılacağını belirtiyoruz.
-                // Bu, URL geçersizse veya resim yüklenemezse uygulamanın çökmesini engeller.
-                errorBuilder:
-                    (
-                      BuildContext context,
-                      Object error,
-                      StackTrace? stackTrace,
-                    ) {
-                      // Hatanın ne olduğunu konsola yazdırarak sorunu anlamamızı sağlar.
-                      print('MekanKarti Resim Hatası: $error');
-                      // Hata durumunda kullanıcıya kırık bir resim ikonu gösteriyoruz.
-                      return const SizedBox(
-                        height: 140,
-                        child: Icon(
-                          Icons.broken_image_outlined,
-                          color: Colors.grey,
-                          size: 60,
-                        ),
-                      );
-                    },
+                      ),
               ),
             ),
             // Yazı Alanı
@@ -105,25 +101,22 @@ class MekanKarti extends StatelessWidget {
                 children: [
                   Text(
                     isim,
-                    style: theme.textTheme.titleLarge?.copyWith(
+                    style: theme.textTheme.titleMedium?.copyWith(
                       color: theme.colorScheme.onSurface,
+                      fontWeight: FontWeight.bold
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 6),
-                  Text(kategori, style: theme.textTheme.labelMedium),
+                  const SizedBox(height: 4),
+                  Text(kategori, style: theme.textTheme.bodySmall),
                   const SizedBox(height: 8),
-
-                  // ESKİ PUAN SİSTEMİNİ SİLİP YENİSİNİ KOYUYORUZ
                   Row(
                     children: [
-                      PuanGostergesi(puan: puan), // İşte yeni sistemimiz!
+                      PuanGostergesi(puan: puan, iconSize: 16),
                       const SizedBox(width: 8),
                       Text(
-                        puan.toStringAsFixed(
-                          1,
-                        ), // 4.8 gibi sayıyı yine de yanında gösterelim
+                        puan.toStringAsFixed(1),
                         style: theme.textTheme.bodyMedium,
                       ),
                     ],
