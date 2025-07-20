@@ -5,7 +5,7 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 
-// Rota dosyalarını en başta dahil ediyoruz
+// Rota dosyalarını dahil ediyoruz
 const authRoutes = require('./routes/authRoutes');
 const mekanRoutes = require('./routes/mekanRoutes');
 const yorumRoutes = require('./routes/yorumRoutes');
@@ -17,27 +17,35 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Rotaları Doğru Şekilde Kullanma
-// Her rotayı kendi dosyasına doğru bir şekilde yönlendiriyoruz
-app.use('/api/auth', authRoutes);
-app.use('/api/mekanlar', mekanRoutes); // DÜZELTİLDİ: Artık mekanRoutes'e gidiyor
-app.use('/api/yorumlar', yorumRoutes);
-
-// Ana yol için bir GET isteği
-app.get('/', (req, res) => {
-  res.send('Rize Kültür Projesi API Çalışıyor!');
-});
-
-// Veritabanı Bağlantısı ve Sunucuyu Başlatma
+// Veritabanı Bağlantısı
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log('MongoDB veritabanına başarıyla bağlanıldı.');
-    // Sunucuyu SADECE veritabanı bağlantısı başarılı olursa başlatıyoruz.
-    // Bu, en doğru ve güvenli yöntemdir.
+
+    // --- İŞTE ÇÖZÜM BURADA ---
+    // Sunucuyu başlatmadan ve rotaları kullanmadan önce,
+    // tüm modelleri bir kere burada çağırarak Mongoose'a tanıtıyoruz.
+    require('./models/Kullanici');
+    require('./models/Mekan');
+    require('./models/Yorum');
+    // -------------------------
+
+    // Rotaları Kullanma
+    app.use('/api/auth', authRoutes);
+    app.use('/api/mekanlar', mekanRoutes);
+    app.use('/api/yorumlar', yorumRoutes);
+
+    // Ana yol için bir GET isteği
+    app.get('/', (req, res) => {
+      res.send('Rize Kültür Projesi API Çalışıyor!');
+    });
+
+    // Sunucuyu Başlatma
     app.listen(PORT, () => {
       console.log(`API sunucusu http://localhost:${PORT} adresinde başlatıldı`);
     });
   })
   .catch((err) => {
     console.error('Veritabanı bağlantı hatası:', err);
+    process.exit(1); // Bağlantı hatası varsa uygulamayı sonlandır.
   });
