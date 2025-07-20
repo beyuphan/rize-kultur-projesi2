@@ -132,15 +132,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get newPassword => 'Yeni Şifre';
 
   @override
-  String get noName => 'İsim Yok';
-
-  @override
-  String get noVenuesFound => 'Değer Bulunamadı';
-
-  @override
-  String get noCommentsYet => 'Yorum Yok';
-
-  @override
   String get reviews => 'Değerlendirmeler';
 
   @override

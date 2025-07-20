@@ -108,4 +108,22 @@ class ApiService {
       throw Exception(responseBody['msg'] ?? 'Yorum gönderilemedi');
     }
   }
+
+
+
+  Future<List<MekanModel>> getYakindakiMekanlar({
+    required double enlem,
+    required double boylam,
+        double mesafe = 500000, // Varsayılan olarak geniş bir alan
+  }) async {
+    final url = '$_baseUrl/mekanlar/yakinimdakiler?enlem=$enlem&boylam=$boylam&mesafe=${mesafe.toInt()}';    
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final List<dynamic> mekanlarJson = json.decode(utf8.decode(response.bodyBytes));
+      return mekanlarJson.map((json) => MekanModel.fromListJson(json)).toList();
+    } else {
+      throw Exception('Yakındaki mekanlar yüklenemedi.');
+    }
+  }
 }

@@ -362,6 +362,30 @@ abstract class AppLocalizations {
   /// **'No Comments Yet'**
   String get noCommentsYet;
 
+  /// No description provided for @noName.
+  ///
+  /// In en, this message translates to:
+  /// **'No Name'**
+  String get noName;
+
+  /// No description provided for @noVenuesFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No Venues Yet'**
+  String get noVenuesFound;
+
+  /// No description provided for @yourComment.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Comment'**
+  String get yourComment;
+
+  /// No description provided for @edit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get edit;
+
   /// No description provided for @reviews.
   ///
   /// In en, this message translates to:

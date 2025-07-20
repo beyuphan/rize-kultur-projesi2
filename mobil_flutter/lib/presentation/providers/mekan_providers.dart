@@ -11,6 +11,9 @@ import 'package:flutter/material.dart';
 // İSİM DEĞİŞİKLİĞİ: Provider'ın adını da servisle uyumlu hale getiriyoruz.
 final mekanServiceProvider = Provider<ApiService>((ref) => ApiService());
 
+
+final mesafeCapiProvider = StateProvider<double>((ref) => 5000.0);
+
 // --- YORUM/PUAN GÖNDERME İÇİN YENİ PROVIDER ---
 // YENİ EKLENDİ: Yorum/Puan gönderme işleminin durumunu (yükleniyor, başarılı, hata) yönetmek için.
 final yorumSubmitProvider =
@@ -63,44 +66,42 @@ final filtrelenmisMekanlarProvider =
       return ref.read(mekanServiceProvider).getMekanlar(kategori: kategoriKey);
     });
 
-// ⚙️ DÜZELTİLMİŞ NİHAİ PROVIDER
-//-----------------------------------------------------------------------------
-// Bu provider, artık bir liste değil, doğrudan bir AsyncValue döndürür.
-// Bu sayede .when() metodu UI tarafında sorunsuz çalışır.
+
 final nihaiMekanlarProvider = Provider.autoDispose
     .family<AsyncValue<List<MekanModel>>, Locale>((ref, locale) {
-      // Mevcut dil kodunu alıyoruz ('tr' veya 'en').
-      final langCode = locale.languageCode;
+  // Mevcut dil kodunu alıyoruz ('tr' veya 'en').
+  final langCode = locale.languageCode;
 
-      final seciliKategoriKey = ref.watch(seciliKategoriProvider);
-      final mekanlarAsyncValue = ref.watch(
-        filtrelenmisMekanlarProvider(seciliKategoriKey),
-      );
-      final aramaSorgusu = ref.watch(aramaSorgusuProvider);
+  final seciliKategoriKey = ref.watch(seciliKategoriProvider);
+  final mekanlarAsyncValue = ref.watch(
+    filtrelenmisMekanlarProvider(seciliKategoriKey),
+  );
+  final aramaSorgusu = ref.watch(aramaSorgusuProvider);
 
-      if (!mekanlarAsyncValue.hasValue) {
-        return mekanlarAsyncValue;
-      }
+  // Veri henüz gelmediyse veya hata varsa, o durumu direkt döndür.
+  if (!mekanlarAsyncValue.hasValue || mekanlarAsyncValue.isLoading) {
+    return mekanlarAsyncValue;
+  }
 
-      final mekanlar = mekanlarAsyncValue.value!;
-      if (aramaSorgusu.isEmpty) {
-        return AsyncData(mekanlar);
-      }
+  final mekanlar = mekanlarAsyncValue.value!;
+  
+  // Arama sorgusu boşsa, tüm listeyi döndür.
+  if (aramaSorgusu.isEmpty) {
+    return AsyncData(mekanlar);
+  }
 
-      final filtrelenmis = mekanlar.where((mekan) {
-        // ARAMA MANTIĞI GÜNCELLEMESİ:
-        // 1. Mekanın ismini mevcut uygulama dilinde al.
-        // 2. Eğer o dilde isim yoksa, varsayılan olarak Türkçe'yi kullan (fallback).
-        final mekanIsmi = mekan.isim[langCode] ?? mekan.isim['tr'] ?? '';
-        final sorguLower = aramaSorgusu.toLowerCase();
+  // Arama sorgusu doluysa, filtreleme yap.
+  final filtrelenmis = mekanlar.where((mekan) {
+    // --- İŞTE DÜZELTME BURADA ---
+    // 'mekan.isim' nesnesinin özelliklerine köşeli parantez yerine nokta ile erişiyoruz.
+    final mekanIsmi = (langCode == 'tr') ? mekan.isim.tr : mekan.isim.en;
+    final sorguLower = aramaSorgusu.toLowerCase();
 
-        return mekanIsmi.toLowerCase().contains(sorguLower);
-      }).toList();
+    return mekanIsmi.toLowerCase().contains(sorguLower);
+  }).toList();
 
-      return AsyncData(
-        filtrelenmis,
-      ); // Filtrelenmiş veriyi AsyncData olarak döndür.
-    });
+  return AsyncData(filtrelenmis);
+});
 //-----------------------------------------------------------------------------
 
 // 4. Mekan Detayı

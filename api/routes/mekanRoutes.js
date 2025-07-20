@@ -1,140 +1,199 @@
-// routes/mekanRoutes.js
+// routes/mekanRoutes.js (GÜVENLİ VE TUTARLI HALİ)
 
 const express = require('express');
 const router = express.Router();
-const Mekan = require('../models/Mekan'); // Daha önce oluşturduğumuz Mekan modelini içeri alıyoruz
-
+const auth = require('../middleware/auth'); // Güvenlik için middleware'i dahil ediyoruz
+const Mekan = require('../models/Mekan');
+const Yorum = require('../models/Yorum');
 
 // @route   GET api/mekanlar
 // @desc    Tüm mekanları veya kategoriye göre filtrelenmiş mekanları getirir
 // @access  Public
 router.get('/', async (req, res) => {
     try {
-        const { kategori } = req.query; // URL'den gelen ?kategori=... parametresini al
-
-        const filtre = {}; // Boş bir filtre nesnesi oluştur
+        const { kategori } = req.query;
+        const filtre = {};
         if (kategori && kategori !== 'categoryAll') {
-            // Eğer bir kategori geldiyse ve bu 'Tümü' değilse, filtreye ekle
             filtre.kategori = kategori;
         }
 
-        // Veritabanında filtreye göre arama yap
-        const mekanlar = await Mekan.find(filtre).sort({ eklenmeTarihi: -1 });
+        // İYİLEŞTİRME: .select() ile sadece liste için gerekli alanları çekiyoruz.
+        // Bu, gönderilen veri miktarını azaltır ve performansı artırır.
+        const mekanlar = await Mekan.find(filtre)
+            .select('isim kategori fotograflar ortalamaPuan konum')
+            .sort({ eklenmeTarihi: -1 });
         
         res.json(mekanlar);
     } catch (err) {
         console.error(err.message);
-        res.status(500).send('Sunucu Hatası');
+        // DÜZELTME: Artık tüm hatalar JSON formatında gönderiliyor.
+        res.status(500).json({ msg: 'Sunucu Hatası' });
     }
 });
 
 // @route   POST api/mekanlar
 // @desc    Yeni bir mekan oluşturur
-// @access  Private (Şimdilik Public, sonra admin yetkisi ekleyeceğiz)
-router.post('/', async (req, res) => {
+// @access  Private (Sadece giriş yapmış ve admin yetkisine sahip kullanıcılar)
+router.post('/', auth, async (req, res) => { // GÜVENLİK: 'auth' middleware eklendi.
     try {
-        // İstekle gelen verilerden yeni bir mekan oluşturuyoruz
+        // DÜZELTME: Çok-dilli yapıya uygun veri alımı
+        const { isim, aciklama, kategori, konum, fotograflar } = req.body;
+
+        // Gerekli alanların kontrolü
+        if (!isim || !isim.tr || !isim.en || !aciklama || !kategori || !konum) {
+            return res.status(400).json({ msg: 'Lütfen gerekli tüm alanları doldurun.' });
+        }
+
         const yeniMekan = new Mekan({
-            isim: req.body.isim,
-            aciklama: req.body.aciklama,
-            kategori: req.body.kategori,
-            konum: req.body.konum
-            // fotograflar gibi zorunlu olmayan alanlar daha sonra eklenebilir
+            isim,
+            aciklama,
+            kategori,
+            konum,
+            fotograflar
         });
 
-        // Yeni mekanı veritabanına kaydediyoruz
         const mekan = await yeniMekan.save();
-
-        // Başarılı olursa, kaydedilen mekanı cevap olarak dönüyoruz
         res.status(201).json(mekan);
 
     } catch (err) {
         console.error(err.message);
-        res.status(500).send('Sunucu Hatası');
+        res.status(500).json({ msg: 'Sunucu Hatası' });
     }
 });
 
 
+// @route   GET api/mekanlar/yakinimdakiler
+// @desc    Verilen koordinatlara en yakın mekanları getirir (DETAYLI LOG'LAMA İLE)
+// @access  Public
+router.get('/yakinimdakiler', async (req, res) => {
+    console.log("\n--- YAKINIMDAKİLER ROTASI TETİKLENDİ ---");
+    try {
+        const { enlem, boylam, mesafe = 500000 } = req.query;
+        console.log(`[1] Gelen Parametreler -> Enlem: ${enlem}, Boylam: ${boylam}`);
+
+        if (!enlem || !boylam) {
+            console.log("[HATA] Enlem veya boylam parametresi eksik.");
+            return res.status(400).json({ msg: 'Enlem ve boylam gereklidir.' });
+        }
+
+        const lat = parseFloat(enlem);
+        const lon = parseFloat(boylam);
+        console.log(`[2] Parse Edilmiş Değerler -> Enlem: ${lat}, Boylam: ${lon}`);
+
+        const sorgu = {
+            konum: {
+                $nearSphere: {
+                    $geometry: {
+                        type: "Point",
+                        coordinates: [lon, lat]
+                    },
+                    $maxDistance: parseInt(mesafe)
+                }
+            }
+        };
+        console.log("[3] MongoDB'ye gönderilecek sorgu oluşturuldu.");
+
+        const mekanlar = await Mekan.find(sorgu).select('isim kategori fotograflar ortalamaPuan konum');
+        console.log(`[4] Sorgu başarılı. ${mekanlar.length} adet mekan bulundu.`);
+
+        res.json(mekanlar);
+
+    } catch (err) {
+        console.error("\n!!! YAKINIMDAKİLER ROTASINDA KRİTİK HATA !!!");
+        console.error(err); // Hatanın tamamını ve sebebini terminale yazdır
+        
+        res.status(500).json({
+            msg: 'Sunucu tarafında bir hata oluştu. Lütfen terminal loglarını kontrol edin.',
+            error: err.message,
+        });
+    }
+});
+
 // @route   GET api/mekanlar/:id
-// @desc    ID ile tek bir mekanın detayını ve YORUMLARINI getirir
+// @desc    ID ile tek bir mekanın detayını ve yorumlarını getirir
 // @access  Public
 router.get('/:id', async (req, res) => {
     try {
-        // ID ile mekanı bul ve bu mekana ait tüm yorumları getir.
-        // populate ile referanslı alanları gerçek verilerle dolduruyoruz.
         const mekan = await Mekan.findById(req.params.id);
-        
-        const yorumlar = await Yorum.find({ mekan: req.params.id })
-            .populate({
-                path: 'yazar', // Yorum modelindeki 'yazar' alanını doldur
-                select: 'kullaniciAdi profilFotoUrl' // Yazardan sadece bu bilgileri al
-            })
-            .sort({ yorumTarihi: -1 });
-
         if (!mekan) {
             return res.status(404).json({ msg: 'Mekan bulunamadı' });
         }
 
-        // Mekan ve yorumları tek bir JSON nesnesinde birleştirip gönder
+        const yorumlar = await Yorum.find({ mekan: req.params.id })
+            .populate('yazar', 'kullaniciAdi profilFotoUrl')
+            .sort({ yorumTarihi: -1 });
+
         res.json({
             mekan: mekan,
             yorumlar: yorumlar
         });
-
     } catch (err) {
-        // ... mevcut catch bloğu aynı kalabilir ...
+        console.error("MEKAN DETAYI ÇEKİLİRKEN HATA OLUŞTU:", err);
+        if (err.kind === 'ObjectId') {
+            return res.status(404).json({ msg: 'Mekan bulunamadı' });
+        }
+        res.status(500).json({ 
+            msg: 'Sunucu tarafında bir hata oluştu.', 
+            error: err.message
+        });
     }
 });
-
 
 // @route   PUT api/mekanlar/:id
 // @desc    Mevcut bir mekanı günceller
-// @access  Private (Şimdilik Public)
-router.put('/:id', async (req, res) => {
+// @access  Private
+router.put('/:id', auth, async (req, res) => { // GÜVENLİK: 'auth' middleware eklendi.
     try {
-        // ID ile güncellenecek mekanı bul
-        let mekan = await Mekan.findById(req.params.id);
-
+        const mekan = await Mekan.findById(req.params.id);
         if (!mekan) {
             return res.status(404).json({ msg: 'Mekan bulunamadı' });
         }
-
-        // Yeni verilerle mekanı güncelle
-        // { new: true } parametresi, güncellenmiş halini cevap olarak dönmesini sağlar
-        mekan = await Mekan.findByIdAndUpdate(
+        
+        // DÜZELTME: req.body'yi doğrudan kullanmak yerine güncellenecek alanları belirliyoruz.
+        const { isim, aciklama, kategori, konum, fotograflar } = req.body;
+        const guncellenecekAlanlar = {};
+        if (isim) guncellenecekAlanlar.isim = isim;
+        if (aciklama) guncellenecekAlanlar.aciklama = aciklama;
+        if (kategori) guncellenecekAlanlar.kategori = kategori;
+        if (konum) guncellenecekAlanlar.konum = konum;
+        if (fotograflar) guncellenecekAlanlar.fotograflar = fotograflar;
+        
+        const guncellenmisMekan = await Mekan.findByIdAndUpdate(
             req.params.id,
-            { $set: req.body },
+            { $set: guncellenecekAlanlar },
             { new: true }
         );
 
-        res.json(mekan);
-
+        res.json(guncellenmisMekan);
     } catch (err) {
         console.error(err.message);
-        res.status(500).send('Sunucu Hatası');
+        res.status(500).json({ msg: 'Sunucu Hatası' });
     }
 });
 
-
 // @route   DELETE api/mekanlar/:id
-// @desc    Bir mekanı siler
-// @access  Private (Şimdilik Public)
-router.delete('/:id', async (req, res) => {
+// @desc    Bir mekanı ve ilgili tüm yorumları siler
+// @access  Private
+router.delete('/:id', auth, async (req, res) => { // GÜVENLİK: 'auth' middleware eklendi.
     try {
-        let mekan = await Mekan.findById(req.params.id);
-
+        const mekan = await Mekan.findById(req.params.id);
         if (!mekan) {
             return res.status(404).json({ msg: 'Mekan bulunamadı' });
         }
 
+        // VERİ BÜTÜNLÜĞÜ: Mekanı silmeden önce, o mekana ait tüm yorumları da siliyoruz.
+        await Yorum.deleteMany({ mekan: req.params.id });
+
+        // Şimdi mekanı silebiliriz.
         await Mekan.findByIdAndDelete(req.params.id);
 
-        res.json({ msg: 'Mekan başarıyla silindi' });
-
+        res.json({ msg: 'Mekan ve ilgili yorumlar başarıyla silindi' });
     } catch (err) {
         console.error(err.message);
-        res.status(500).send('Sunucu Hatası');
+        res.status(500).json({ msg: 'Sunucu Hatası' });
     }
 });
 
-module.exports = router; // Bu rotaları dışarıya açıyoruz
+
+
+module.exports = router;

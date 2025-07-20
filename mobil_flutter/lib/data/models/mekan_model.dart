@@ -1,8 +1,27 @@
-// lib/data/models/mekan_model.dart
-import 'package:mobil_flutter/data/models/yorum_model.dart'; // YorumModel'i import et
+// lib/data/models/mekan_model.dart (TAM VE DÜZELTİLMİŞ HALİ)
 
+import 'package:mobil_flutter/data/models/yorum_model.dart';
 
-// 1. Konum verisini tutacak sınıf (Null kontrolü eklendi)
+// YARDIMCI SINIF
+class CokDilliMetin {
+  final String tr;
+  final String en;
+
+  CokDilliMetin({required this.tr, required this.en});
+
+  // DÜZELTME BURADA: Map<String, dynamic> olarak değiştirildi.
+  factory CokDilliMetin.fromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      return CokDilliMetin(tr: 'Veri Yok', en: 'No Data');
+    }
+    return CokDilliMetin(
+      tr: json['tr'] ?? 'Çeviri Yok',
+      en: json['en'] ?? 'No Translation',
+    );
+  }
+}
+
+// YARDIMCI SINIF
 class Konum {
   final double enlem;
   final double boylam;
@@ -11,18 +30,17 @@ class Konum {
 
   factory Konum.fromJson(Map<String, dynamic> json) {
     return Konum(
-      // ?? 0.0 ile null gelirse varsayılan değer atıyoruz.
       enlem: (json['enlem'] ?? 0.0).toDouble(),
       boylam: (json['boylam'] ?? 0.0).toDouble(),
     );
   }
 }
 
-// 2. Mekan sınıfı (Null kontrolleri ile daha güvenli hale getirildi)
+// ANA MODEL
 class MekanModel {
   final String id;
-  final Map<String, String> isim;
-  final Map<String, String> aciklama;
+  final CokDilliMetin isim;
+  final CokDilliMetin aciklama;
   final String kategori;
   final Konum konum;
   final List<String> fotograflar;
@@ -37,24 +55,21 @@ class MekanModel {
     required this.konum,
     required this.fotograflar,
     required this.ortalamaPuan,
-    required this.yorumlar, 
+    required this.yorumlar,
   });
 
-   factory MekanModel.fromDetailJson(Map<String, dynamic> json) {
+  factory MekanModel.fromDetailJson(Map<String, dynamic> json) {
     var yorumListesi = <YorumModel>[];
     if (json['yorumlar'] != null) {
       json['yorumlar'].forEach((v) {
         yorumListesi.add(YorumModel.fromJson(v));
       });
     }
-
     final mekanJson = json['mekan'];
-    
     return MekanModel(
-      // DÜZELTME: Artık tüm verileri `json` yerine `mekanJson`'dan okuyoruz.
       id: mekanJson['_id'] ?? '',
-      isim: mekanJson['isim'] ?? 'İsim Yok',
-      aciklama: mekanJson['aciklama'] ?? 'Açıklama Yok',
+      isim: CokDilliMetin.fromJson(mekanJson['isim']),
+      aciklama: CokDilliMetin.fromJson(mekanJson['aciklama']),
       kategori: mekanJson['kategori'] ?? 'Kategorisiz',
       konum: mekanJson['konum'] != null
           ? Konum.fromJson(mekanJson['konum'])
@@ -65,23 +80,18 @@ class MekanModel {
     );
   }
 
-  // YENİ EKLENDİ: Ana listedeki mekanları (yorumlar olmadan) parse eden basit factory
   factory MekanModel.fromListJson(Map<String, dynamic> json) {
     return MekanModel(
       id: json['_id'] ?? '',
-      isim: json['isim'] is Map
-          ? Map<String, String>.from(json['isim'])
-          : {'tr': 'İsim Yok', 'en': 'No Name'},
-      aciklama: json['aciklama'] is Map
-          ? Map<String, String>.from(json['aciklama'])
-          : {'tr': 'Açıklama Yok', 'en': 'No Description'},
+      isim: CokDilliMetin.fromJson(json['isim']),
+      aciklama: CokDilliMetin.fromJson(json['aciklama']),
       kategori: json['kategori'] ?? 'Kategorisiz',
       konum: json['konum'] != null
           ? Konum.fromJson(json['konum'])
           : Konum(enlem: 0.0, boylam: 0.0),
       fotograflar: List<String>.from(json['fotograflar'] ?? []),
       ortalamaPuan: (json['ortalamaPuan'] ?? 0.0).toDouble(),
-      yorumlar: [], // Liste görünümünde yorumlar boş gelir.
+      yorumlar: [],
     );
   }
 }

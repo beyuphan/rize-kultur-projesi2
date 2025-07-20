@@ -52,6 +52,11 @@
   "oldPassword": "Eski Şifre",
   "newPassword": "Yeni Şifre",
   "noName": "İsim Yok",
+   "noVenuesFound": "Değer Bulunamadı.",
+    "yourComment": "Yorumunuz",
+    "edit": "Düzenle",
+
+  "noName": "İsim Yok",
   "noVenuesFound": "Değer Bulunamadı",
   "noCommentsYet": "Yorum Yok",
   "reviews": "Değerlendirmeler",

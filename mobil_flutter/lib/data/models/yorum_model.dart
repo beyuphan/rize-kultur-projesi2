@@ -1,12 +1,10 @@
-// lib/data/models/yorum_model.dart dosyasının TAMAMI BU OLMALI
-
-import 'package:mobil_flutter/data/models/user_model.dart';
+import 'package:mobil_flutter/data/models/user_model.dart'; // UserModel'ı import ediyoruz
 
 class YorumModel {
   final String id;
-  final String? icerik;
-  final double? puan;
-  final UserModel yazar;
+  final String? icerik; // Artık null olabilir
+  final double? puan;   // Artık null olabilir
+  final UserModel yazar; // Yorumu yapan kişinin bilgileri
   final DateTime yorumTarihi;
 
   YorumModel({
@@ -22,7 +20,7 @@ class YorumModel {
       id: json['_id'],
       icerik: json['icerik'],
       puan: (json['puan'] != null) ? (json['puan'] as num).toDouble() : null,
-      yazar: UserModel.fromJson(json['yazar']),
+      yazar: UserModel.fromJson(json['yazar']), // İç içe model parse etme
       yorumTarihi: DateTime.parse(json['yorumTarihi']),
     );
   }
