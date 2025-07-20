@@ -60,5 +60,8 @@
   "bottomNavProfile": "My Profile",
   "yourRating": "Your Rating",
   "photos": "Photos",
-  "addComment": "Add Comment"
+  "addComment": "Add Comment",
+  "noVenuesFound": "No Venues Found",
+  "yourComment": "Your Comment",
+  "edit": "Edit"
 }

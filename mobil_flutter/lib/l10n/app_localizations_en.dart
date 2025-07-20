@@ -132,27 +132,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newPassword => 'New Password';
 
   @override
-  String get noName => 'No Name';
-
-  @override
-  String get noVenuesFound => 'No Venues Found';
-
-  @override
-  String get noCommentsYet => 'No Comments Yet';
-
-  @override
-  String get noName => 'No Name';
-
-  @override
-  String get noVenuesFound => 'No Venues Yet';
-
-  @override
-  String get yourComment => 'Your Comment';
-
-  @override
-  String get edit => 'Edit';
-
-  @override
   String get reviews => 'Reviews';
 
   @override
@@ -181,4 +160,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bottomNavProfile => 'My Profile';
+
+  @override
+  String get noVenuesFound => 'No Venues Found';
+
+  @override
+  String get yourComment => 'Your Comment';
+
+  @override
+  String get edit => 'Edit';
 }

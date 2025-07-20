@@ -344,48 +344,6 @@ abstract class AppLocalizations {
   /// **'New Password'**
   String get newPassword;
 
-  /// No description provided for @noName.
-  ///
-  /// In en, this message translates to:
-  /// **'No Name'**
-  String get noName;
-
-  /// No description provided for @noVenuesFound.
-  ///
-  /// In en, this message translates to:
-  /// **'No Venues Found'**
-  String get noVenuesFound;
-
-  /// No description provided for @noCommentsYet.
-  ///
-  /// In en, this message translates to:
-  /// **'No Comments Yet'**
-  String get noCommentsYet;
-
-  /// No description provided for @noName.
-  ///
-  /// In en, this message translates to:
-  /// **'No Name'**
-  String get noName;
-
-  /// No description provided for @noVenuesFound.
-  ///
-  /// In en, this message translates to:
-  /// **'No Venues Yet'**
-  String get noVenuesFound;
-
-  /// No description provided for @yourComment.
-  ///
-  /// In en, this message translates to:
-  /// **'Your Comment'**
-  String get yourComment;
-
-  /// No description provided for @edit.
-  ///
-  /// In en, this message translates to:
-  /// **'Edit'**
-  String get edit;
-
   /// No description provided for @reviews.
   ///
   /// In en, this message translates to:
@@ -439,6 +397,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'My Profile'**
   String get bottomNavProfile;
+
+  /// No description provided for @noVenuesFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No Venues Found'**
+  String get noVenuesFound;
+
+  /// No description provided for @yourComment.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Comment'**
+  String get yourComment;
+
+  /// No description provided for @edit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get edit;
 }
 
 class _AppLocalizationsDelegate

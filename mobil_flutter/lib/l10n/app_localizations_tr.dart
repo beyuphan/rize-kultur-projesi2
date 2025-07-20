@@ -160,4 +160,13 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get bottomNavProfile => 'Profilim';
+
+  @override
+  String get noVenuesFound => 'Değer Bulunamadı';
+
+  @override
+  String get yourComment => 'Yorumunuz';
+
+  @override
+  String get edit => 'Düzenle';
 }
