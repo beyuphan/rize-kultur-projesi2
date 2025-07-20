@@ -74,6 +74,7 @@ router.get('/kullanici/me', auth, async (req, res) => {
     try {
         console.log("[1] Kullanıcının yorumları aranıyor ve mekan bilgileri populate ediliyor...");
         const yorumlar = await Yorum.find({ yazar: req.kullanici.id })
+            .populate('yazar', 'kullaniciAdi profilFotoUrl')    
             .populate('mekan', 'isim fotograflar')
             .sort({ yorumTarihi: -1 });
         console.log(`[2] Yorumlar başarıyla bulundu ve populate edildi. Adet: ${yorumlar.length}`);
