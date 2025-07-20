@@ -2,9 +2,12 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobil_flutter/data/models/mekan_model.dart';
+import 'package:mobil_flutter/data/models/yorum_model.dart';
+
 // İSİM DEĞİŞİKLİĞİ: Artık ApiService yerine MekanService kullanıyoruz.
 // Bu yüzden kendi projende de dosya adını ve sınıf adını değiştirmeyi unutma.
 import 'package:mobil_flutter/data/services/api_service.dart';
+import 'package:mobil_flutter/presentation/providers/user_providers.dart';
 import 'package:flutter/material.dart';
 
 // --- SERVİS PROVIDER ---
@@ -112,4 +115,34 @@ final mekanDetayProvider = FutureProvider.family<MekanModel, String>((
   // watch kullanmak burada daha doğru olabilir, çünkü servis değişirse (pek olası değil ama)
   // bu provider da güncellenir. Ama read de sorunsuz çalışır.
   return ref.watch(mekanServiceProvider).getMekanDetay(mekanId);
+});
+
+
+
+// 5. Mekanların Favori Durumunu Değiştirme
+// Giriş yapmış kullanıcının tüm yorumlarını getiren provider
+final kullaniciYorumlariProvider = FutureProvider.autoDispose<List<YorumModel>>((ref) {
+  final mekanService = ref.watch(mekanServiceProvider);
+  return mekanService.getMyYorumlar();
+});
+
+// Giriş yapmış kullanıcının favori mekanlarının detaylarını getiren provider
+final favoriMekanlarProvider = FutureProvider.autoDispose<List<MekanModel>>((ref) async {
+  // Önce kullanıcı profilini alıp favori ID'lerini öğrenmemiz lazım
+  final userAsyncValue = ref.watch(userProfileProvider);
+  
+  // DÜZELTME: userAsyncValue'nin data içerip içermediğini kontrol et
+  return userAsyncValue.when(
+    data: (user) async {
+      if (user.favoriMekanlar.isEmpty) {
+        return []; // Favorisi yoksa boş liste dön
+      }
+      // Sonra o ID'ler ile mekan detaylarını çek
+      final mekanService = ref.watch(mekanServiceProvider);
+      return mekanService.getMekanlarByIds(user.favoriMekanlar);
+    },
+    // Yükleniyor veya hata durumlarında boş liste döndür
+    loading: () => [], 
+    error: (e, s) => throw e, // Veya hatayı göster
+  );
 });

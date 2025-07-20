@@ -65,4 +65,21 @@ router.post('/:mekanId', auth, async (req, res) => {
     }
 });
 
+
+// @route   GET api/yorumlar/kullanici/me
+// @desc    Giriş yapmış kullanıcının tüm yorumlarını getirir
+// @access  Private
+router.get('/kullanici/me', auth, async (req, res) => {
+    try {
+        const yorumlar = await Yorum.find({ yazar: req.kullanici.id })
+            .populate('mekan', 'isim fotograflar') // Yorumun yapıldığı mekanın ismini ve fotoğrafını da getir
+            .sort({ yorumTarihi: -1 });
+
+        res.json(yorumlar);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Sunucu Hatası' });
+    }
+});
+
 module.exports = router;

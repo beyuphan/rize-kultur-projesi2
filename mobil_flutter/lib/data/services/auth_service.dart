@@ -204,4 +204,7 @@ class AuthService {
       throw Exception('Profil alınırken bir hata oluştu: $e');
     }
   }
+
+  
+
 }

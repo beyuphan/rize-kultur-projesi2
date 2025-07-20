@@ -126,4 +126,43 @@ class ApiService {
       throw Exception('Yakındaki mekanlar yüklenemedi.');
     }
   }
+
+  // KULLANICININ YORUMLARINI GETİR
+Future<List<YorumModel>> getMyYorumlar() async {
+    final token = await _authService.tokenAl();
+    if (token == null) throw Exception('Yorumları getirmek için giriş yapmalısınız.');
+    
+    final url = '$_baseUrl/yorumlar/kullanici/me';
+    final response = await http.get(
+      Uri.parse(url),
+      headers: { 'Authorization': 'Bearer $token' },
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> yorumlarJson = json.decode(utf8.decode(response.bodyBytes));
+      // DİKKAT: YorumModel'in fromJson'ı mekan objesini de parse edebilmeli.
+      return yorumlarJson.map((json) => YorumModel.fromJsonWithMekan(json)).toList();
+    } else {
+      throw Exception('Yorumlar yüklenemedi.');
+    }
+}
+
+// FAVORİ MEKAN DETAYLARINI GETİR
+Future<List<MekanModel>> getMekanlarByIds(List<String> ids) async {
+    if (ids.isEmpty) return [];
+    
+    final url = '$_baseUrl/mekanlar/by-ids';
+    final response = await http.post(
+      Uri.parse(url),
+      headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+      body: jsonEncode({ 'ids': ids }),
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> mekanlarJson = json.decode(utf8.decode(response.bodyBytes));
+      return mekanlarJson.map((json) => MekanModel.fromListJson(json)).toList();
+    } else {
+      throw Exception('Favori mekanlar yüklenemedi.');
+    }
+}
 }

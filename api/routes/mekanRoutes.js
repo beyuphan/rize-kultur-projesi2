@@ -196,4 +196,26 @@ router.delete('/:id', auth, async (req, res) => { // GÜVENLİK: 'auth' middlewa
 
 
 
+// @route   POST api/mekanlar/by-ids
+// @desc    Verilen ID dizisindeki mekanların detaylarını getirir
+// @access  Public
+router.post('/by-ids', async (req, res) => {
+    try {
+        const ids = req.body.ids;
+        if (!ids || !Array.isArray(ids)) {
+            return res.status(400).json({ msg: 'ID dizisi gereklidir.' });
+        }
+
+        const mekanlar = await Mekan.find({ '_id': { $in: ids } })
+            .select('isim kategori fotograflar ortalamaPuan');
+
+        res.json(mekanlar);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Sunucu Hatası' });
+    }
+});
+
+
+
 module.exports = router;
