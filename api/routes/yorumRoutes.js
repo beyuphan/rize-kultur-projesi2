@@ -70,15 +70,20 @@ router.post('/:mekanId', auth, async (req, res) => {
 // @desc    Giriş yapmış kullanıcının tüm yorumlarını getirir
 // @access  Private
 router.get('/kullanici/me', auth, async (req, res) => {
+   console.log(`\n--- KULLANICI YORUMLARI İSTEĞİ GELDİ: UserID = ${req.kullanici.id} ---`);
     try {
+        console.log("[1] Kullanıcının yorumları aranıyor ve mekan bilgileri populate ediliyor...");
         const yorumlar = await Yorum.find({ yazar: req.kullanici.id })
-            .populate('mekan', 'isim fotograflar') // Yorumun yapıldığı mekanın ismini ve fotoğrafını da getir
+            .populate('mekan', 'isim fotograflar')
             .sort({ yorumTarihi: -1 });
+        console.log(`[2] Yorumlar başarıyla bulundu ve populate edildi. Adet: ${yorumlar.length}`);
 
         res.json(yorumlar);
+        console.log("--- KULLANICI YORUMLARI İSTEĞİ BAŞARIYLA BİTTİ ---");
     } catch (err) {
-        console.error(err.message);
-        res.status(500).json({ msg: 'Sunucu Hatası' });
+        console.error("\n!!! KULLANICI YORUMLARI ROTASINDA KRİTİK HATA !!!");
+        console.error(err);
+        res.status(500).json({ msg: 'Sunucu Hatası', error: err.message });
     }
 });
 

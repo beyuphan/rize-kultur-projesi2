@@ -113,29 +113,33 @@ router.get('/yakinimdakiler', async (req, res) => {
 // @desc    ID ile tek bir mekanın detayını ve yorumlarını getirir
 // @access  Public
 router.get('/:id', async (req, res) => {
+    console.log(`\n--- MEKAN DETAYI İSTEĞİ GELDİ: ID = ${req.params.id} ---`);
     try {
+        console.log("[1] Mekan bilgisi aranıyor...");
         const mekan = await Mekan.findById(req.params.id);
+
         if (!mekan) {
+            console.log("[HATA] Mekan bulunamadı.");
             return res.status(404).json({ msg: 'Mekan bulunamadı' });
         }
+        console.log("[2] Mekan bulundu:", mekan.isim.tr);
 
+        console.log("[3] Bu mekana ait yorumlar aranıyor ve populate ediliyor...");
         const yorumlar = await Yorum.find({ mekan: req.params.id })
             .populate('yazar', 'kullaniciAdi profilFotoUrl')
             .sort({ yorumTarihi: -1 });
+        console.log(`[4] Yorumlar başarıyla bulundu ve populate edildi. Adet: ${yorumlar.length}`);
 
         res.json({
             mekan: mekan,
             yorumlar: yorumlar
         });
+        console.log("--- MEKAN DETAYI İSTEĞİ BAŞARIYLA BİTTİ ---");
+
     } catch (err) {
-        console.error("MEKAN DETAYI ÇEKİLİRKEN HATA OLUŞTU:", err);
-        if (err.kind === 'ObjectId') {
-            return res.status(404).json({ msg: 'Mekan bulunamadı' });
-        }
-        res.status(500).json({ 
-            msg: 'Sunucu tarafında bir hata oluştu.', 
-            error: err.message
-        });
+        console.error("\n!!! MEKAN DETAYI ROTASINDA KRİTİK HATA !!!");
+        console.error(err);
+        res.status(500).json({ msg: 'Sunucu Hatası', error: err.message });
     }
 });
 
