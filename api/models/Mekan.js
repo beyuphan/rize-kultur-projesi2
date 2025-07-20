@@ -63,7 +63,6 @@ const MekanSchema = new Schema({
 });
 
 
-MekanSchema.index({ mekan: 1 }); // Bu satır YorumSchema'daydı, burada değil. Karıştırmayalım.
 
 
 // Coğrafi sorgular için indeksi ana şemaya ekliyoruz
