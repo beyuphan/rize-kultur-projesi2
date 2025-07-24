@@ -14,47 +14,56 @@ class PuanGostergesi extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const cayYapragiIkonu = Icons.eco; // Kendi özel SVG ikonumuzu kullanana kadar...
+    const cayYapragiIkonu = Icons.eco;
     final tema = Theme.of(context);
+    final aktifRenk = tema.colorScheme.secondary;
+    final pasifRenk = tema.dividerColor.withOpacity(0.5);
 
-    // Puanın, 0 ile 5 arasında olduğundan emin oluyoruz.
-    final gecerliPuan = puan.clamp(0.0, maxPuan.toDouble());
-    
-    // Doluluk oranını hesaplıyoruz (ör: 4.8 puan -> 0.96)
-    final dolulukOrani = gecerliPuan / maxPuan;
-
-    return ShaderMask(
-      // İşte sihir burada! Bu maske, altındaki widget'a bir gradyan uygular.
-      shaderCallback: (Rect bounds) {
-        // Sol alttan sağ üste giden bir gradyan oluşturuyoruz.
-        return LinearGradient(
-          // DÜZELTME: Eğimi biraz daha yatay yapmak için y eksenindeki değerleri küçültüyoruz.
-          // Bu, dolumun 45 dereceden daha yumuşak bir açıyla olmasını sağlar.
-          begin: const Alignment(-0.3, 0.6),
-          end: const Alignment(0.9, -0.8),
-          // Puanımıza göre gradyanın nerede başlayıp biteceğini hesaplıyoruz.
-          // Dolu kısım temanın vurgu rengi, boş kısım şeffaf olacak.
-          stops: [0.0, dolulukOrani, dolulukOrani],
-          colors: [
-            tema.colorScheme.secondary, // Başlangıç rengi (dolu)
-            tema.colorScheme.secondary, // Bitiş rengi (dolu)
-            tema.colorScheme.secondary.withOpacity(0.0) // Şeffaf (görünmez) kısım
-          ],
-          tileMode: TileMode.mirror,
-        ).createShader(bounds);
-      },
-      child: Row(
+    // Tek bir ikon sırası oluşturan yardımcı bir fonksiyon
+    Row buildIconRow(Color renk) {
+      return Row(
         mainAxisSize: MainAxisSize.min,
         children: List.generate(maxPuan, (index) {
-          // Bu katman, her zaman 5 tane tam dolu, beyaz (veya herhangi bir renk)
-          // ikon çizer. Üstteki ShaderMask, bunları doğru şekilde boyayacak.
           return Icon(
             cayYapragiIkonu,
-            color: Colors.white, // Maskenin çalışması için burası dolu bir renk olmalı.
+            color: renk,
             size: iconSize,
           );
         }),
-      ),
+      );
+    }
+
+    return Stack(
+      children: [
+        // 1. Katman: Alttaki boş ikonlar
+        buildIconRow(pasifRenk),
+        // 2. Katman: Kırpılmış dolu ikonlar
+        ClipRect(
+          clipper: _PuanClipper(puan: puan, maxPuan: maxPuan),
+          child: buildIconRow(aktifRenk),
+        ),
+      ],
     );
+  }
+}
+
+// Bu yardımcı sınıf, üstteki widget'ı doğru oranda kırpmamızı sağlar
+class _PuanClipper extends CustomClipper<Rect> {
+  _PuanClipper({required this.puan, required this.maxPuan});
+  
+  final double puan;
+  final int maxPuan;
+
+  @override
+  Rect getClip(Size size) {
+    // Toplam genişliğin ne kadarının gösterileceğini hesapla
+    final double dolulukOrani = (puan / maxPuan).clamp(0.0, 1.0);
+    return Rect.fromLTRB(0, 0, size.width * dolulukOrani, size.height);
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Rect> oldClipper) {
+    // Puan değiştiğinde kırpma işleminin yeniden yapılmasını sağlar
+    return oldClipper is _PuanClipper && oldClipper.puan != puan;
   }
 }
