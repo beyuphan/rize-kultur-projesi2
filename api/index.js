@@ -33,6 +33,7 @@ mongoose.connect(process.env.MONGO_URI)
     app.use('/api/auth', authRoutes);
     app.use('/api/mekanlar', mekanRoutes);
     app.use('/api/yorumlar', yorumRoutes);
+    app.use('/api/users', require('./routes/userRoutes')); 
 
     app.get('/', (req, res) => {
       res.send('Rize Kültür Projesi API Çalışıyor!');

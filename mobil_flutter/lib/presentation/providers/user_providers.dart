@@ -2,11 +2,12 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobil_flutter/data/models/user_model.dart';
-import 'package:mobil_flutter/data/services/auth_service.dart';
 import 'package:mobil_flutter/data/services/api_service.dart';
 import 'package:mobil_flutter/presentation/providers/mekan_providers.dart';
 import 'package:mobil_flutter/presentation/providers/auth_providers.dart';
 
+
+final apiServiceProvider = Provider((ref) => ApiService());
 
 // --- YENİ StateNotifier VE Provider ---
 // ESKİ FutureProvider'ın YERİNİ BU ALACAK
@@ -63,4 +64,13 @@ class UserProfileNotifier extends StateNotifier<AsyncValue<UserModel>> {
       state = currentState; 
     }
   }
+
 }
+
+// --- DÜZELTME BURADA ---
+// publicUserProfileProvider, UserProfileNotifier sınıfının DIŞINDA olmalı.
+final publicUserProfileProvider = FutureProvider.family<UserModel, String>((ref, userId) {
+  // ApiService provider'ını burada okuyup kullanıyoruz
+  final apiService = ref.watch(apiServiceProvider); 
+  return apiService.getPublicUserProfile(userId);
+});

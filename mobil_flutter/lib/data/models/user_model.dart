@@ -1,9 +1,12 @@
+import 'package:mobil_flutter/data/models/yorum_model.dart';
+
 class UserModel {
   final String id;
   final String kullaniciAdi;
   final String email;
   final String? profilFotoUrl; // YENİ: Null olabilir
   final List<String> favoriMekanlar; // FAVORİ LİSTESİ ALANI
+    final List<YorumModel> yorumlar; // Bu alanı ekle
 
   UserModel({
     required this.id,
@@ -11,6 +14,7 @@ class UserModel {
     required this.email,
     this.profilFotoUrl,
         required this.favoriMekanlar, // CONSTRUCTOR'A EKLENDİ
+            this.yorumlar = const [], // Constructor'a ekle
   });
 
   // Backend'den gelen JSON verisinden model oluşturmak için
@@ -21,6 +25,19 @@ class UserModel {
       email: json['email'] ?? 'E-posta yok',
       profilFotoUrl: json['profilFotoUrl'], // YENİ
             favoriMekanlar: List<String>.from(json['favoriMekanlar'] ?? []),
+      yorumlar: const [],     );
+  }
+
+  // YENİ VE EKSİK OLAN METOT: Halka açık profil verisini parse eder
+  factory UserModel.fromPublicProfileJson(Map<String, dynamic> userJson, List<dynamic> yorumlarJson) {
+    return UserModel(
+      id: userJson['_id'],
+      kullaniciAdi: userJson['kullaniciAdi'],
+      profilFotoUrl: userJson['profilFotoUrl'],
+      // Halka açık profilde bu bilgiler olmadığı için varsayılan değerler atanır
+      email: '',
+      favoriMekanlar: [],
+      yorumlar: yorumlarJson.map((json) => YorumModel.fromJson(json)).toList(),
     );
   }
 

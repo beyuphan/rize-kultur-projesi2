@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:mobil_flutter/data/models/mekan_model.dart';
 import 'package:mobil_flutter/data/models/yorum_model.dart';
 import 'package:mobil_flutter/data/services/auth_service.dart'; // Token almak için AuthService'e ihtiyacımız var
+import 'package:mobil_flutter/data/models/user_model.dart'; // UserModel'i kullanmak için gerekli
 
 class ApiService {
   final String _baseUrl = 'https://rize-kultur-api.onrender.com/api';
@@ -164,5 +165,28 @@ Future<List<MekanModel>> getMekanlarByIds(List<String> ids) async {
     } else {
       throw Exception('Favori mekanlar yüklenemedi.');
     }
+}
+
+
+// YENİ METOT
+Future<UserModel> getPublicUserProfile(String userId) async {
+  final url = '$_baseUrl/users/$userId';
+  final response = await http.get(Uri.parse(url));
+
+  if (response.statusCode == 200) {
+    // Backend'den gelen {kullanici: ..., yorumlar: ...} yapısını parse etmeliyiz.
+    // UserModel'e yorumları da ekleyebiliriz veya yeni bir model oluşturabiliriz.
+    // Şimdilik UserModel'i zenginleştirelim.
+    final responseJson = json.decode(utf8.decode(response.bodyBytes));
+    final userJson = responseJson['kullanici'];
+    final yorumlarJson = responseJson['yorumlar'] as List;
+
+    // UserModel.fromJson'ın bu yeni yapıyı handle edebilmesi lazım.
+    // Ya da burada manuel olarak birleştirme yapabiliriz.
+    // En temizi UserModel'e bir factory constructor daha eklemek.
+    return UserModel.fromPublicProfileJson(userJson, yorumlarJson);
+  } else {
+    throw Exception('Kullanıcı profili yüklenemedi. Hata Kodu: ${response.statusCode}');
+  }
 }
 }

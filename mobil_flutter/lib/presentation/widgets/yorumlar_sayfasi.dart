@@ -76,11 +76,7 @@ class _YorumlarSayfasiState extends ConsumerState<YorumlarSayfasi> {
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 16.0),
                         child: YorumKarti(
-                          kullaniciAdi: yorum.yazar.kullaniciAdi,
-                          puan: yorum.puan,
-                          yorum: yorum.icerik,
-                          kullaniciImageUrl: yorum.yazar.profilFotoUrl,
-                          yorumTarihi: yorum.yorumTarihi,
+                          yorum: yorum,
                         ),
                       );
                     },
@@ -146,11 +142,7 @@ class _KullaniciYorumuGoster extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           YorumKarti(
-            kullaniciAdi: yorum.yazar.kullaniciAdi,
-            puan: yorum.puan,
-            yorum: yorum.icerik,
-            kullaniciImageUrl: yorum.yazar.profilFotoUrl,
-            yorumTarihi: yorum.yorumTarihi,
+            yorum: yorum
           ),
         ],
       ),
