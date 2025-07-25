@@ -116,7 +116,9 @@ router.get('/me', auth, async (req, res) => {
         }
 
         // YENİ: Bu kullanıcıya ait tüm yorumları bul
-        const yorumlar = await Yorum.find({ yazar: req.kullanici.id });
+        const yorumlar = await Yorum.find({ yazar: req.kullanici.id })
+          .populate('mekan', 'isim fotograflar') // EKLENDİ
+            .populate('yazar', 'kullaniciAdi profilFotoUrl'); // EKLENDİ
 
         // YENİ: Mongoose objesini normal bir objeye çevirip yorumları ekle
         const kullaniciObjesi = kullanici.toObject();
