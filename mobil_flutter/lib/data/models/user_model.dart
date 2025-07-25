@@ -19,13 +19,20 @@ class UserModel {
 
   // Backend'den gelen JSON verisinden model oluşturmak için
   factory UserModel.fromJson(Map<String, dynamic> json) {
+     var yorumListesi = <YorumModel>[];
+  if (json['yorumlar'] != null) {
+    json['yorumlar'].forEach((v) {
+      yorumListesi.add(YorumModel.fromJson(v));
+    });
+  }
+    
     return UserModel(
       id: json['_id'] ?? '', // Backend'den gelen ID'ye göre ayarlayın
       kullaniciAdi: json['kullaniciAdi'] ?? 'İsimsiz',
       email: json['email'] ?? 'E-posta yok',
       profilFotoUrl: json['profilFotoUrl'], // YENİ
             favoriMekanlar: List<String>.from(json['favoriMekanlar'] ?? []),
-      yorumlar: const [],     );
+      yorumlar:  yorumListesi,     );
   }
 
   // YENİ VE EKSİK OLAN METOT: Halka açık profil verisini parse eder
