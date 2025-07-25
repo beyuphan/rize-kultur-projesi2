@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const auth = require('../middleware/auth'); // Auth middleware'ini dahil ediyoruz
 const Kullanici = require('../models/Kullanici'); // Kullanici modelimizi dahil ediyoruz
+const Yorum = require('../models/Yorum'); // Yorum modelini import etmeyi unutma
 const upload = require('../config/cloudinaryConfig'); // Multer yapılandırmamızı import ediyoruz
 
 // @route   POST api/auth/kayit
@@ -109,19 +110,26 @@ router.post('/giris', async (req, res) => {
 // @access  Private
 router.get('/me', auth, async (req, res) => {
     try {
-        // auth middleware'i, token'dan aldığı kullanıcı id'sini req.kullanici.id'ye koyar.
-        // Şifre hariç diğer tüm bilgileri seçerek kullanıcıyı buluyoruz.
         const kullanici = await Kullanici.findById(req.kullanici.id).select('-sifre');
         if (!kullanici) {
             return res.status(404).json({ msg: 'Kullanıcı bulunamadı' });
         }
-        res.json(kullanici);
+
+        // YENİ: Bu kullanıcıya ait tüm yorumları bul
+        const yorumlar = await Yorum.find({ yazar: req.kullanici.id });
+
+        // YENİ: Mongoose objesini normal bir objeye çevirip yorumları ekle
+        const kullaniciObjesi = kullanici.toObject();
+        kullaniciObjesi.yorumlar = yorumlar;
+
+        // YENİ: Yorumları eklenmiş objeyi gönder
+        res.json(kullaniciObjesi);
+        
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Sunucu Hatası');
     }
 });
-
 
 // @route   PUT api/auth/favorites/:mekanId
 // @desc    Bir mekanı kullanıcının favorilerine ekler/çıkarır

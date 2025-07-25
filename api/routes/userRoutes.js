@@ -20,6 +20,7 @@ router.get('/:userId', async (req, res) => {
         // 2. Bu kullanıcının yaptığı tüm yorumları al
         const yorumlar = await Yorum.find({ yazar: req.params.userId })
             .populate('mekan', 'isim fotograflar') // Yorumun hangi mekana yapıldığını göster
+            .populate('yazar', 'kullaniciAdi profilFotoUrl') // <-- BU SATIRI EKLE
             .sort({ yorumTarihi: -1 });
 
         // 3. Kullanıcı bilgileri ve yorumlarını birleştirip gönder
