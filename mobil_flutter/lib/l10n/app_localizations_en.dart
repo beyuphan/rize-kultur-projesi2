@@ -175,4 +175,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noFavoritesYet => 'No Favorites Yet';
+
+  @override
+  String get searchResults => 'search Results';
 }

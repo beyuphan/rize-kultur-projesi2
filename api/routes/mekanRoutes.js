@@ -9,24 +9,64 @@ const Yorum = require('../models/Yorum');
 // @route   GET api/mekanlar
 // @desc    Tüm mekanları veya kategoriye göre filtrelenmiş mekanları getirir
 // @access  Public
+r
+// @route   GET api/mekanlar
+// @desc    Tüm mekanları getirir (filtreleme, arama, sıralama ve sayfalama ile)
+// @access  Public
 router.get('/', async (req, res) => {
     try {
-        const { kategori } = req.query;
-        const filtre = {};
+        // 1. Flutter'dan gelebilecek tüm parametreleri alıyoruz.
+        // Parametre gelmezse kullanılacak varsayılan değerleri de atıyoruz.
+        const { kategori, sortBy, arama, limit = 20, page = 1 } = req.query;
+
+        // 2. MongoDB sorgusunu oluşturmak için boş bir obje hazırlıyoruz.
+        let sorgu = {};
+
+        // 3. Parametrelere göre sorgu objesini dinamik olarak dolduruyoruz.
+        // Eğer bir kategori filtresi geldiyse, sorguya ekle.
         if (kategori && kategori !== 'categoryAll') {
-            filtre.kategori = kategori;
+            sorgu.kategori = kategori;
         }
 
-        // İYİLEŞTİRME: .select() ile sadece liste için gerekli alanları çekiyoruz.
-        // Bu, gönderilen veri miktarını azaltır ve performansı artırır.
-        const mekanlar = await Mekan.find(filtre)
-            .select('isim kategori fotograflar ortalamaPuan konum')
-            .sort({ eklenmeTarihi: -1 });
+        // Eğer bir arama kelimesi geldiyse, sorguya ekle.
+        if (arama) {
+            // 'i' parametresi büyük/küçük harf duyarsız arama (case-insensitive) sağlar.
+            // Sadece mekanların Türkçe isminde arama yapıyoruz, istersen 'isim.en' de eklenebilir.
+            sorgu['isim.tr'] = new RegExp(arama, 'i');
+        }
+
+        // 4. Sıralama seçeneklerini belirliyoruz.
+        let siralamaSecenekleri = {};
+        if (sortBy === 'puan') {
+            siralamaSecenekleri = { ortalamaPuan: -1 }; // -1: Büyükten küçüğe sırala
+        } else if (sortBy === 'yeni') {
+            siralamaSecenekleri = { eklenmeTarihi: -1 };
+        } else {
+            siralamaSecenekleri = { eklenmeTarihi: -1 }; // Varsayılan olarak en yeniye göre sırala
+        }
         
-        res.json(mekanlar);
+        // 5. Sayfalama (Pagination) için ayarları yapıyoruz.
+        const sayfaLimiti = parseInt(limit);
+        const atlanacakKayitSayisi = (parseInt(page) - 1) * sayfaLimiti;
+
+        // 6. Son sorguyu oluşturup veritabanından mekanları çekiyoruz.
+        const mekanlar = await Mekan.find(sorgu)
+            .sort(siralamaSecenekleri) // Sırala
+            .skip(atlanacakKayitSayisi) // Belirli sayıda kaydı atla (ör: 2. sayfa için ilk 20'yi atla)
+            .limit(sayfaLimiti);      // Sadece limit kadarını al (ör: 20 tane)
+        
+        // (Opsiyonel ama çok faydalı) Toplam sonuç sayısını da bulup gönderiyoruz.
+        const toplamMekanSayisi = await Mekan.countDocuments(sorgu);
+
+        // 7. Flutter'a hem mekanları hem de sayfa bilgilerini gönderiyoruz.
+        res.json({
+            mekanlar,
+            toplamSayfa: Math.ceil(toplamMekanSayisi / sayfaLimiti),
+            mevcutSayfa: parseInt(page),
+        });
+
     } catch (err) {
         console.error(err.message);
-        // DÜZELTME: Artık tüm hatalar JSON formatında gönderiliyor.
         res.status(500).json({ msg: 'Sunucu Hatası' });
     }
 });

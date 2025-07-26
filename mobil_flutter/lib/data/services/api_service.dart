@@ -1,68 +1,114 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobil_flutter/data/models/mekan_model.dart';
 import 'package:mobil_flutter/data/models/yorum_model.dart';
-import 'package:mobil_flutter/data/services/auth_service.dart'; // Token almak için AuthService'e ihtiyacımız var
-import 'package:mobil_flutter/data/models/user_model.dart'; // UserModel'i kullanmak için gerekli
+import 'package:mobil_flutter/data/services/auth_service.dart';
+import 'package:mobil_flutter/data/models/user_model.dart';
+
+// YENİ YARDIMCI SINIF: API'den gelen cevabı (mekan listesi + sayfa bilgisi) bir arada tutar.
+class MekanlarResponse {
+  final List<MekanModel> mekanlar;
+  final int toplamSayfa;
+  final int mevcutSayfa;
+
+  MekanlarResponse({
+    required this.mekanlar,
+    required this.toplamSayfa,
+    required this.mevcutSayfa,
+  });
+}
 
 class ApiService {
   final String _baseUrl = 'https://rize-kultur-api.onrender.com/api';
-  // AuthService'i private bir değişken olarak tutalım.
-  // Bu, her seferinde yeni bir instance oluşturmak yerine var olanı kullanmamızı sağlar.
   final AuthService _authService = AuthService();
 
-  // Bu fonksiyon aynı kalabilir, sadece daha güvenli hale getirelim.
-  Future<List<MekanModel>> getMekanlar({String kategori = 'categoryAll'}) async {
-    String url = '$_baseUrl/mekanlar';
-    if (kategori != 'categoryAll') {
-      url += '?kategori=$kategori';
+  // --- ESKİ getMekanlar FONKSİYONUNUN YERİNE GELEN GÜNCELLENMİŞ VERSİYON ---
+  Future<MekanlarResponse> getMekanlar({
+    String? kategori,
+    String? aramaSorgusu,
+    String? sortBy,
+    int sayfa = 1, // Sayfalama için 'page' parametresi
+      int? limit, // <-- YENİ: limit parametresini ekle
+  }) async {
+    // 1. Parametreler için boş bir Map oluştur.
+    final Map<String, String> queryParameters = {
+      'page': sayfa.toString(),
+    };
+
+    // 2. Sadece dolu olan parametreleri Map'e ekle.
+    if (kategori != null && kategori != 'categoryAll') {
+      queryParameters['kategori'] = kategori;
+    }
+    if (aramaSorgusu != null && aramaSorgusu.isNotEmpty) {
+      queryParameters['arama'] = aramaSorgusu;
+    }
+    if (sortBy != null && sortBy.isNotEmpty) {
+      queryParameters['sortBy'] = sortBy;
     }
 
-    final response = await http.get(Uri.parse(url));
+    // 3. Uri'yi bu Map ile güvenli bir şekilde oluştur.
+    final uri = Uri.https(
+      'rize-kultur-api.onrender.com',
+      '/api/mekanlar',
+      queryParameters,
+    );
 
-     if (response.statusCode == 200) {
-      final List<dynamic> mekanlarJson = json.decode(utf8.decode(response.bodyBytes));
-      // DÜZELTME: Artık UnimplementedError yerine yeni factory metodumuzu kullanıyoruz.
-      return mekanlarJson.map((json) => MekanModel.fromListJson(json)).toList();
+    debugPrint('API İsteği Gönderiliyor: $uri'); // Hata ayıklama için isteği yazdır
+
+    final response = await http.get(uri);
+
+    if (response.statusCode == 200) {
+      if (response.body.isEmpty) {
+        throw Exception('Sunucudan boş yanıt geldi.');
+      }
+
+      final responseJson = json.decode(utf8.decode(response.bodyBytes));
+
+      final List<dynamic> mekanlarJson = responseJson['mekanlar'];
+      final mekanlarListesi = mekanlarJson.map((json) => MekanModel.fromListJson(json)).toList();
+
+      return MekanlarResponse(
+        mekanlar: mekanlarListesi,
+        toplamSayfa: responseJson['toplamSayfa'] ?? 1,
+        mevcutSayfa: responseJson['mevcutSayfa'] ?? 1,
+      );
     } else {
       throw Exception('Mekanlar yüklenemedi. Hata Kodu: ${response.statusCode}');
     }
   }
+  // --- GÜNCELLEME BİTTİ ---
 
-  // BU FONKSİYONU ÇOK DAHA VERİMLİ HALE GETİRİYORUZ
+  //
+  // --- DİĞER FONKSİYONLARIN AYNI ŞEKİLDE KALIYOR ---
+  //
+  
   Future<MekanModel> getMekanDetay(String mekanId) async {
     final url = '$_baseUrl/mekanlar/$mekanId';
-    print('Mekan detayı isteniyor: $url');
+    debugPrint('Mekan detayı isteniyor: $url');
 
     final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> responseJson = json.decode(utf8.decode(response.bodyBytes));
-      // Backend artık mekan ve yorumları tek bir pakette gönderiyor.
-      // Bunu parse edecek olan yeni factory metodumuzu kullanıyoruz.
       return MekanModel.fromDetailJson(responseJson);
     } else {
       throw Exception('Mekan detayı yüklenemedi. Hata Kodu: ${response.statusCode}');
     }
   }
 
-  // YENİ FONKSİYON: FAVORİLERE EKLEME/ÇIKARMA
   Future<List<String>> toggleFavorite(String mekanId) async {
     final token = await _authService.tokenAl();
     if (token == null) throw Exception('Favoriye eklemek için giriş yapmalısınız.');
     
-    // DİKKAT: Bu route'u biz /api/auth altında tanımlamıştık.
     final url = 'https://rize-kultur-api.onrender.com/api/auth/favorites/$mekanId';
 
     final response = await http.put(
       Uri.parse(url),
-      headers: {
-        'Authorization': 'Bearer $token',
-      },
+      headers: { 'Authorization': 'Bearer $token' },
     );
 
     if (response.statusCode == 200) {
-      // Backend güncel favori listesini [String] olarak dönüyor.
       final List<dynamic> favorilerJson = json.decode(response.body);
       return favorilerJson.map((id) => id.toString()).toList();
     } else {
@@ -71,8 +117,6 @@ class ApiService {
     }
   }
 
-
-  // YENİ FONKSİYON: YORUM VE/VEYA PUAN EKLEME
   Future<YorumModel> addYorum({
     required String mekanId,
     String? icerik,
@@ -110,14 +154,13 @@ class ApiService {
     }
   }
 
-
-
   Future<List<MekanModel>> getYakindakiMekanlar({
     required double enlem,
     required double boylam,
-        double mesafe = 500000, // Varsayılan olarak geniş bir alan
+    double mesafe = 500000,
   }) async {
-    final url = '$_baseUrl/mekanlar/yakinimdakiler?enlem=$enlem&boylam=$boylam&mesafe=${mesafe.toInt()}';    
+    // Bu fonksiyon da Uri.https kullanacak şekilde güncellenebilir ama şimdilik bırakıyorum.
+    final url = '$_baseUrl/mekanlar/yakinimdakiler?enlem=$enlem&boylam=$boylam&mesafe=${mesafe.toInt()}';
     final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
@@ -128,8 +171,7 @@ class ApiService {
     }
   }
 
-  // KULLANICININ YORUMLARINI GETİR
-Future<List<YorumModel>> getMyYorumlar() async {
+  Future<List<YorumModel>> getMyYorumlar() async {
     final token = await _authService.tokenAl();
     if (token == null) throw Exception('Yorumları getirmek için giriş yapmalısınız.');
     
@@ -141,15 +183,13 @@ Future<List<YorumModel>> getMyYorumlar() async {
 
     if (response.statusCode == 200) {
       final List<dynamic> yorumlarJson = json.decode(utf8.decode(response.bodyBytes));
-      // DİKKAT: YorumModel'in fromJson'ı mekan objesini de parse edebilmeli.
-      return yorumlarJson.map((json) => YorumModel.fromJsonWithMekan(json)).toList();
+      return yorumlarJson.map((json) => YorumModel.fromJson(json)).toList();
     } else {
       throw Exception('Yorumlar yüklenemedi.');
     }
-}
+  }
 
-// FAVORİ MEKAN DETAYLARINI GETİR
-Future<List<MekanModel>> getMekanlarByIds(List<String> ids) async {
+  Future<List<MekanModel>> getMekanlarByIds(List<String> ids) async {
     if (ids.isEmpty) return [];
     
     final url = '$_baseUrl/mekanlar/by-ids';
@@ -165,28 +205,19 @@ Future<List<MekanModel>> getMekanlarByIds(List<String> ids) async {
     } else {
       throw Exception('Favori mekanlar yüklenemedi.');
     }
-}
-
-
-// YENİ METOT
-Future<UserModel> getPublicUserProfile(String userId) async {
-  final url = '$_baseUrl/users/$userId';
-  final response = await http.get(Uri.parse(url));
-
-  if (response.statusCode == 200) {
-    // Backend'den gelen {kullanici: ..., yorumlar: ...} yapısını parse etmeliyiz.
-    // UserModel'e yorumları da ekleyebiliriz veya yeni bir model oluşturabiliriz.
-    // Şimdilik UserModel'i zenginleştirelim.
-    final responseJson = json.decode(utf8.decode(response.bodyBytes));
-    final userJson = responseJson['kullanici'];
-    final yorumlarJson = responseJson['yorumlar'] as List;
-
-    // UserModel.fromJson'ın bu yeni yapıyı handle edebilmesi lazım.
-    // Ya da burada manuel olarak birleştirme yapabiliriz.
-    // En temizi UserModel'e bir factory constructor daha eklemek.
-    return UserModel.fromPublicProfileJson(userJson, yorumlarJson);
-  } else {
-    throw Exception('Kullanıcı profili yüklenemedi. Hata Kodu: ${response.statusCode}');
   }
-}
+
+  Future<UserModel> getPublicUserProfile(String userId) async {
+    final url = '$_baseUrl/users/$userId';
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final responseJson = json.decode(utf8.decode(response.bodyBytes));
+      final userJson = responseJson['kullanici'];
+      final yorumlarJson = responseJson['yorumlar'] as List;
+      return UserModel.fromPublicProfileJson(userJson, yorumlarJson);
+    } else {
+      throw Exception('Kullanıcı profili yüklenemedi. Hata Kodu: ${response.statusCode}');
+    }
+  }
 }

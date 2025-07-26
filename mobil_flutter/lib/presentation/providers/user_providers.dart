@@ -1,27 +1,24 @@
-// lib/presentation/providers/user_providers.dart (YENİ DOSYA)
+// lib/presentation/providers/user_providers.dart
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobil_flutter/data/models/user_model.dart';
+import 'package:mobil_flutter/data/services/auth_service.dart';
 import 'package:mobil_flutter/data/services/api_service.dart';
-import 'package:mobil_flutter/presentation/providers/mekan_providers.dart';
 import 'package:mobil_flutter/presentation/providers/auth_providers.dart';
+import 'package:mobil_flutter/presentation/providers/api_service_provider.dart';
 
 
-final apiServiceProvider = Provider((ref) => ApiService());
 
-// --- YENİ StateNotifier VE Provider ---
-// ESKİ FutureProvider'ın YERİNİ BU ALACAK
 final userProfileProvider = StateNotifierProvider<UserProfileNotifier, AsyncValue<UserModel>>((ref) {
   return UserProfileNotifier(ref);
 });
 
 class UserProfileNotifier extends StateNotifier<AsyncValue<UserModel>> {
   UserProfileNotifier(this.ref) : super(const AsyncLoading()) {
-    _fetchProfile(); // Notifier oluşturulunca profili otomatik çek
+    _fetchProfile();
   }
   final Ref ref;
 
-  // Profil bilgisini ilk başta çeken metot
   Future<void> _fetchProfile() async {
     state = const AsyncLoading();
     try {
@@ -33,16 +30,15 @@ class UserProfileNotifier extends StateNotifier<AsyncValue<UserModel>> {
     }
   }
 
-  // Favori durumunu değiştiren metot
   Future<void> toggleFavorite(String mekanId) async {
     final currentState = state;
-    // Sadece mevcut state'imiz data ise (yani profil bilgisi başarıyla yüklendiyse) devam et
     if (currentState is! AsyncData) return;
 
     final user = currentState.value!;
-    final mekanService = ref.read(mekanServiceProvider);
+    // DÜZELTME: Artık standart olan apiServiceProvider'ı okuyoruz.
+    final apiService = ref.read(apiServiceProvider);
 
-    // 1. Anlık UI güncellemesi için "iyimser" (optimistic) güncelleme yapalım
+    // İyimser (optimistic) güncelleme
     final isCurrentlyFavorite = user.favoriMekanlar.contains(mekanId);
     final newFavorites = List<String>.from(user.favoriMekanlar);
     if (isCurrentlyFavorite) {
@@ -50,27 +46,25 @@ class UserProfileNotifier extends StateNotifier<AsyncValue<UserModel>> {
     } else {
       newFavorites.add(mekanId);
     }
-    // State'i, sunucudan cevap beklemeden HEMEN güncelle. Arayüz anında değişsin.
     state = AsyncData(user.copyWith(favoriMekanlar: newFavorites));
     
-    // 2. Şimdi de arka planda sunucuya isteği at
     try {
-      // Sunucudaki favori listesini güncelle
-      final sunucudanGelenFavoriler = await mekanService.toggleFavorite(mekanId);
-      // Sunucudan gelen en güncel liste ile state'i tekrar güncelle (garanti olsun)
-      state = AsyncData(user.copyWith(favoriMekanlar: sunucudanGelenFavoriler));
+      // DÜZELTME: toggleFavorite metodunu apiService üzerinden çağırıyoruz.
+      final sunucudanGelenFavoriler = await apiService.toggleFavorite(mekanId);
+      // State'i sunucudan gelen en güncel liste ile tekrar güncelle
+      // ÖNEMLİ: state'i güncellerken eski 'user' objesini değil, en güncel 'state.value'yu kullan.
+      if (state is AsyncData) {
+         state = AsyncData(state.value!.copyWith(favoriMekanlar: sunucudanGelenFavoriler));
+      }
     } catch (e) {
-      // 3. Hata olursa, yaptığımız iyimser güncellemeyi geri al ve eski hale dön.
+      // Hata olursa, yaptığımız iyimser güncellemeyi geri al.
       state = currentState; 
     }
   }
-
 }
 
-// --- DÜZELTME BURADA ---
-// publicUserProfileProvider, UserProfileNotifier sınıfının DIŞINDA olmalı.
+// publicUserProfileProvider'ı bu dosyanın en altına taşıdık.
 final publicUserProfileProvider = FutureProvider.family<UserModel, String>((ref, userId) {
-  // ApiService provider'ını burada okuyup kullanıyoruz
   final apiService = ref.watch(apiServiceProvider); 
   return apiService.getPublicUserProfile(userId);
 });

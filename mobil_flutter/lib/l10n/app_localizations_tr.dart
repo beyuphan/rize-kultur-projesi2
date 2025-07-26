@@ -175,4 +175,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get noFavoritesYet => 'henüz Favori Eklenmedi';
+
+  @override
+  String get searchResults => 'Arama Sonucu';
 }

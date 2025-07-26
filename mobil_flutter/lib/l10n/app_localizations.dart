@@ -427,6 +427,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No Favorites Yet'**
   String get noFavoritesYet;
+
+  /// No description provided for @searchResults.
+  ///
+  /// In en, this message translates to:
+  /// **'search Results'**
+  String get searchResults;
 }
 
 class _AppLocalizationsDelegate
