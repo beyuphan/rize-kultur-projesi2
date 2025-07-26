@@ -7,10 +7,6 @@ const Mekan = require('../models/Mekan');
 const Yorum = require('../models/Yorum');
 
 // @route   GET api/mekanlar
-// @desc    Tüm mekanları veya kategoriye göre filtrelenmiş mekanları getirir
-// @access  Public
-r
-// @route   GET api/mekanlar
 // @desc    Tüm mekanları getirir (filtreleme, arama, sıralama ve sayfalama ile)
 // @access  Public
 router.get('/', async (req, res) => {
