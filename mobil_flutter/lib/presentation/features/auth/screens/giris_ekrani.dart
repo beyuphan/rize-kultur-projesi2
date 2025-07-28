@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobil_flutter/presentation/providers/auth_providers.dart';
-import 'package:mobil_flutter/presentation/screens/kayit_ol_ekrani.dart'; // Kayıt Ol ekranını import ediyoruz
+import 'package:mobil_flutter/presentation/features/auth/screens/kayit_ol_ekrani.dart'; // Kayıt Ol ekranını import ediyoruz
 
 // 1. Widget'ı ConsumerStatefulWidget olarak değiştiriyoruz
 class GirisEkrani extends ConsumerStatefulWidget {

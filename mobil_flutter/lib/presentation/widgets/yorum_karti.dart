@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mobil_flutter/data/models/yorum_model.dart';
-import 'package:mobil_flutter/presentation/screens/profil/profil_sayfasi.dart'; // DİKKAT: Yeni ProfilSayfasi'na import
+import 'package:mobil_flutter/presentation/features/profil/screens//profil_sayfasi.dart'; 
 import 'package:mobil_flutter/presentation/widgets/puan_gostergesi.dart';
 
 class YorumKarti extends StatelessWidget {

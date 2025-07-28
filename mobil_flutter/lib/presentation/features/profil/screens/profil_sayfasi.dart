@@ -7,11 +7,11 @@ import 'package:mobil_flutter/l10n/app_localizations.dart';
 import 'package:mobil_flutter/presentation/providers/auth_providers.dart';
 import 'package:mobil_flutter/presentation/providers/user_providers.dart';
 import 'package:mobil_flutter/presentation/providers/mekan_providers.dart';
-import 'package:mobil_flutter/presentation/screens/ayarlar_ekrani.dart';
+import 'package:mobil_flutter/presentation/features/settings/screens/ayarlar_ekrani.dart';
 import 'package:mobil_flutter/presentation/widgets/sliver_tab_bar_delegate.dart';
-import 'widgets/favoriler_tab.dart';
-import 'widgets/istatistik_widget.dart';
-import 'widgets/yorumlar_tab.dart';
+import 'package:mobil_flutter/presentation/features/profil/widgets/favoriler_tab.dart';
+import 'package:mobil_flutter/presentation/features/profil/widgets/istatistik_widget.dart';
+import 'package:mobil_flutter/presentation/features/profil/widgets/yorumlar_tab.dart';
 
 // DÜZELTME: Sınıf adı daha genel ve dinamik ID alabilen bir yapıya dönüştü.
 class ProfilSayfasi extends ConsumerWidget {

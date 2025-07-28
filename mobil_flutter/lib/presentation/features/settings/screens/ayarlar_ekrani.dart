@@ -5,7 +5,7 @@ import 'package:mobil_flutter/common/theme/app_themes.dart';
 import 'package:mobil_flutter/l10n/app_localizations.dart';
 import 'package:mobil_flutter/main.dart';
 import 'package:mobil_flutter/presentation/providers/user_providers.dart';
-import 'package:mobil_flutter/presentation/screens/profil_duzenle_ekrani.dart';
+import 'package:mobil_flutter/presentation/features/profil/screens/profil_duzenle_ekrani.dart';
 
 // --- AYARLAR EKRANI ---
 class AyarlarEkrani extends ConsumerWidget {

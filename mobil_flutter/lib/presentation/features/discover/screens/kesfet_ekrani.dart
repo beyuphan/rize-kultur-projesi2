@@ -5,9 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobil_flutter/l10n/app_localizations.dart';
 import 'package:mobil_flutter/presentation/widgets/mekan_karti.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'mekan_detay_ekrani.dart';
+import 'package:mobil_flutter/presentation/features/venue/screens/mekan_detay_ekrani.dart';
 import 'package:mobil_flutter/presentation/providers/mekan_providers.dart';
-import 'package:mobil_flutter/presentation/screens/mekan_listesi_ekrani.dart';
+import 'package:mobil_flutter/presentation/features/venue/screens/mekan_listesi_ekrani.dart';
 
 // Kategori verilerini tutmak için basit bir sınıf
 class Category {
@@ -35,14 +35,16 @@ class KesfetEkrani extends ConsumerWidget {
           // --- BAŞLIK VE ARAMA ÇUBUĞU ---
           SliverAppBar(
             backgroundColor: theme.scaffoldBackgroundColor,
-            expandedHeight: 150.0,
+            expandedHeight: 120.0,
             floating: false,
             pinned: true, // Arama çubuğunun yukarıda kalmasını sağlar
             elevation: 0,
             flexibleSpace: FlexibleSpaceBar(
               titlePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               centerTitle: true,
-              title: TextField(
+              title: SizedBox(
+                  height: 32, // ← Burayı istersen 32-40 arası oynarsın
+                child:TextField(
                 onSubmitted: (sorgu) {
                   if (sorgu.trim().isNotEmpty) {
                     Navigator.of(context).push(MaterialPageRoute(
@@ -55,7 +57,8 @@ class KesfetEkrani extends ConsumerWidget {
                 },
                 decoration: InputDecoration(
                   hintText: l10n.searchHint,
-                  prefixIcon: const Icon(Icons.search, size: 20),
+                  hintStyle: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurface.withOpacity(0.6)),
+                  prefixIcon: const Icon(Icons.search, size: 14),
                   contentPadding: EdgeInsets.zero,
                   filled: true,
                   fillColor: theme.colorScheme.surface,
@@ -65,13 +68,14 @@ class KesfetEkrani extends ConsumerWidget {
                   ),
                 ),
               ),
+              ),
               background: Padding(
                 padding: const EdgeInsets.only(bottom: 56.0, left: 16, right: 16),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(l10n.welcome, style: theme.textTheme.headlineMedium),
+                    Text(l10n.welcome, style: theme.textTheme.displaySmall),
                   ],
                 ),
               ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobil_flutter/presentation/screens/giris_ekrani.dart';
+import 'package:mobil_flutter/presentation/features/auth/screens/giris_ekrani.dart';
 
 class AyarlarEkraniMisafir extends StatelessWidget {
   const AyarlarEkraniMisafir({super.key});

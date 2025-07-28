@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobil_flutter/presentation/providers/auth_providers.dart';
-import 'package:mobil_flutter/presentation/screens/ayarlar_ekrani_misafir.dart';
-import 'package:mobil_flutter/presentation/screens/harita_ekrani.dart';
-import 'package:mobil_flutter/presentation/screens/kesfet_ekrani.dart';
-import 'package:mobil_flutter/presentation/screens/profil/profil_sayfasi.dart';
+
+
+// Yeni, özellik bazlı klasör yolları
+import 'package:mobil_flutter/presentation/features/settings/screens/ayarlar_ekrani_misafir.dart';
+import 'package:mobil_flutter/presentation/features/map/screens/harita_ekrani.dart';
+import 'package:mobil_flutter/presentation/features/discover/screens/kesfet_ekrani.dart';
+import 'package:mobil_flutter/presentation/features/profil/screens/profil_sayfasi.dart';
+
+
 import 'package:mobil_flutter/presentation/screens/rotalar_ekrani.dart';
 import 'package:mobil_flutter/l10n/app_localizations.dart';
 

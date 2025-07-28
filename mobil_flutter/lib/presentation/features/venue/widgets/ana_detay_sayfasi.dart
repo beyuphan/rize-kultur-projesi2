@@ -8,7 +8,7 @@ import 'package:mobil_flutter/presentation/providers/user_providers.dart';
 import 'package:mobil_flutter/presentation/widgets/fotograf_galerisi.dart';
 import 'package:mobil_flutter/presentation/widgets/puan_gostergesi.dart';
 import 'package:mobil_flutter/presentation/widgets/puanlama_girdisi.dart';
-import 'package:mobil_flutter/presentation/widgets/yorumlar_sayfasi.dart';
+import 'package:mobil_flutter/presentation/features/venue/widgets/yorumlar_sayfasi.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 //--- SAYFA 1: ANA DETAY (SON TASARIM) ---

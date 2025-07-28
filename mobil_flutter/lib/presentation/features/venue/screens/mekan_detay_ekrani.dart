@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobil_flutter/presentation/providers/mekan_providers.dart';
-import 'package:mobil_flutter/presentation/widgets/ana_detay_sayfasi.dart';
-import 'package:mobil_flutter/presentation/widgets/yorumlar_sayfasi.dart';
-import 'package:mobil_flutter/presentation/widgets/bilgi_sayfasi.dart'; // Yeni sayfayı import et
+import 'package:mobil_flutter/presentation/features/venue/widgets/ana_detay_sayfasi.dart';
+import 'package:mobil_flutter/presentation/features/venue/widgets/yorumlar_sayfasi.dart';
+import 'package:mobil_flutter/presentation/features/venue/widgets/bilgi_sayfasi.dart'; // Yeni sayfayı import et
 
 
 

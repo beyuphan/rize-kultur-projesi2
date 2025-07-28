@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobil_flutter/presentation/providers/auth_providers.dart';
-import 'package:mobil_flutter/presentation/screens/giris_ekrani.dart';
-import 'package:mobil_flutter/presentation/screens/main_navigation_screen.dart';
-
+import 'package:mobil_flutter/presentation/features/auth/screens/giris_ekrani.dart';
+import 'package:mobil_flutter/presentation/features/home/screens/main_navigation_screen.dart'; 
 class AuthYonlendirici extends ConsumerWidget {
   const AuthYonlendirici({super.key});
 

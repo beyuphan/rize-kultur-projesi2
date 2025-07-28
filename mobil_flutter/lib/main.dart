@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobil_flutter/common/theme/app_themes.dart';
-import 'package:mobil_flutter/presentation/widgets/auth_yonlendirici.dart';
+import 'package:mobil_flutter/presentation/features/home/widgets/auth_yonlendirici.dart';
 import 'package:mobil_flutter/l10n/app_localizations.dart';
 import 'dart:io';
+
+
+
+
 
 // UYGULAMANIN GENEL DURUMUNU YÖNETEN PROVIDER'LAR
 final themeProvider = StateProvider<AppTheme>((ref) => AppTheme.firtinaYesili);

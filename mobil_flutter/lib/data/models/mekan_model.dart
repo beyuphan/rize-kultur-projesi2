@@ -46,8 +46,8 @@ class MekanModel {
   final List<String> fotograflar;
   final double ortalamaPuan;
   final List<YorumModel> yorumlar;
-  final CokDilliMetin tarihce; // YENİ
-  final List<String> etiketler; // YENİ
+  final CokDilliMetin? tarihce; // YENİ
+  final List<String>? etiketler; // YENİ
 
   MekanModel({
     required this.id,
@@ -58,8 +58,8 @@ class MekanModel {
     required this.fotograflar,
     required this.ortalamaPuan,
     required this.yorumlar,
-    required this.tarihce, // YENİ
-    required this.etiketler, // YENİ
+    this.tarihce, // YENİ
+    this.etiketler, // YENİ
   });
 
 // HATA AYIKLAMA İÇİN ÖZEL OLARAK YAZILMIŞTIR
@@ -149,6 +149,8 @@ factory MekanModel.fromDetailJson(Map<String, dynamic> json) {
       fotograflar: List<String>.from(json['fotograflar'] ?? []),
       ortalamaPuan: (json['ortalamaPuan'] ?? 0.0).toDouble(),
       yorumlar: [],
+      tarihce: CokDilliMetin.fromJson(json['tarihce']), // YENİ
+      etiketler: List<String>.from(json['etiketler'] ?? []), 
     );
   }
 }

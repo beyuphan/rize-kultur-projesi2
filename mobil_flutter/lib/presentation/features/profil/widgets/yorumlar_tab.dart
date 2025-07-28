@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobil_flutter/data/models/yorum_model.dart';
 import 'package:mobil_flutter/l10n/app_localizations.dart';
-import 'package:mobil_flutter/presentation/screens/mekan_detay_ekrani.dart';
+import 'package:mobil_flutter/presentation/features/venue/screens/mekan_detay_ekrani.dart';
 import 'package:mobil_flutter/presentation/widgets/puan_gostergesi.dart';
 import 'package:intl/intl.dart';
 
