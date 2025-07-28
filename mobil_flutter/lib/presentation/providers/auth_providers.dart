@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobil_flutter/data/services/auth_service.dart';
 
 // 1. Auth durumunu tutacak olan enum
-enum AuthStatus { bilinmiyor, girisYapilmadi, girisYapildi }
+enum AuthStatus { bilinmiyor, girisYapilmadi, girisYapildi, loading}
 
 // 2. Auth durumunu yöneten StateNotifier
 class AuthNotifier extends StateNotifier<AuthStatus> {
@@ -28,6 +28,7 @@ class AuthNotifier extends StateNotifier<AuthStatus> {
     String email,
     String sifre,
   ) async {
+        state = AuthStatus.loading;
     final hataMesaji = await _authService.kayitOl(kullaniciAdi, email, sifre);
     if (hataMesaji == null) {
       state = AuthStatus.girisYapildi; // Durumu güncelle
@@ -36,6 +37,7 @@ class AuthNotifier extends StateNotifier<AuthStatus> {
   }
 
   Future<String?> girisYap(String email, String sifre) async {
+        state = AuthStatus.loading;
     final hataMesaji = await _authService.girisYap(email, sifre);
     if (hataMesaji == null) {
       state = AuthStatus.girisYapildi; // Durumu güncelle

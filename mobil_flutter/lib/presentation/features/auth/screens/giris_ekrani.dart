@@ -1,9 +1,11 @@
+// lib/presentation/features/auth/screens/giris_ekrani.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mobil_flutter/l10n/app_localizations.dart';
 import 'package:mobil_flutter/presentation/providers/auth_providers.dart';
-import 'package:mobil_flutter/presentation/features/auth/screens/kayit_ol_ekrani.dart'; // Kayıt Ol ekranını import ediyoruz
+import 'package:mobil_flutter/presentation/features/auth/screens/kayit_ol_ekrani.dart';
 
-// 1. Widget'ı ConsumerStatefulWidget olarak değiştiriyoruz
 class GirisEkrani extends ConsumerStatefulWidget {
   const GirisEkrani({super.key});
 
@@ -11,46 +13,10 @@ class GirisEkrani extends ConsumerStatefulWidget {
   ConsumerState<GirisEkrani> createState() => _GirisEkraniState();
 }
 
-// 2. State sınıfını ConsumerState olarak değiştiriyoruz
 class _GirisEkraniState extends ConsumerState<GirisEkrani> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _isLoading = false;
-
-  // 3. Giriş yapma fonksiyonunu AuthProvider'ı kullanacak şekilde güncelliyoruz
-  Future<void> _signIn() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-    setState(() {
-      _isLoading = true;
-    });
-
-    // AuthNotifier'daki girisYap fonksiyonunu çağırıyoruz
-    final hataMesaji = await ref
-        .read(authProvider.notifier)
-        .girisYap(
-          _emailController.text.trim(),
-          _passwordController.text.trim(),
-        );
-
-    // Eğer bir hata mesajı döndüyse, kullanıcıya göster
-    if (hataMesaji != null && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(hataMesaji), backgroundColor: Colors.red),
-      );
-    }
-    // Başarılı olursa, AuthYonlendirici zaten bizi ana ekrana atacaktır.
-    // Bu yüzden burada bir navigasyon koduna gerek yok.
-
-    // İşlem bitince yükleniyor durumunu bitir
-    if (mounted) {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
 
   @override
   void dispose() {
@@ -59,86 +25,157 @@ class _GirisEkraniState extends ConsumerState<GirisEkrani> {
     super.dispose();
   }
 
+  Future<void> _signIn() async {
+    // Bu fonksiyonun içindeki mantık zaten doğru, dokunmuyoruz.
+    if (!_formKey.currentState!.validate()) return;
+
+    final hataMesaji = await ref.read(authProvider.notifier).girisYap(
+          _emailController.text.trim(),
+          _passwordController.text.trim(),
+        );
+
+    if (hataMesaji != null && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(hataMesaji), backgroundColor: Colors.red),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    final authState = ref.watch(authProvider);
+
     return Scaffold(
-      appBar: AppBar(title: const Text("Giriş Yap")),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // E-posta alanı
-                TextFormField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    labelText: "E-posta",
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.email_outlined),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          // ARKA PLAN GÖRSELİ
+          Image.network(
+            'https://celebiakbiyik.wordpress.com/wp-content/uploads/2020/12/hss.jpg',
+            fit: BoxFit.cover,
+            color: Colors.black.withOpacity(0.5), // Resmi karart
+            colorBlendMode: BlendMode.darken,
+          ),
+          SafeArea(
+            child: Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(32.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // BAŞLIK
+                      Text(
+                        l10n.loginTitle,
+                        style: theme.textTheme.headlineLarge?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        l10n.loginSubtitle,
+                        style: theme.textTheme.bodyLarge?.copyWith(color: Colors.white70),
+                      ),
+                      const SizedBox(height: 48),
+
+                      // E-POSTA ALANI
+                      TextFormField(
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                                                style: const TextStyle(color: Colors.white), // <-- YENİ EKLENEN SATIR
+                        decoration: _buildInputDecoration(l10n.email, Icons.email_outlined),
+                        validator: (value) => (value == null || !value.contains('@')) ? l10n.emailValidation : null,
+                      ),
+                      const SizedBox(height: 20),
+
+                      // ŞİFRE ALANI
+                      TextFormField(
+                        controller: _passwordController,
+                        obscureText: true,
+                                                style: const TextStyle(color: Colors.white), // <-- YENİ EKLENEN SATIR
+                        decoration: _buildInputDecoration(l10n.password, Icons.lock_outline),
+                        validator: (value) => (value == null || value.trim().isEmpty) ? l10n.passwordValidation : null,
+                      ),
+                      const SizedBox(height: 32),
+
+                      // GİRİŞ YAP BUTONU
+                      SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: authState == AuthStatus.loading ? null : _signIn,
+                          child: authState == AuthStatus.loading
+                              ? const CircularProgressIndicator(color: Colors.white)
+                              : Text(l10n.loginButton),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+
+                      // KAYIT OL EKRANINA YÖNLENDİRME
+                      _buildRichTextNavigation(
+                        context: context,
+                        text1: "${l10n.dontHaveAccount} ",
+                        text2: l10n.registerButton,
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(builder: (context) => const KayitEkrani()),
+                        ),
+                      ),
+                    ],
                   ),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return "Lütfen e-posta adresinizi girin.";
-                    }
-                    return null;
-                  },
                 ),
-                const SizedBox(height: 16),
-                // Şifre alanı
-                TextFormField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: "Şifre",
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.lock_outline),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return "Lütfen şifrenizi girin.";
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 24),
-                // Giriş Yap butonu
-                SizedBox(
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _isLoading ? null : _signIn,
-                    child: _isLoading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text("Giriş Yap"),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                // Kayıt Ol ekranına yönlendirme butonu
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text("Hesabınız yok mu?"),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => const KayitEkrani(),
-                          ),
-                        );
-                      },
-                      child: const Text("Kayıt Ol"),
-                    ),
-                  ],
-                ),
-              ],
+              ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
+}
+
+// --- YARDIMCI METOTLAR ---
+// Bu metotları sınıfın dışına veya içine koyabilirsin.
+
+InputDecoration _buildInputDecoration(String label, IconData icon) {
+  return InputDecoration(
+    labelText: label,
+    prefixIcon: Icon(icon, color: Colors.white),
+    labelStyle: const TextStyle(color: Colors.white),
+    filled: true,
+    fillColor: Colors.black.withOpacity(0.2),
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide.none,
+    ),
+  );
+}
+
+Widget _buildRichTextNavigation({
+  required BuildContext context,
+  required String text1,
+  required String text2,
+  required VoidCallback onTap,
+}) {
+  final theme = Theme.of(context);
+  return GestureDetector(
+    onTap: onTap,
+    child: RichText(
+      text: TextSpan(
+        style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white),
+        children: [
+          TextSpan(text: text1),
+          TextSpan(
+            text: text2,
+            style: TextStyle(
+              color: theme.colorScheme.secondary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 }
