@@ -41,6 +41,8 @@
   "changePassword": "Change Password",
   "oldPassword": "Old Password",
   "newPassword": "New Password",
+  "averageRating": "Average Rating",
+
   "reviews": "Reviews",
   "reviewsCount": "({count} Reviews)",
   "@reviewsCount": {

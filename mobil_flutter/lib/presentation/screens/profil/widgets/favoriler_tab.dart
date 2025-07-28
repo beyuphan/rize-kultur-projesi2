@@ -40,7 +40,8 @@ class FavorilerTab extends ConsumerWidget {
           },
           child: MekanKarti(
             isim: langCode == 'tr' ? mekan.isim.tr : mekan.isim.en,
-            kategori: mekan.kategori,
+            kategoriKey: mekan.kategori,
+            l10n: l10n,
             puan: mekan.ortalamaPuan,
             imageUrl: mekan.fotograflar.isNotEmpty ? mekan.fotograflar[0] : null,
           ),

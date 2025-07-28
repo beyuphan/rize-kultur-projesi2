@@ -165,7 +165,7 @@ class __AnaDetaySayfasiState extends ConsumerState<AnaDetaySayfasi> {
                             child: Row(
                               children: [
                                 Text(
-                                  "ortalaama puan",
+                                  l10n.averageRating,
                                   style: theme.textTheme.labelLarge?.copyWith(
                                     color: theme.colorScheme.onSurfaceVariant,
                                   ),

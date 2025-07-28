@@ -61,6 +61,7 @@
   "noName": "İsim Yok",
   "noVenuesFound": "Değer Bulunamadı",
   "noCommentsYet": "Yorum Yok",
+  "averageRating": "Ortalama Puan",
   "reviews": "Değerlendirmeler",
   "reviewsCount": "({count} Değerlendirme)",
   "@reviewsCount": {

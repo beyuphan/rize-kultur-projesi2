@@ -132,6 +132,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get newPassword => 'Yeni Şifre';
 
   @override
+  String get averageRating => 'Ortalama Puan';
+
+  @override
   String get reviews => 'Değerlendirmeler';
 
   @override

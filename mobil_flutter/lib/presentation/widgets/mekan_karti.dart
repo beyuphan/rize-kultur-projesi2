@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:mobil_flutter/presentation/widgets/puan_gostergesi.dart';
+import 'package:mobil_flutter/l10n/app_localizations.dart'; // YENİ: l10n import'u eklendi
 
 class MekanKarti extends StatelessWidget {
   final String isim;
-  final String kategori;
-  final double puan;
+  final String kategoriKey; // DÜZELTME: Artık çevrilmemiş anahtarı alacak (kategori -> kategoriKey)
+    final double puan;
   final String? imageUrl;
   final VoidCallback? onTap;
+    final AppLocalizations l10n; // YENİ: Çeviri yapabilmesi için l10n objesini alacak
 
   const MekanKarti({
     super.key,
     required this.isim,
-    required this.kategori,
+    required this.kategoriKey,
     required this.puan,
+        required this.l10n,       // YENİ
     this.imageUrl,
     this.onTap,
   });
@@ -21,6 +24,24 @@ class MekanKarti extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    // YENİ: Çeviri mantığı artık kartın kendi içinde
+    String getTranslatedCategory(String key) {
+      switch (key) {
+        case 'categoryAll':
+          return l10n.categoryAll;
+        case 'categoryPlateaus':
+          return l10n.categoryPlateaus;
+        case 'categoryWaterfalls':
+          return l10n.categoryWaterfalls;
+        case 'categoryRestaurants':
+          return l10n.categoryRestaurants;
+        case 'categoryHistorical':
+          return l10n.categoryHistorical;
+        default:
+          return key; // Bilinmeyen bir key gelirse, olduğu gibi göster
+      }
+    }
+    
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -109,7 +130,7 @@ class MekanKarti extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
-                  Text(kategori, style: theme.textTheme.bodySmall),
+                  Text(getTranslatedCategory(kategoriKey), style: theme.textTheme.bodySmall),
                   const SizedBox(height: 8),
                   Row(
                     children: [

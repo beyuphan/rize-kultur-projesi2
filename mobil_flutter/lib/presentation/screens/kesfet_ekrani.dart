@@ -108,13 +108,18 @@ class KesfetEkrani extends ConsumerWidget {
                     itemCount: mekanlar.length,
                     itemBuilder: (context, index) {
                       final mekan = mekanlar[index];
+                       // --- HATA AYIKLAMA İÇİN BU SATIRI EKLE ---
+      print("MEKAN ADI: ${mekan.isim.tr}, GELEN KATEGORİ DEĞERİ: '${mekan.kategori}'");
+      // --- BİTTİ ---
+
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: SizedBox(
                           width: 220,
                           child: MekanKarti(
                             isim: langCode == 'tr' ? mekan.isim.tr : mekan.isim.en,
-                            kategori: mekan.kategori,
+                            kategoriKey: mekan.kategori,
+                            l10n: l10n,  
                             puan: mekan.ortalamaPuan,
                             imageUrl: mekan.fotograflar.isNotEmpty ? mekan.fotograflar[0] : null,
                             onTap: () => Navigator.push(context, MaterialPageRoute(

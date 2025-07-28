@@ -344,6 +344,12 @@ abstract class AppLocalizations {
   /// **'New Password'**
   String get newPassword;
 
+  /// No description provided for @averageRating.
+  ///
+  /// In en, this message translates to:
+  /// **'Average Rating'**
+  String get averageRating;
+
   /// No description provided for @reviews.
   ///
   /// In en, this message translates to:
