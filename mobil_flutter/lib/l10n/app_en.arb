@@ -68,5 +68,9 @@
   "edit": "Edit",
   "noCommentsYet": "No Comments Yet",
   "noFavoritesYet": "No Favorites Yet",
-  "searchResults": "search Results"
+  "searchResults": "search Results",
+  "tagCarAccess": "Car Access",
+  "tagWinterFriendly": "Winter Friendly",
+  "tagEntryFee": "Entry Fee",
+  "tagHikingTrail": "Hiking Trail"
 }

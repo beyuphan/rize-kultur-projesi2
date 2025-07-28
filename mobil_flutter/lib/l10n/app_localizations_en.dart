@@ -181,4 +181,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get searchResults => 'search Results';
+
+  @override
+  String get tagCarAccess => 'Car Access';
+
+  @override
+  String get tagWinterFriendly => 'Winter Friendly';
+
+  @override
+  String get tagEntryFee => 'Entry Fee';
+
+  @override
+  String get tagHikingTrail => 'Hiking Trail';
 }

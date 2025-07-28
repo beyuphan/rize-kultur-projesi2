@@ -439,6 +439,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'search Results'**
   String get searchResults;
+
+  /// No description provided for @tagCarAccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Car Access'**
+  String get tagCarAccess;
+
+  /// No description provided for @tagWinterFriendly.
+  ///
+  /// In en, this message translates to:
+  /// **'Winter Friendly'**
+  String get tagWinterFriendly;
+
+  /// No description provided for @tagEntryFee.
+  ///
+  /// In en, this message translates to:
+  /// **'Entry Fee'**
+  String get tagEntryFee;
+
+  /// No description provided for @tagHikingTrail.
+  ///
+  /// In en, this message translates to:
+  /// **'Hiking Trail'**
+  String get tagHikingTrail;
 }
 
 class _AppLocalizationsDelegate

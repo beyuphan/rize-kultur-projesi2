@@ -181,4 +181,16 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get searchResults => 'Arama Sonucu';
+
+  @override
+  String get tagCarAccess => 'Araç Ulaşımı';
+
+  @override
+  String get tagWinterFriendly => 'Kışa Uygun';
+
+  @override
+  String get tagEntryFee => 'Giriş Ücretli';
+
+  @override
+  String get tagHikingTrail => 'Yürüyüş Yolu';
 }

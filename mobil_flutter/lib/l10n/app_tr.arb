@@ -62,6 +62,10 @@
   "noVenuesFound": "Değer Bulunamadı",
   "noCommentsYet": "Yorum Yok",
   "averageRating": "Ortalama Puan",
+  "tagCarAccess": "Araç Ulaşımı",
+  "tagWinterFriendly": "Kışa Uygun",
+  "tagEntryFee": "Giriş Ücretli",
+  "tagHikingTrail": "Yürüyüş Yolu",
   "reviews": "Değerlendirmeler",
   "reviewsCount": "({count} Değerlendirme)",
   "@reviewsCount": {

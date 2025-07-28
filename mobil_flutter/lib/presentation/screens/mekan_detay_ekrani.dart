@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobil_flutter/presentation/providers/mekan_providers.dart';
 import 'package:mobil_flutter/presentation/widgets/ana_detay_sayfasi.dart';
 import 'package:mobil_flutter/presentation/widgets/yorumlar_sayfasi.dart';
-
+import 'package:mobil_flutter/presentation/widgets/bilgi_sayfasi.dart'; // Yeni sayfayı import et
 
 
 
@@ -17,8 +17,9 @@ class MekanDetayEkrani extends ConsumerStatefulWidget {
 }
 
 class _MekanDetayEkraniState extends ConsumerState<MekanDetayEkrani> {
-  final PageController _pageController = PageController();
-  int _currentPage = 0;
+    // Başlangıç sayfasını 1 yap (0: Bilgi, 1: Ana Detay, 2: Yorumlar)
+  final PageController _pageController = PageController(initialPage: 1);
+  int _currentPage = 1;
 
   @override
   void initState() {
@@ -58,6 +59,7 @@ class _MekanDetayEkraniState extends ConsumerState<MekanDetayEkrani> {
               PageView(
                 controller: _pageController,
                 children: [
+                  BilgiSayfasi(mekan: mekan),
                   AnaDetaySayfasi(mekan: mekan),
                   YorumlarSayfasi(mekan: mekan),
                 ],
@@ -76,7 +78,7 @@ class _MekanDetayEkraniState extends ConsumerState<MekanDetayEkrani> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(2, (index) {
+                      children: List.generate(3, (index) {
                         return AnimatedContainer(
                           duration: const Duration(milliseconds: 300),
                           margin: const EdgeInsets.symmetric(horizontal: 4),

@@ -44,6 +44,11 @@ const MekanSchema = new Schema({
         tr: { type: String, required: true },
         en: { type: String, required: true }
     },
+    tarihce: {
+        tr: { type: String }, // Zorunlu değil, bazı mekanların tarihi olmayabilir
+        en: { type: String }
+    },
+    etiketler: [String],
     kategori: String,
     fotograflar: [String],
     // Konum alanı olarak yukarıda oluşturduğumuz KonumSchema'yı kullanıyoruz.
