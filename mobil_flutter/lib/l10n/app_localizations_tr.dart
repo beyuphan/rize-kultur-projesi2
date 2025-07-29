@@ -214,7 +214,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get bottomNavProfile => 'Profilim';
 
   @override
-  String get noVenuesFound => 'Değer Bulunamadı';
+  String get noVenuesFound => 'Değer Bulunamadı.';
 
   @override
   String get yourComment => 'Yorumunuz';
@@ -223,7 +223,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get edit => 'Düzenle';
 
   @override
-  String get noCommentsYet => 'Yorum Yok';
+  String get noCommentsYet => 'Henüz Yorum Yok';
 
   @override
   String get noFavoritesYet => 'henüz Favori Eklenmedi';
@@ -242,4 +242,160 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get tagHikingTrail => 'Yürüyüş Yolu';
+
+  @override
+  String get discoverRoutesTitle => 'Keşfedilecek Rotalar';
+
+  @override
+  String get routeDetailTitle => 'Rota Detayı';
+
+  @override
+  String get routeLoadingError => 'Rotalar yüklenirken bir hata oluştu.';
+
+  @override
+  String get routesNotFound => 'Gösterilecek rota bulunamadı.';
+
+  @override
+  String get firtinaVadisiName => 'Fırtına Vadisi Macerası';
+
+  @override
+  String get firtinaVadisiDescription =>
+      'Fırtına Deresi boyunca uzanan bu rota, tarihi köprüler ve yemyeşil doğa manzaraları sunuyor.';
+
+  @override
+  String get firtinaVadisiDuration => '4-5 Saat';
+
+  @override
+  String get firtinaVadisiDifficulty => 'Orta';
+
+  @override
+  String get kackarlarZirveName => 'Kaçkarlar\'ın Zirvelerine Yolculuk';
+
+  @override
+  String get kackarlarZirveDescription =>
+      'Ayder Yaylası\'ndan başlayan bu rota, tecrübeli yürüyüşçüler için Kaçkar Dağları\'nın nefes kesen manzaralarını sunar.';
+
+  @override
+  String get kackarlarZirveDuration => '2 Gün';
+
+  @override
+  String get kackarlarZirveDifficulty => 'Zor';
+
+  @override
+  String get cayBahceleriName => 'Çay Bahçeleri Turu';
+
+  @override
+  String get cayBahceleriDescription =>
+      'Rize\'nin ünlü çay tarlaları arasında keyifli bir gezi. Çayın tarladan bardağa yolculuğuna tanık olun.';
+
+  @override
+  String get cayBahceleriDuration => '3 Saat';
+
+  @override
+  String get cayBahceleriDifficulty => 'Kolay';
+
+  @override
+  String get addedToFavorites => 'Favorilere eklendi';
+
+  @override
+  String get removedFromFavorites => 'Favorilerden çıkarıldı';
+
+  @override
+  String get routeSharing => 'Rota paylaşılıyor...';
+
+  @override
+  String get duration => 'Süre';
+
+  @override
+  String get difficulty => 'Zorluk';
+
+  @override
+  String get placeCount => 'Mekan Sayısı';
+
+  @override
+  String get stops => 'Durak';
+
+  @override
+  String get rating => 'Puan';
+
+  @override
+  String get route => 'Rota';
+
+  @override
+  String get places => 'Mekanlar';
+
+  @override
+  String get information => 'Bilgiler';
+
+  @override
+  String get startRoute => 'Rotayı Başlat';
+
+  @override
+  String get routePreparation => 'Rotaya Hazırlık';
+
+  @override
+  String get clothing => 'Kıyafet';
+
+  @override
+  String get clothingDescription =>
+      'Rahat yürüyüş kıyafetleri ve su geçirmez mont';
+
+  @override
+  String get water => 'Su';
+
+  @override
+  String get waterDescription => 'Kişi başı en az 2 litre su';
+
+  @override
+  String get food => 'Yiyecek';
+
+  @override
+  String get foodDescription => 'Ara öğün için atıştırmalık ve enerji barı';
+
+  @override
+  String get firstAid => 'İlk Yardım';
+
+  @override
+  String get firstAidDescription => 'Temel ilk yardım malzemeleri';
+
+  @override
+  String get safetyTips => 'Güvenlik İpuçları';
+
+  @override
+  String get checkWeather => 'Hava durumunu kontrol edin';
+
+  @override
+  String get travelInGroup => 'Grup halinde seyahat edin';
+
+  @override
+  String get askLocalGuides => 'Yerel rehberlerden bilgi alın';
+
+  @override
+  String get emergencyContacts =>
+      'Acil durumlarda iletişim bilgilerini yanınızda taşıyın';
+
+  @override
+  String get recommendedTime => 'Önerilen süre';
+
+  @override
+  String get features => 'Özellikler';
+
+  @override
+  String get showOnMap => 'Haritada Göster';
+
+  @override
+  String get openingOnMap => 'haritada açılıyor...';
+
+  @override
+  String get startRouteConfirmation =>
+      'Bu rotayı başlatmak istediğinizden emin misiniz? GPS takibi açılacak ve size yol gösterilecek.';
+
+  @override
+  String get cancel => 'İptal';
+
+  @override
+  String get start => 'Başlat';
+
+  @override
+  String get routeStarting => 'Rota başlatılıyor... GPS açılıyor.';
 }

@@ -93,7 +93,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get photos => 'Photos';
 
   @override
-  String get addComment => 'Add Comment';
+  String get addComment => 'Add Comment';
 
   @override
   String get favorites => 'Favoriler';
@@ -242,4 +242,159 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tagHikingTrail => 'Hiking Trail';
+
+  @override
+  String get discoverRoutesTitle => 'Routes to Discover';
+
+  @override
+  String get routeDetailTitle => 'Route Detail';
+
+  @override
+  String get routeLoadingError => 'An error occurred while loading routes.';
+
+  @override
+  String get routesNotFound => 'No routes found.';
+
+  @override
+  String get firtinaVadisiName => 'Fırtına Valley Adventure';
+
+  @override
+  String get firtinaVadisiDescription =>
+      'This route along the Fırtına River offers views of historical bridges and lush green nature.';
+
+  @override
+  String get firtinaVadisiDuration => '4-5 Hours';
+
+  @override
+  String get firtinaVadisiDifficulty => 'Medium';
+
+  @override
+  String get kackarlarZirveName => 'Journey to the Peaks of Kaçkars';
+
+  @override
+  String get kackarlarZirveDescription =>
+      'Starting from Ayder Plateau, this route offers breathtaking views of the Kaçkar Mountains for experienced hikers.';
+
+  @override
+  String get kackarlarZirveDuration => '2 Days';
+
+  @override
+  String get kackarlarZirveDifficulty => 'Hard';
+
+  @override
+  String get cayBahceleriName => 'Tea Gardens Tour';
+
+  @override
+  String get cayBahceleriDescription =>
+      'A pleasant trip among the famous tea fields of Rize. Witness the journey of tea from the field to the cup.';
+
+  @override
+  String get cayBahceleriDuration => '3 Hours';
+
+  @override
+  String get cayBahceleriDifficulty => 'Easy';
+
+  @override
+  String get addedToFavorites => 'Added to favorites';
+
+  @override
+  String get removedFromFavorites => 'Removed from favorites';
+
+  @override
+  String get routeSharing => 'Sharing route...';
+
+  @override
+  String get duration => 'Duration';
+
+  @override
+  String get difficulty => 'Difficulty';
+
+  @override
+  String get placeCount => 'Place Count';
+
+  @override
+  String get stops => 'Stops';
+
+  @override
+  String get rating => 'Rating';
+
+  @override
+  String get route => 'Route';
+
+  @override
+  String get places => 'Places';
+
+  @override
+  String get information => 'Information';
+
+  @override
+  String get startRoute => 'Start Route';
+
+  @override
+  String get routePreparation => 'Route Preparation';
+
+  @override
+  String get clothing => 'Clothing';
+
+  @override
+  String get clothingDescription =>
+      'Comfortable hiking clothes and waterproof jacket';
+
+  @override
+  String get water => 'Water';
+
+  @override
+  String get waterDescription => 'At least 2 liters of water per person';
+
+  @override
+  String get food => 'Food';
+
+  @override
+  String get foodDescription => 'Snacks and energy bars for meals';
+
+  @override
+  String get firstAid => 'First Aid';
+
+  @override
+  String get firstAidDescription => 'Basic first aid supplies';
+
+  @override
+  String get safetyTips => 'Safety Tips';
+
+  @override
+  String get checkWeather => 'Check the weather forecast';
+
+  @override
+  String get travelInGroup => 'Travel in groups';
+
+  @override
+  String get askLocalGuides => 'Get information from local guides';
+
+  @override
+  String get emergencyContacts => 'Keep emergency contact information with you';
+
+  @override
+  String get recommendedTime => 'Recommended time';
+
+  @override
+  String get features => 'Features';
+
+  @override
+  String get showOnMap => 'Show on Map';
+
+  @override
+  String get openingOnMap => 'opening on map...';
+
+  @override
+  String get startRouteConfirmation =>
+      'Are you sure you want to start this route? GPS tracking will be enabled and you will be guided.';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get start => 'Start';
+
+  @override
+  String get routeStarting => 'Starting route... Opening GPS.';
 }

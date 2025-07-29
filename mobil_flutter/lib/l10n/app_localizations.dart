@@ -269,7 +269,7 @@ abstract class AppLocalizations {
   /// No description provided for @addComment.
   ///
   /// In en, this message translates to:
-  /// **'Add Comment'**
+  /// **'Add Comment'**
   String get addComment;
 
   /// No description provided for @favorites.
@@ -559,6 +559,306 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Hiking Trail'**
   String get tagHikingTrail;
+
+  /// No description provided for @discoverRoutesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Routes to Discover'**
+  String get discoverRoutesTitle;
+
+  /// No description provided for @routeDetailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Route Detail'**
+  String get routeDetailTitle;
+
+  /// No description provided for @routeLoadingError.
+  ///
+  /// In en, this message translates to:
+  /// **'An error occurred while loading routes.'**
+  String get routeLoadingError;
+
+  /// No description provided for @routesNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No routes found.'**
+  String get routesNotFound;
+
+  /// No description provided for @firtinaVadisiName.
+  ///
+  /// In en, this message translates to:
+  /// **'Fırtına Valley Adventure'**
+  String get firtinaVadisiName;
+
+  /// No description provided for @firtinaVadisiDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'This route along the Fırtına River offers views of historical bridges and lush green nature.'**
+  String get firtinaVadisiDescription;
+
+  /// No description provided for @firtinaVadisiDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'4-5 Hours'**
+  String get firtinaVadisiDuration;
+
+  /// No description provided for @firtinaVadisiDifficulty.
+  ///
+  /// In en, this message translates to:
+  /// **'Medium'**
+  String get firtinaVadisiDifficulty;
+
+  /// No description provided for @kackarlarZirveName.
+  ///
+  /// In en, this message translates to:
+  /// **'Journey to the Peaks of Kaçkars'**
+  String get kackarlarZirveName;
+
+  /// No description provided for @kackarlarZirveDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Starting from Ayder Plateau, this route offers breathtaking views of the Kaçkar Mountains for experienced hikers.'**
+  String get kackarlarZirveDescription;
+
+  /// No description provided for @kackarlarZirveDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'2 Days'**
+  String get kackarlarZirveDuration;
+
+  /// No description provided for @kackarlarZirveDifficulty.
+  ///
+  /// In en, this message translates to:
+  /// **'Hard'**
+  String get kackarlarZirveDifficulty;
+
+  /// No description provided for @cayBahceleriName.
+  ///
+  /// In en, this message translates to:
+  /// **'Tea Gardens Tour'**
+  String get cayBahceleriName;
+
+  /// No description provided for @cayBahceleriDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'A pleasant trip among the famous tea fields of Rize. Witness the journey of tea from the field to the cup.'**
+  String get cayBahceleriDescription;
+
+  /// No description provided for @cayBahceleriDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'3 Hours'**
+  String get cayBahceleriDuration;
+
+  /// No description provided for @cayBahceleriDifficulty.
+  ///
+  /// In en, this message translates to:
+  /// **'Easy'**
+  String get cayBahceleriDifficulty;
+
+  /// No description provided for @addedToFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Added to favorites'**
+  String get addedToFavorites;
+
+  /// No description provided for @removedFromFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Removed from favorites'**
+  String get removedFromFavorites;
+
+  /// No description provided for @routeSharing.
+  ///
+  /// In en, this message translates to:
+  /// **'Sharing route...'**
+  String get routeSharing;
+
+  /// No description provided for @duration.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get duration;
+
+  /// No description provided for @difficulty.
+  ///
+  /// In en, this message translates to:
+  /// **'Difficulty'**
+  String get difficulty;
+
+  /// No description provided for @placeCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Place Count'**
+  String get placeCount;
+
+  /// No description provided for @stops.
+  ///
+  /// In en, this message translates to:
+  /// **'Stops'**
+  String get stops;
+
+  /// No description provided for @rating.
+  ///
+  /// In en, this message translates to:
+  /// **'Rating'**
+  String get rating;
+
+  /// No description provided for @route.
+  ///
+  /// In en, this message translates to:
+  /// **'Route'**
+  String get route;
+
+  /// No description provided for @places.
+  ///
+  /// In en, this message translates to:
+  /// **'Places'**
+  String get places;
+
+  /// No description provided for @information.
+  ///
+  /// In en, this message translates to:
+  /// **'Information'**
+  String get information;
+
+  /// No description provided for @startRoute.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Route'**
+  String get startRoute;
+
+  /// No description provided for @routePreparation.
+  ///
+  /// In en, this message translates to:
+  /// **'Route Preparation'**
+  String get routePreparation;
+
+  /// No description provided for @clothing.
+  ///
+  /// In en, this message translates to:
+  /// **'Clothing'**
+  String get clothing;
+
+  /// No description provided for @clothingDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Comfortable hiking clothes and waterproof jacket'**
+  String get clothingDescription;
+
+  /// No description provided for @water.
+  ///
+  /// In en, this message translates to:
+  /// **'Water'**
+  String get water;
+
+  /// No description provided for @waterDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'At least 2 liters of water per person'**
+  String get waterDescription;
+
+  /// No description provided for @food.
+  ///
+  /// In en, this message translates to:
+  /// **'Food'**
+  String get food;
+
+  /// No description provided for @foodDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Snacks and energy bars for meals'**
+  String get foodDescription;
+
+  /// No description provided for @firstAid.
+  ///
+  /// In en, this message translates to:
+  /// **'First Aid'**
+  String get firstAid;
+
+  /// No description provided for @firstAidDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Basic first aid supplies'**
+  String get firstAidDescription;
+
+  /// No description provided for @safetyTips.
+  ///
+  /// In en, this message translates to:
+  /// **'Safety Tips'**
+  String get safetyTips;
+
+  /// No description provided for @checkWeather.
+  ///
+  /// In en, this message translates to:
+  /// **'Check the weather forecast'**
+  String get checkWeather;
+
+  /// No description provided for @travelInGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Travel in groups'**
+  String get travelInGroup;
+
+  /// No description provided for @askLocalGuides.
+  ///
+  /// In en, this message translates to:
+  /// **'Get information from local guides'**
+  String get askLocalGuides;
+
+  /// No description provided for @emergencyContacts.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep emergency contact information with you'**
+  String get emergencyContacts;
+
+  /// No description provided for @recommendedTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommended time'**
+  String get recommendedTime;
+
+  /// No description provided for @features.
+  ///
+  /// In en, this message translates to:
+  /// **'Features'**
+  String get features;
+
+  /// No description provided for @showOnMap.
+  ///
+  /// In en, this message translates to:
+  /// **'Show on Map'**
+  String get showOnMap;
+
+  /// No description provided for @openingOnMap.
+  ///
+  /// In en, this message translates to:
+  /// **'opening on map...'**
+  String get openingOnMap;
+
+  /// No description provided for @startRouteConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to start this route? GPS tracking will be enabled and you will be guided.'**
+  String get startRouteConfirmation;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @start.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get start;
+
+  /// No description provided for @routeStarting.
+  ///
+  /// In en, this message translates to:
+  /// **'Starting route... Opening GPS.'**
+  String get routeStarting;
 }
 
 class _AppLocalizationsDelegate
