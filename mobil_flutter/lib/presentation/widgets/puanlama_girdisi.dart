@@ -1,3 +1,5 @@
+// lib/presentation/widgets/puanlama_girdisi.dart (DÜZELTİLMİŞ TAM KOD)
+
 import 'package:flutter/material.dart';
 
 class PuanlamaGirdisi extends StatefulWidget {
@@ -46,16 +48,30 @@ class _PuanlamaGirdisiState extends State<PuanlamaGirdisi> {
       children: List.generate(5, (index) {
         return IconButton(
           icon: Icon(
+            // Görünüm mantığı doğru, dokunmuyoruz.
             _mevcutPuan > index ? cayYapragiDolu : cayYapragiBos,
-            color: tema.colorScheme.secondary,
+            color: tema.colorScheme.primary, // secondary yerine primary daha iyi olabilir
             size: widget.iconBoyutu,
           ),
           onPressed: () {
-            final yeniPuan = index + 1.0;
+            // --- DÜZELTME BURADA BAŞLIYOR ---
+            
+            // Kullanıcının tıkladığı ikonun puan değerini hesapla
+            double tiklananPuan = index + 1.0;
+
+            // Eğer kullanıcı mevcut puana eşit olan ikona tekrar tıkladıysa,
+            // puanı sıfırla. Aksi halde, yeni puanı ata.
+            if (_mevcutPuan == tiklananPuan) {
+              tiklananPuan = 0.0;
+            }
+
+            // State'i ve dışarıyı yeni hesaplanan puanla bilgilendir
             setState(() {
-              _mevcutPuan = yeniPuan;
+              _mevcutPuan = tiklananPuan;
             });
-            widget.onPuanDegisti(yeniPuan);
+            widget.onPuanDegisti(tiklananPuan);
+            
+            // --- DÜZELTME BİTTİ ---
           },
         );
       }),

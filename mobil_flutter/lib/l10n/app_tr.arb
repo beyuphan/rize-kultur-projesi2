@@ -79,6 +79,10 @@
   "usernameValidation": "Kullanıcı Adı Doğrulama",
   "passwordLengthValidation": "Şire Uzunluğu Doğrulama",
   "alreadyHaveAccount": "Zaten bir hesabın var mı?",
+  "guestProfileTitle": "Keşfetmeye Başla",
+  "guestPromptTitle": "Tüm Özellikleri Keşfet",
+  "guestPromptSubtitle":"Mekanları favorilere eklemek, yorum ve puan bırakmak için bir hesap oluşturun.",
+
   "reviews": "Değerlendirmeler",
   "reviewsCount": "({count} Değerlendirme)",
   "@reviewsCount": {

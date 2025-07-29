@@ -434,6 +434,24 @@ abstract class AppLocalizations {
   /// **'Reviews'**
   String get reviews;
 
+  /// No description provided for @guestProfileTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Discover'**
+  String get guestProfileTitle;
+
+  /// No description provided for @guestPromptTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Discover All Feature'**
+  String get guestPromptTitle;
+
+  /// No description provided for @guestPromptSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create an account to add places to your favorites, leave reviews and ratings.'**
+  String get guestPromptSubtitle;
+
   /// The number of reviews for a place
   ///
   /// In en, this message translates to:

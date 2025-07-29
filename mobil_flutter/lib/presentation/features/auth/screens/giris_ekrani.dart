@@ -34,7 +34,14 @@ class _GirisEkraniState extends ConsumerState<GirisEkrani> {
           _passwordController.text.trim(),
         );
 
-    if (hataMesaji != null && mounted) {
+      // Bu kontrol, işlem bittiğinde sayfa kapatılmışsa hata almayı önler.
+    if (!mounted) return;
+
+    if (hataMesaji == null) {
+      // GİRİŞ BAŞARILI: Bu ekranı kapat ve ana ekrana dön.
+      Navigator.of(context).pop();
+    } else {
+      // GİRİŞ BAŞARISIZ: Hata mesajını göster.
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(hataMesaji), backgroundColor: Colors.red),
       );

@@ -177,6 +177,16 @@ class AppLocalizationsTr extends AppLocalizations {
   String get reviews => 'Değerlendirmeler';
 
   @override
+  String get guestProfileTitle => 'Keşfetmeye Başla';
+
+  @override
+  String get guestPromptTitle => 'Tüm Özellikleri Keşfet';
+
+  @override
+  String get guestPromptSubtitle =>
+      'Mekanları favorilere eklemek, yorum ve puan bırakmak için bir hesap oluşturun.';
+
+  @override
   String reviewsCount(String count) {
     return '($count Değerlendirme)';
   }

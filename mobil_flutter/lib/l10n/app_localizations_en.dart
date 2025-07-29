@@ -177,6 +177,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reviews => 'Reviews';
 
   @override
+  String get guestProfileTitle => 'Start Discover';
+
+  @override
+  String get guestPromptTitle => 'Discover All Feature';
+
+  @override
+  String get guestPromptSubtitle =>
+      'Create an account to add places to your favorites, leave reviews and ratings.';
+
+  @override
   String reviewsCount(String count) {
     return '($count Reviews)';
   }

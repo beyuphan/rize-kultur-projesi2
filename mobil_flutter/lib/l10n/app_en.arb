@@ -56,6 +56,9 @@
   "passwordLengthValidation": "Password Length Validation",
   "alreadyHaveAccount": "Already Have Account?",
   "reviews": "Reviews",
+  "guestProfileTitle": "Start Discover",
+  "guestPromptTitle": "Discover All Feature",
+  "guestPromptSubtitle":"Create an account to add places to your favorites, leave reviews and ratings.",
   "reviewsCount": "({count} Reviews)",
   "@reviewsCount": {
     "description": "The number of reviews for a place",
