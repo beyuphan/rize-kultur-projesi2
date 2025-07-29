@@ -47,9 +47,7 @@ class _MainNavigationScreenState extends ConsumerState<MainNavigationScreen> {
       pages = const [
         KesfetEkrani(),
         HaritaEkrani(),
-        Scaffold(
-          body: Center(child: Text("Rotalar (Yapım Aşamasında)")),
-        ), // Rotalar
+        RotalarEkrani(), // Rotalar ekranı
         ProfilSayfasi(), // Kendi profilini gösterir
       ];
       items = [
@@ -75,7 +73,7 @@ class _MainNavigationScreenState extends ConsumerState<MainNavigationScreen> {
       pages = const [
         KesfetEkrani(),
         HaritaEkrani(),
-        Scaffold(body: Center(child: Text("Rotalar (Yapım Aşamasında)"))),
+        RotalarEkrani(),
         MisafirEkrani(), // Profilim yerine Giriş Yap ekranını gösterir
       ];
       items = [
