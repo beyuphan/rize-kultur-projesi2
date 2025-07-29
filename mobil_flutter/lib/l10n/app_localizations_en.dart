@@ -135,7 +135,56 @@ class AppLocalizationsEn extends AppLocalizations {
   String get averageRating => 'Average Rating';
 
   @override
+  String get loginTitle => 'Login';
+
+  @override
+  String get loginSubtitle => 'Login...';
+
+  @override
+  String get emailValidation => 'E-Mail Validation';
+
+  @override
+  String get passwordValidation => 'Password Validation';
+
+  @override
+  String get password => 'Password';
+
+  @override
+  String get loginButton => 'Login';
+
+  @override
+  String get dontHaveAccount => 'Dont Have Account?';
+
+  @override
+  String get registerButton => 'Register';
+
+  @override
+  String get registerTitle => 'Register';
+
+  @override
+  String get registerSubtitle => 'Register...';
+
+  @override
+  String get usernameValidation => 'Username Validation';
+
+  @override
+  String get passwordLengthValidation => 'Password Length Validation';
+
+  @override
+  String get alreadyHaveAccount => 'Already Have Account?';
+
+  @override
   String get reviews => 'Reviews';
+
+  @override
+  String get guestProfileTitle => 'Start Discover';
+
+  @override
+  String get guestPromptTitle => 'Discover All Feature';
+
+  @override
+  String get guestPromptSubtitle =>
+      'Create an account to add places to your favorites, leave reviews and ratings.';
 
   @override
   String reviewsCount(String count) {

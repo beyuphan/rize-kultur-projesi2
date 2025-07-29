@@ -350,11 +350,107 @@ abstract class AppLocalizations {
   /// **'Average Rating'**
   String get averageRating;
 
+  /// No description provided for @loginTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Login'**
+  String get loginTitle;
+
+  /// No description provided for @loginSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Login...'**
+  String get loginSubtitle;
+
+  /// No description provided for @emailValidation.
+  ///
+  /// In en, this message translates to:
+  /// **'E-Mail Validation'**
+  String get emailValidation;
+
+  /// No description provided for @passwordValidation.
+  ///
+  /// In en, this message translates to:
+  /// **'Password Validation'**
+  String get passwordValidation;
+
+  /// No description provided for @password.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get password;
+
+  /// No description provided for @loginButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Login'**
+  String get loginButton;
+
+  /// No description provided for @dontHaveAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Dont Have Account?'**
+  String get dontHaveAccount;
+
+  /// No description provided for @registerButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Register'**
+  String get registerButton;
+
+  /// No description provided for @registerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Register'**
+  String get registerTitle;
+
+  /// No description provided for @registerSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Register...'**
+  String get registerSubtitle;
+
+  /// No description provided for @usernameValidation.
+  ///
+  /// In en, this message translates to:
+  /// **'Username Validation'**
+  String get usernameValidation;
+
+  /// No description provided for @passwordLengthValidation.
+  ///
+  /// In en, this message translates to:
+  /// **'Password Length Validation'**
+  String get passwordLengthValidation;
+
+  /// No description provided for @alreadyHaveAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Already Have Account?'**
+  String get alreadyHaveAccount;
+
   /// No description provided for @reviews.
   ///
   /// In en, this message translates to:
   /// **'Reviews'**
   String get reviews;
+
+  /// No description provided for @guestProfileTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Discover'**
+  String get guestProfileTitle;
+
+  /// No description provided for @guestPromptTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Discover All Feature'**
+  String get guestPromptTitle;
+
+  /// No description provided for @guestPromptSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create an account to add places to your favorites, leave reviews and ratings.'**
+  String get guestPromptSubtitle;
 
   /// The number of reviews for a place
   ///

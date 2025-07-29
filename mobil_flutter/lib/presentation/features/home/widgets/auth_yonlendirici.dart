@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobil_flutter/presentation/providers/auth_providers.dart';
-import 'package:mobil_flutter/presentation/features/auth/screens/giris_ekrani.dart';
 import 'package:mobil_flutter/presentation/features/home/screens/main_navigation_screen.dart'; 
 class AuthYonlendirici extends ConsumerWidget {
   const AuthYonlendirici({super.key});
@@ -16,7 +15,7 @@ class AuthYonlendirici extends ConsumerWidget {
       case AuthStatus.girisYapildi:
         return const MainNavigationScreen();
       case AuthStatus.girisYapilmadi:
-        return const GirisEkrani();
+        return const MainNavigationScreen();
       case AuthStatus.bilinmiyor:
       default:
         // Auth durumu kontrol edilirken yüklenme animasyonu göster

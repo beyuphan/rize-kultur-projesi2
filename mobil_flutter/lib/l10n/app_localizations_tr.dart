@@ -135,7 +135,56 @@ class AppLocalizationsTr extends AppLocalizations {
   String get averageRating => 'Ortalama Puan';
 
   @override
+  String get loginTitle => 'Giriş Yap';
+
+  @override
+  String get loginSubtitle => 'Hesabınıza giriş yapabilirsiniz.';
+
+  @override
+  String get emailValidation => 'E-Mail Doğrulama';
+
+  @override
+  String get passwordValidation => 'Şifre Doğrulama';
+
+  @override
+  String get password => 'Şifre';
+
+  @override
+  String get loginButton => 'Giriş Yap';
+
+  @override
+  String get dontHaveAccount => 'Henüz bir hesabınız yok mu?';
+
+  @override
+  String get registerButton => 'Kayıt Ol';
+
+  @override
+  String get registerTitle => 'Kayıt Ol';
+
+  @override
+  String get registerSubtitle => 'Hesap oluşturmak için kayıt olabilirsiniz.';
+
+  @override
+  String get usernameValidation => 'Kullanıcı Adı Doğrulama';
+
+  @override
+  String get passwordLengthValidation => 'Şire Uzunluğu Doğrulama';
+
+  @override
+  String get alreadyHaveAccount => 'Zaten bir hesabın var mı?';
+
+  @override
   String get reviews => 'Değerlendirmeler';
+
+  @override
+  String get guestProfileTitle => 'Keşfetmeye Başla';
+
+  @override
+  String get guestPromptTitle => 'Tüm Özellikleri Keşfet';
+
+  @override
+  String get guestPromptSubtitle =>
+      'Mekanları favorilere eklemek, yorum ve puan bırakmak için bir hesap oluşturun.';
 
   @override
   String reviewsCount(String count) {

@@ -1,3 +1,5 @@
+// lib/presentation/features/venue/widgets/yorumlar_sayfasi.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobil_flutter/data/models/mekan_model.dart';
@@ -6,11 +8,13 @@ import 'package:mobil_flutter/presentation/providers/user_providers.dart';
 import 'package:mobil_flutter/presentation/widgets/yorum_karti.dart';
 import 'package:mobil_flutter/data/models/yorum_model.dart';
 import 'package:mobil_flutter/presentation/providers/mekan_providers.dart';
+import 'package:mobil_flutter/presentation/providers/auth_providers.dart'; // Auth provider'ı import et
+import 'package:mobil_flutter/presentation/features/auth/screens/giris_ekrani.dart'; // Giriş ekranını import et
 
-//--- SAYFA 2: YORUMLAR (AKILLI MANTIK) ---
+//--- SAYFA 2: YORUMLAR (GÜNCELLENMİŞ) ---
 class YorumlarSayfasi extends ConsumerStatefulWidget {
   final MekanModel mekan;
-  const YorumlarSayfasi({required this.mekan});
+  const YorumlarSayfasi({super.key, required this.mekan});
 
   @override
   ConsumerState<YorumlarSayfasi> createState() => _YorumlarSayfasiState();
@@ -19,94 +23,105 @@ class YorumlarSayfasi extends ConsumerStatefulWidget {
 class _YorumlarSayfasiState extends ConsumerState<YorumlarSayfasi> {
   bool _isEditing = false;
 
+ @override
+Widget build(BuildContext context) {
+  final theme = Theme.of(context);
+  final l10n = AppLocalizations.of(context)!;
+
+  final authState = ref.watch(authProvider);
+  final bool girisYapildi = authState == AuthStatus.girisYapildi;
+  final userId = girisYapildi ? ref.watch(userProfileProvider).value?.id : null;
+
+  // --- DÜZELTME BURADA ---
+  final YorumModel? kullaniciYorumu;
+  if (girisYapildi && userId != null) {
+    // 'where' kullanarak güvenli bir şekilde arama yapıyoruz.
+    final eslesenYorumlar = widget.mekan.yorumlar.where((yorum) => yorum.yazar.id == userId);
+    kullaniciYorumu = eslesenYorumlar.isNotEmpty ? eslesenYorumlar.first : null;
+  } else {
+    kullaniciYorumu = null;
+  }
+  // --- DÜZELTME BİTTİ ---
+
+  final bool kullaniciMetinliYorumYaptiMi =
+      kullaniciYorumu != null && (kullaniciYorumu.icerik?.trim().isNotEmpty ?? false);
+  final digerYorumlar = widget.mekan.yorumlar
+      .where((yorum) => yorum.yazar.id != userId)
+      .toList();
+
+    // DÜZELTME: Scaffold ve AppBar kaldırıldı, artık direkt içeriği döndürüyoruz.
+    return Column(
+      children: [
+        Expanded(
+          child: digerYorumlar.isEmpty
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                    child: Text(
+                      l10n.noCommentsYet, // Çeviri anahtarı kullanıldı
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodyLarge,
+                    ),
+                  ),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
+                  itemCount: digerYorumlar.length,
+                  itemBuilder: (context, index) {
+                    final yorum = digerYorumlar[index];
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: YorumKarti(yorum: yorum),
+                    );
+                  },
+                ),
+        ),
+        
+        // --- KULLANICI YORUM/GİRİŞ ALANI (AKILLI MANTIK) ---
+        if (girisYapildi)
+          // Eğer kullanıcı giriş yapmışsa...
+          if (kullaniciMetinliYorumYaptiMi && !_isEditing)
+            // ve yazılı bir yorumu varsa ve düzenleme modunda değilse, yorumunu göster
+            _KullaniciYorumuGoster(
+              yorum: kullaniciYorumu!,
+              onEditPressed: () => setState(() => _isEditing = true),
+            )
+          else
+            // Yazılı yorumu yoksa veya düzenleme modundaysa, yazma alanını göster
+            _YorumYazmaAlani(
+              mekanId: widget.mekan.id,
+              duzenlenecekYorum: kullaniciYorumu,
+              onCommentSubmitted: () => setState(() => _isEditing = false),
+            )
+        else
+          // Eğer kullanıcı misafir ise, giriş yapma butonu göster
+          _GirisYapmaButonu(),
+      ],
+    );
+  }
+}
+
+// YENİ: Misafirler için giriş yapma butonu
+class _GirisYapmaButonu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final l10n = AppLocalizations.of(context)!;
-    final langCode = Localizations.localeOf(context).languageCode;
-
-    final userAsync = ref.watch(userProfileProvider);
-    final user = userAsync.value;
-    final userId = userAsync.value?.id;
-
-    final eslesenYorumlar = widget.mekan.yorumlar.where(
-      (yorum) => yorum.yazar.id == userId,
-    );
-    final YorumModel? kullaniciYorumu = eslesenYorumlar.isNotEmpty
-        ? eslesenYorumlar.first
-        : null;
-    final bool kullaniciMetinliYorumYaptiMi =
-        kullaniciYorumu != null &&
-        (kullaniciYorumu.icerik?.trim().isNotEmpty ?? false);
-    final digerYorumlar = widget.mekan.yorumlar
-        .where((yorum) => yorum.yazar.id != userId)
-        .toList();
-
-    return Scaffold(
-      resizeToAvoidBottomInset: true,
-      backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        title: Text(
-          '${langCode == 'tr' ? widget.mekan.isim.tr : widget.mekan.isim.en} - ${l10n.reviews}',
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 24, 16, 40),
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        icon: const Icon(Icons.login),
+        label: const Text("Yorum yapmak için giriş yapın"),
+        onPressed: () {
+          Navigator.of(context).push(MaterialPageRoute(builder: (_) => const GirisEkrani()));
+        },
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 16),
         ),
-        backgroundColor: theme.scaffoldBackgroundColor,
-        elevation: 0,
-        centerTitle: true,
-        automaticallyImplyLeading: true, // Geri butonunu aktif eder
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: digerYorumlar.isEmpty
-                ? Center(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                      child: Text(
-                        "yorum yok şuan",
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.bodyLarge,
-                      ),
-                    ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                    itemCount: digerYorumlar.length,
-                    itemBuilder: (context, index) {
-                      final yorum = digerYorumlar[index];
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 16.0),
-                        child: YorumKarti(
-                          yorum: yorum,
-                        ),
-                      );
-                    },
-                  ),
-          ),
-          if (userId != null)
-            if (kullaniciMetinliYorumYaptiMi && !_isEditing)
-              _KullaniciYorumuGoster(
-                yorum: kullaniciYorumu!,
-                onEditPressed: () {
-                  setState(() {
-                    _isEditing = true;
-                  });
-                },
-              )
-            else
-              _YorumYazmaAlani(
-                mekanId: widget.mekan.id,
-                duzenlenecekYorum: kullaniciYorumu,
-                onCommentSubmitted: () {
-                  setState(() {
-                    _isEditing = false;
-                  });
-                },
-              ),
-        ],
       ),
     );
   }
 }
+
 
 //--- KULLANICININ KENDİ YORUMUNU GÖSTEREN WIDGET ---
 class _KullaniciYorumuGoster extends StatelessWidget {
