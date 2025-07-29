@@ -1,5 +1,5 @@
 // lib/presentation/features/home/screens/main_navigation_screen.dart
-
+import 'package:mobil_flutter/presentation/features/auth/screens/misafir_ekrani.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobil_flutter/presentation/providers/auth_providers.dart';
@@ -10,7 +10,7 @@ import 'package:mobil_flutter/presentation/features/map/screens/harita_ekrani.da
 import 'package:mobil_flutter/presentation/features/discover/screens/kesfet_ekrani.dart';
 import 'package:mobil_flutter/presentation/features/profil/screens/profil_sayfasi.dart';
 
-import 'package:mobil_flutter/presentation/screens/rotalar_ekrani.dart';
+import 'package:mobil_flutter/presentation/features/rotalar/screens/rotalar_ekrani.dart';
 import 'package:mobil_flutter/l10n/app_localizations.dart';
 
 final seciliEkranIndexProvider = StateProvider<int>((ref) => 0);
