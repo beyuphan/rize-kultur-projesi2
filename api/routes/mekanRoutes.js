@@ -28,7 +28,12 @@ router.get('/', async (req, res) => {
         if (arama) {
             // 'i' parametresi büyük/küçük harf duyarsız arama (case-insensitive) sağlar.
             // Sadece mekanların Türkçe isminde arama yapıyoruz, istersen 'isim.en' de eklenebilir.
-            sorgu['isim.tr'] = new RegExp(arama, 'i');
+            const aramaRegex = new RegExp(arama, 'i');
+            
+            sorgu.$or = [
+                { 'isim.tr': aramaRegex },
+                { 'isim.en': aramaRegex }
+            ];
         }
 
         // 4. Sıralama seçeneklerini belirliyoruz.
