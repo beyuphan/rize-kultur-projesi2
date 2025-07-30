@@ -1,28 +1,38 @@
-// api/models/Rota.js
+// api/routes/rotaRoutes.js
 
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const express = require('express');
+const router = express.Router();
+const Rota = require('../models/Rota');
 
-// Mekanlardaki gibi çok dilli metin için bir alt şema
-const CokDilliMetinSchema = new Schema({
-    tr: { type: String, required: true },
-    en: { type: String, required: true }
-}, { _id: false });
-
-const RotaSchema = new Schema({
-    // DÜZELTME: Artık 'adKey' yerine çok dilli bir 'ad' objesi var
-    ad: CokDilliMetinSchema,
-    aciklama: CokDilliMetinSchema,
-    tahminiSure: CokDilliMetinSchema,
-    zorlukSeviyesi: CokDilliMetinSchema,
-    
-    kapakFotografiUrl: { type: String, required: true },
-    
-    mekanIdleri: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Mekan',
-        required: true
-    }]
+// @route   GET api/rotalar
+// @desc    Tüm rotaların listesini getirir
+// @access  Public
+router.get('/', async (req, res) => {
+    try {
+        const rotalar = await Rota.find();
+        res.json(rotalar);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Sunucu Hatası' });
+    }
 });
 
-module.exports = mongoose.model('Rota', RotaSchema);
+// @route   GET api/rotalar/:id
+// @desc    Belirli bir rotanın detayını, içindeki mekan bilgileriyle birlikte getirir
+// @access  Public
+router.get('/:id', async (req, res) => {
+    try {
+        const rota = await Rota.findById(req.params.id)
+            .populate('mekanIdleri'); // <-- İşte sihir burada! Bu komut, mekanIdleri dizisindeki tüm ID'leri gerçek mekan objeleriyle doldurur.
+
+        if (!rota) {
+            return res.status(404).json({ msg: 'Rota bulunamadı' });
+        }
+        res.json(rota);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Sunucu Hatası' });
+    }
+});
+
+module.exports = router;

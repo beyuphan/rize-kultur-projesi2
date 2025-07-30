@@ -23,18 +23,21 @@ mongoose.connect(process.env.MONGO_URI)
     require('./models/Kullanici');
     require('./models/Mekan');
     require('./models/Yorum');
-    
+    require('./models/Rota'); // <-- EKSİK OLAN VE HATAYI ÇÖZEN SATIR
+
     // --- ADIM 2: MODELLER TANINDIKTAN SONRA ROTALARI ÇAĞIRIYORUZ ---
     const authRoutes = require('./routes/authRoutes');
     const mekanRoutes = require('./routes/mekanRoutes');
     const yorumRoutes = require('./routes/yorumRoutes');
+    const userRoutes = require('./routes/userRoutes');
+    const rotaRoutes = require('./routes/rotaRoutes');
 
     // Rotaları Kullan
     app.use('/api/auth', authRoutes);
     app.use('/api/mekanlar', mekanRoutes);
     app.use('/api/yorumlar', yorumRoutes);
-    app.use('/api/users', require('./routes/userRoutes')); 
-    app.use('/api/rotalar', require('./routes/rotaRoutes'));
+    app.use('/api/users', userRoutes); 
+    app.use('/api/rotalar', rotaRoutes);
 
     app.get('/', (req, res) => {
       res.send('Rize Kültür Projesi API Çalışıyor!');
