@@ -5,6 +5,8 @@ import 'package:mobil_flutter/data/models/mekan_model.dart';
 import 'package:mobil_flutter/data/models/yorum_model.dart';
 import 'package:mobil_flutter/data/services/auth_service.dart';
 import 'package:mobil_flutter/data/models/user_model.dart';
+import 'package:mobil_flutter/data/models/rota_model.dart';
+
 
 // YENİ YARDIMCI SINIF: API'den gelen cevabı (mekan listesi + sayfa bilgisi) bir arada tutar.
 class MekanlarResponse {
@@ -220,4 +222,27 @@ class ApiService {
       throw Exception('Kullanıcı profili yüklenemedi. Hata Kodu: ${response.statusCode}');
     }
   }
+
+    
+Future<List<RotaModel>> getRotalar() async {
+  final url = '$_baseUrl/rotalar';
+  final response = await http.get(Uri.parse(url));
+  if (response.statusCode == 200) {
+    final List<dynamic> jsonList = json.decode(utf8.decode(response.bodyBytes));
+    return jsonList.map((json) => RotaModel.fromJson(json)).toList();
+  } else {
+    throw Exception('Rotalar yüklenemedi.');
+  }
+}
+
+Future<RotaModel> getRotaDetay(String rotaId) async {
+  final url = '$_baseUrl/rotalar/$rotaId';
+  final response = await http.get(Uri.parse(url));
+  if (response.statusCode == 200) {
+    final Map<String, dynamic> jsonMap = json.decode(utf8.decode(response.bodyBytes));
+    return RotaModel.fromDetailJson(jsonMap);
+  } else {
+    throw Exception('Rota detayı yüklenemedi.');
+  }
+}
 }
