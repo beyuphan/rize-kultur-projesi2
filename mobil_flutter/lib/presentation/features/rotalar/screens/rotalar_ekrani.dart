@@ -22,7 +22,13 @@ class RotalarEkrani extends ConsumerWidget {
       ),
       body: rotalarAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text(l10n.routeLoadingError)),
+        error: (err, stack) {
+        print("!!! ROTALAR YÜKLENİRKEN HATA YAKALANDI !!!");
+        print("HATA TÜRÜ: ${err.runtimeType}");
+        print("HATA MESAJI: $err");
+        print("STACK TRACE: $stack");
+        return Center(child: Text(l10n.routeLoadingError));
+      },
         data: (rotalar) {
           if (rotalar.isEmpty) {
             return Center(child: Text(l10n.routesNotFound));

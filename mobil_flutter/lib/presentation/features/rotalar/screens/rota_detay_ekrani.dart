@@ -7,6 +7,19 @@ import 'package:mobil_flutter/l10n/app_localizations.dart';
 import 'package:mobil_flutter/presentation/providers/rota_providers.dart';
 import 'package:mobil_flutter/presentation/features/venue/screens/mekan_detay_ekrani.dart';
 import 'package:mobil_flutter/presentation/widgets/sliver_tab_bar_delegate.dart';
+ import 'package:url_launcher/url_launcher.dart';
+
+ 
+ Future<void> _haritayiAc(double lat, double lon) async {
+    final Uri mapsUri = Uri.parse('geo:$lat,$lon');
+    try {
+      if (await canLaunchUrl(mapsUri)) {
+        await launchUrl(mapsUri);
+      }
+    } catch (e) {
+      debugPrint('Harita açılamadı: $e');
+    }
+  }
 
 class RotaDetayEkrani extends ConsumerWidget {
   final String rotaId;
@@ -171,8 +184,8 @@ Widget _buildRotaTab(BuildContext context, List<MekanModel> mekanlar, String lan
           ),
           title: Text(langCode == 'tr' ? mekan.isim.tr : mekan.isim.en, style: const TextStyle(fontWeight: FontWeight.bold)),
           subtitle: Text(langCode == 'tr' ? mekan.aciklama.tr : mekan.aciklama.en, maxLines: 2, overflow: TextOverflow.ellipsis),
-          onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => MekanDetayEkrani(mekanId: mekan.id))),
-        ),
+          onTap: () => _showMekanDetay(context, mekan, langCode), // DÜZELTME
+                  ),
       );
     },
   );
@@ -191,7 +204,7 @@ Widget _buildMekanlarTab(BuildContext context, List<MekanModel> mekanlar, String
         clipBehavior: Clip.antiAlias,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: InkWell(
-          onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => MekanDetayEkrani(mekanId: mekan.id))),
+          onTap: () => _showMekanDetay(context, mekan, langCode), // DÜZELTME
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -215,6 +228,91 @@ Widget _buildMekanlarTab(BuildContext context, List<MekanModel> mekanlar, String
     },
   );
 }
+
+
+// YENİDEN EKLENEN FONKSİYON: Aşağıdan yukarı kayan panel
+void _showMekanDetay(BuildContext context, MekanModel mekan, String langCode) {
+  final theme = Theme.of(context);
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (context) => DraggableScrollableSheet(
+      initialChildSize: 0.6,
+      minChildSize: 0.4,
+      maxChildSize: 0.9,
+      builder: (_, scrollController) => Container(
+        decoration: BoxDecoration(
+          color: theme.scaffoldBackgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          children: [
+            Container(
+              width: 40,
+              height: 5,
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(10)),
+            ),
+            Expanded(
+              child: ListView(
+                controller: scrollController,
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.network(
+                      mekan.fotograflar.isNotEmpty ? mekan.fotograflar[0] : 'https://placehold.co/600x400',
+                      height: 200,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    langCode == 'tr' ? mekan.isim.tr : mekan.isim.en,
+                    style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    langCode == 'tr' ? mekan.aciklama.tr : mekan.aciklama.en,
+                    style: theme.textTheme.bodyLarge?.copyWith(height: 1.5),
+                  ),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      icon: const Icon(Icons.directions_outlined),
+                      label: Text("haritaAç"),
+                      onPressed: () => _haritayiAc(mekan.konum.enlem, mekan.konum.boylam),
+                      style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      icon: const Icon(Icons.open_in_new),
+                      label: Text("Tüm Detayları Gör"),
+                      onPressed: () {
+                        Navigator.pop(context); // Önce paneli kapat
+                        Navigator.of(context).push(MaterialPageRoute(builder: (_) => MekanDetayEkrani(mekanId: mekan.id)));
+                      },
+                      style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
 
 Widget _buildBilgilerTab(BuildContext context, AppLocalizations l10n) {
   return ListView(

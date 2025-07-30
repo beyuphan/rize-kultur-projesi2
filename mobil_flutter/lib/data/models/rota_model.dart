@@ -23,10 +23,10 @@ class RotaModel {
   factory RotaModel.fromJson(Map<String, dynamic> json) {
     return RotaModel(
       id: json['_id'],
-      ad: json['ad'],
-      aciklama: json['aciklama'],
-      tahminiSure: json['tahminiSure'],
-      zorlukSeviyesi: json['zorlukSeviyesi'],
+      ad: CokDilliMetin.fromJson(json['ad']),
+      aciklama: CokDilliMetin.fromJson(json['aciklama']),
+      tahminiSure: CokDilliMetin.fromJson(json['tahminiSure']),
+      zorlukSeviyesi: CokDilliMetin.fromJson(json['zorlukSeviyesi']),
       kapakFotografiUrl: json['kapakFotografiUrl'],
       mekanlar: const[],
     );
@@ -43,10 +43,10 @@ class RotaModel {
 
     return RotaModel(
       id: json['_id'],
-      ad: json['ad'],
-      aciklama: json['aciklama'],
-      tahminiSure: json['tahminiSure'],
-      zorlukSeviyesi: json['zorlukSeviyesi'],
+      ad: CokDilliMetin.fromJson(json['ad']),
+      aciklama: CokDilliMetin.fromJson(json['aciklama']),
+      tahminiSure: CokDilliMetin.fromJson(json['tahminiSure']),
+      zorlukSeviyesi: CokDilliMetin.fromJson(json['zorlukSeviyesi']),
       kapakFotografiUrl: json['kapakFotografiUrl'],
       mekanlar: mekanListesi,
     );
