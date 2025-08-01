@@ -3,7 +3,52 @@
 const express = require('express');
 const router = express.Router();
 const Rota = require('../models/Rota');
+const { Client } = require("@googlemaps/google-maps-services-js");
+const Rota = require('../models/Rota'); // Rota modelini import et
 
+// Rota durakları arasındaki mesafeyi ve süreyi hesaplayıp güncelleyen fonksiyon
+async function mesafeleriHesaplaVeGuncelle(rotaId) {
+  try {
+    const googleMapsClient = new Client({});
+    const rota = await Rota.findById(rotaId).populate('duraklar.mekanId');
+
+    if (!rota || rota.duraklar.length < 2) {
+      console.log('Mesafe hesaplaması için en az 2 durak gerekli.');
+      return;
+    }
+
+    // Duraklar arasında sırayla gezip Directions API'ye istek atacağız
+    for (let i = 0; i < rota.duraklar.length - 1; i++) {
+      const baslangic = rota.duraklar[i].mekanId.konum.coordinates;
+      const bitis = rota.duraklar[i + 1].mekanId.konum.coordinates;
+
+      const request = {
+        params: {
+          origin: { lat: baslangic[1], lng: baslangic[0] },
+          destination: { lat: bitis[1], lng: bitis[0] },
+          mode: 'DRIVING', // Araba ile
+          key: process.env.Maps_API_KEY,
+        },
+      };
+      
+      const response = await googleMapsClient.directions(request);
+      
+      if (response.data.routes.length > 0) {
+        const leg = response.data.routes[0].legs[0];
+        // Bulunan mesafe ve süre bilgisini rotanın ilgili durağına kaydet
+        rota.duraklar[i].sonrakiDuragaMesafe = leg.distance.text; // "21.4 km"
+        rota.duraklar[i].sonrakiDuragaSure = leg.duration.text;   // "35 mins"
+      }
+    }
+
+    // Değişiklikleri veritabanına kaydet
+    await rota.save();
+    console.log(`'${rota.ad.tr}' rotası için mesafeler başarıyla güncellendi.`);
+
+  } catch (error) {
+    console.error("Mesafe hesaplama hatası:", error);
+  }
+}
 // @route   GET api/rotalar
 // @desc    Tüm rotaların listesini getirir
 // @access  Public
