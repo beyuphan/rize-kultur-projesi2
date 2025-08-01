@@ -397,4 +397,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get routeStarting => 'Starting route... Opening GPS.';
+
+  @override
+  String get themeLazHoronu => 'Laz Horon';
+
+  @override
+  String get themeZumrutYayla => 'Emerald Plateau';
 }

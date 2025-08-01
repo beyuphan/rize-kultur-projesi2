@@ -134,5 +134,7 @@
   "startRouteConfirmation": "Are you sure you want to start this route? GPS tracking will be enabled and you will be guided.",
   "cancel": "Cancel",
   "start": "Start",
-  "routeStarting": "Starting route... Opening GPS."
+  "routeStarting": "Starting route... Opening GPS.",
+  "themeLazHoronu": "Laz Horon",
+  "themeZumrutYayla": "Emerald Plateau"
 }

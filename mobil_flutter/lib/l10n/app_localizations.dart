@@ -859,6 +859,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Starting route... Opening GPS.'**
   String get routeStarting;
+
+  /// No description provided for @themeLazHoronu.
+  ///
+  /// In en, this message translates to:
+  /// **'Laz Horon'**
+  String get themeLazHoronu;
+
+  /// No description provided for @themeZumrutYayla.
+  ///
+  /// In en, this message translates to:
+  /// **'Emerald Plateau'**
+  String get themeZumrutYayla;
 }
 
 class _AppLocalizationsDelegate
