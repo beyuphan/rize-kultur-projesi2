@@ -83,4 +83,27 @@ router.get('/:id', async (req, res) => {
     }
 });
 
+
+// --- YENİ KODU BURAYA EKLE ---
+// @route   GET api/rotalar/hesapla/:id
+// @desc    Belirli bir rota için duraklar arası mesafeyi hesaplar ve veritabanına kaydeder.
+// @access  Public (Sadece sen bileceğin için sorun yok)
+router.get('/hesapla/:id', async (req, res) => {
+  try {
+    const rotaId = req.params.id;
+    console.log(`'${rotaId}' ID'li rota için mesafe hesaplama işlemi başlatıldı...`);
+    
+    // Daha önce yazdığımız ana fonksiyonu burada çağırıyoruz.
+    await mesafeleriHesaplaVeGuncelle(rotaId);
+    
+    // İşlem bittikten sonra tarayıcıya basit bir mesaj gönderiyoruz.
+    res.send(`'${rotaId}' ID'li rota için mesafe ve süre bilgileri başarıyla hesaplanıp veritabanına kaydedildi. Uygulamayı kontrol edebilirsin.`);
+
+  } catch (err) {
+    console.error("Manuel hesaplama sırasında hata:", err);
+    res.status(500).json({ msg: 'Hesaplama sırasında sunucu hatası oluştu.' });
+  }
+});
+
+
 module.exports = router;
