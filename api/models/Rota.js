@@ -18,7 +18,8 @@ const DurakSchema = new Schema({
     },
     sonrakiDuragaMesafe: { type: String }, // Örn: "15 km"
     sonrakiDuragaSure: { type: String }   // Örn: "25 dk"
-}, { _id: false });
+},
+);
 
 // Bilgiler sekmesindeki her bir maddenin yapısını tanımlayan alt şema
 const BilgiItemSchema = new Schema({

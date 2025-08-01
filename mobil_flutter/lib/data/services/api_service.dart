@@ -223,26 +223,31 @@ class ApiService {
     }
   }
 
-    
-Future<List<RotaModel>> getRotalar() async {
-  final url = '$_baseUrl/rotalar';
-  final response = await http.get(Uri.parse(url));
-  if (response.statusCode == 200) {
-    final List<dynamic> jsonList = json.decode(utf8.decode(response.bodyBytes));
-    return jsonList.map((json) => RotaModel.fromJson(json)).toList();
-  } else {
-    throw Exception('Rotalar yüklenemedi.');
-  }
-}
+ // Tüm rotaların listesini çeker
+  Future<List<RotaModel>> getRotalar() async {
+    final uri = Uri.https('rize-kultur-api.onrender.com', '/api/rotalar');
+    final response = await http.get(uri);
 
-Future<RotaModel> getRotaDetay(String rotaId) async {
-  final url = '$_baseUrl/rotalar/$rotaId';
-  final response = await http.get(Uri.parse(url));
-  if (response.statusCode == 200) {
-    final Map<String, dynamic> jsonMap = json.decode(utf8.decode(response.bodyBytes));
-    return RotaModel.fromDetailJson(jsonMap);
-  } else {
-    throw Exception('Rota detayı yüklenemedi.');
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonList = json.decode(utf8.decode(response.bodyBytes));
+      // Her bir JSON objesini RotaModel.fromJson ile RotaModel'e çevirir
+      return jsonList.map((json) => RotaModel.fromJson(json)).toList();
+    } else {
+      throw Exception('Rotalar yüklenemedi.');
+    }
   }
-}
+
+  // ID'ye göre tek bir rotanın tüm detaylarını çeker
+  Future<RotaModel> getRotaDetay(String rotaId) async {
+    final uri = Uri.https('rize-kultur-api.onrender.com', '/api/rotalar/$rotaId');
+    final response = await http.get(uri);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> jsonMap = json.decode(utf8.decode(response.bodyBytes));
+      // JSON objesini RotaModel.fromDetailJson ile RotaModel'e çevirir
+      return RotaModel.fromDetailJson(jsonMap);
+    } else {
+      throw Exception('Rota detayı yüklenemedi.');
+    }
+  }
 }

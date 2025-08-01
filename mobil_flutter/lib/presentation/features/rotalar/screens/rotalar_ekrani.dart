@@ -11,9 +11,11 @@ class RotalarEkrani extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // DİNAMİK YAPI: Artık veriyi provider'dan izliyoruz
     final rotalarAsync = ref.watch(rotalarProvider);
     final l10n = AppLocalizations.of(context)!;
     final langCode = Localizations.localeOf(context).languageCode;
+    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -21,14 +23,11 @@ class RotalarEkrani extends ConsumerWidget {
         centerTitle: true,
       ),
       body: rotalarAsync.when(
+        // Veri yüklenirken gösterilecek
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) {
-        print("!!! ROTALAR YÜKLENİRKEN HATA YAKALANDI !!!");
-        print("HATA TÜRÜ: ${err.runtimeType}");
-        print("HATA MESAJI: $err");
-        print("STACK TRACE: $stack");
-        return Center(child: Text(l10n.routeLoadingError));
-      },
+        // Hata durumunda gösterilecek
+        error: (err, stack) => Center(child: Text(l10n.routeLoadingError)),
+        // Veri başarıyla geldiğinde gösterilecek
         data: (rotalar) {
           if (rotalar.isEmpty) {
             return Center(child: Text(l10n.routesNotFound));
@@ -41,15 +40,20 @@ class RotalarEkrani extends ConsumerWidget {
               final rota = rotalar[index];
               return InkWell(
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(
-                    builder: (context) => RotaDetayEkrani(rotaId: rota.id),
-                  ));
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      // DİNAMİK YAPI: Artık Rota objesini değil, sadece ID'sini gönderiyoruz
+                      builder: (context) => RotaDetayEkrani(rotaId: rota.id),
+                    ),
+                  );
                 },
                 child: Card(
                   margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                   clipBehavior: Clip.antiAlias,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   elevation: 4,
+                  shadowColor: Colors.black.withOpacity(0.1),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -57,38 +61,41 @@ class RotalarEkrani extends ConsumerWidget {
                         rota.kapakFotografiUrl,
                         height: 180,
                         fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          height: 180,
+                          color: Colors.grey[200],
+                          child: const Icon(Icons.image_not_supported, size: 50, color: Colors.grey),
+                        ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(12.0),
+                        padding: const EdgeInsets.all(16.0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              // DÜZELTME: Artık _translate yok, direkt modelden okuyoruz
+                              // DİNAMİK YAPI: Çeviriyi artık doğrudan modelden okuyoruz
                               langCode == 'tr' ? rota.ad.tr : rota.ad.en,
-                              style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                              style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(height: 8),
                             Text(
                               langCode == 'tr' ? rota.aciklama.tr : rota.aciklama.en,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(color: Colors.grey),
+                              style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
                             ),
                             const SizedBox(height: 12),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Row(children: [
-                                  const Icon(Icons.timer_outlined, size: 16, color: Colors.grey),
-                                  const SizedBox(width: 4),
-                                  Text(langCode == 'tr' ? rota.tahminiSure.tr : rota.tahminiSure.en),
-                                ]),
-                                Row(children: [
-                                  const Icon(Icons.hiking, size: 16, color: Colors.grey),
-                                  const SizedBox(width: 4),
-                                  Text(langCode == 'tr' ? rota.zorlukSeviyesi.tr : rota.zorlukSeviyesi.en),
-                                ]),
+                                _buildInfoChip(
+                                  icon: Icons.timer_outlined,
+                                  text: langCode == 'tr' ? rota.tahminiSure.tr : rota.tahminiSure.en,
+                                ),
+                                _buildInfoChip(
+                                  icon: Icons.hiking,
+                                  text: langCode == 'tr' ? rota.zorlukSeviyesi.tr : rota.zorlukSeviyesi.en,
+                                ),
                               ],
                             ),
                           ],
@@ -102,6 +109,17 @@ class RotalarEkrani extends ConsumerWidget {
           );
         },
       ),
+    );
+  }
+
+  // Kart içindeki küçük bilgi ikonları için yardımcı widget
+  Widget _buildInfoChip({required IconData icon, required String text}) {
+    return Row(
+      children: [
+        Icon(icon, size: 16, color: Colors.grey[700]),
+        const SizedBox(width: 6),
+        Text(text, style: TextStyle(color: Colors.grey[700], fontWeight: FontWeight.w500)),
+      ],
     );
   }
 }
