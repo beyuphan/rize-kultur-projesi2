@@ -16,7 +16,6 @@ async function mesafeleriHesaplaVeGuncelle(rotaId) {
       return;
     }
 
-    // Duraklar arasında sırayla gezip Directions API'ye istek atacağız
     for (let i = 0; i < rota.duraklar.length - 1; i++) {
       const baslangic = rota.duraklar[i].mekanId.konum.coordinates;
       const bitis = rota.duraklar[i + 1].mekanId.konum.coordinates;
@@ -25,7 +24,7 @@ async function mesafeleriHesaplaVeGuncelle(rotaId) {
         params: {
           origin: { lat: baslangic[1], lng: baslangic[0] },
           destination: { lat: bitis[1], lng: bitis[0] },
-          mode: 'DRIVING', // Araba ile
+          mode: 'DRIVING',
           key: process.env.Maps_API_KEY,
         },
       };
@@ -34,13 +33,16 @@ async function mesafeleriHesaplaVeGuncelle(rotaId) {
       
       if (response.data.routes.length > 0) {
         const leg = response.data.routes[0].legs[0];
-        // Bulunan mesafe ve süre bilgisini rotanın ilgili durağına kaydet
-        rota.duraklar[i].sonrakiDuragaMesafe = leg.distance.text; // "21.4 km"
-        rota.duraklar[i].sonrakiDuragaSure = leg.duration.text;   // "35 mins"
+        rota.duraklar[i].sonrakiDuragaMesafe = leg.distance.text;
+        rota.duraklar[i].sonrakiDuragaSure = leg.duration.text;
       }
     }
 
-    // Değişiklikleri veritabanına kaydet
+    // --- KRİTİK DÜZELTME BURADA ---
+    // Mongoose'a 'duraklar' dizisinin değiştiğini manuel olarak bildiriyoruz.
+    rota.markModified('duraklar');
+
+    // Artık değişiklikler doğru bir şekilde kaydedilecek.
     await rota.save();
     console.log(`'${rota.ad.tr}' rotası için mesafeler başarıyla güncellendi.`);
 
