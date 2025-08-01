@@ -9,6 +9,8 @@ const Rota = require('../models/Rota');
 // @access  Public
 router.get('/', async (req, res) => {
     try {
+        // Not: Rota listesi için mekan detaylarını göndermiyoruz,
+        // bu yüzden burada populate'e gerek yok. Bu, listeyi daha hızlı yükler.
         const rotalar = await Rota.find();
         res.json(rotalar);
     } catch (err) {
@@ -22,8 +24,10 @@ router.get('/', async (req, res) => {
 // @access  Public
 router.get('/:id', async (req, res) => {
     try {
+        // --- DÜZELTME BURADA ---
+        // Artık 'mekanIdleri' yerine, 'duraklar' dizisinin içindeki 'mekanId' alanını populate ediyoruz.
         const rota = await Rota.findById(req.params.id)
-            .populate('mekanIdleri'); // <-- İşte sihir burada! Bu komut, mekanIdleri dizisindeki tüm ID'leri gerçek mekan objeleriyle doldurur.
+            .populate('duraklar.mekanId'); // Mongoose'un bu "nested populate" özelliği harika!
 
         if (!rota) {
             return res.status(404).json({ msg: 'Rota bulunamadı' });
