@@ -91,8 +91,7 @@
   "alreadyHaveAccount": "Zaten bir hesabın var mı?",
   "guestProfileTitle": "Keşfetmeye Başla",
   "guestPromptTitle": "Tüm Özellikleri Keşfet",
-  "guestPromptSubtitle":"Mekanları favorilere eklemek, yorum ve puan bırakmak için bir hesap oluşturun.",
-
+  "guestPromptSubtitle": "Mekanları favorilere eklemek, yorum ve puan bırakmak için bir hesap oluşturun.",
   "reviews": "Değerlendirmeler",
   "reviewsCount": "({count} Değerlendirme)",
   "@reviewsCount": {
@@ -136,5 +135,7 @@
   "startRouteConfirmation": "Bu rotayı başlatmak istediğinizden emin misiniz? GPS takibi açılacak ve size yol gösterilecek.",
   "cancel": "İptal",
   "start": "Başlat",
-  "routeStarting": "Rota başlatılıyor... GPS açılıyor."
+  "routeStarting": "Rota başlatılıyor... GPS açılıyor.",
+  "themeLazHoronu": "Laz Horonu",
+  "themeZumrutYayla": "Zümrüt Yayla"
 }

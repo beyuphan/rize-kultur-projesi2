@@ -398,4 +398,10 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get routeStarting => 'Rota başlatılıyor... GPS açılıyor.';
+
+  @override
+  String get themeLazHoronu => 'Laz Horonu';
+
+  @override
+  String get themeZumrutYayla => 'Zümrüt Yayla';
 }

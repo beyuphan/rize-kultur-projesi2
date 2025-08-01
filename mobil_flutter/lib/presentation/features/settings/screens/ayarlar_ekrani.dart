@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobil_flutter/common/theme/app_themes.dart';
@@ -36,6 +35,31 @@ class AyarlarEkrani extends ConsumerWidget {
               RadioListTile<AppTheme>(
                 title: Text(l10n.themeKackarSisi),
                 value: AppTheme.kackarSisi,
+                groupValue: mevcutTema,
+                onChanged: (AppTheme? value) {
+                  if (value != null) {
+                    ref.read(themeProvider.notifier).state = value;
+                    Navigator.pop(context);
+                  }
+                },
+              ),
+
+              RadioListTile<AppTheme>(
+                title: Text(
+                  l10n.themeLazHoronu,
+                ), // 👈 çeviri dosyanda bu olmalı
+                value: AppTheme.lazHoronu,
+                groupValue: mevcutTema,
+                onChanged: (AppTheme? value) {
+                  if (value != null) {
+                    ref.read(themeProvider.notifier).state = value;
+                    Navigator.pop(context);
+                  }
+                },
+              ),
+              RadioListTile<AppTheme>(
+                title: Text(l10n.themeZumrutYayla),
+                value: AppTheme.zumrutYayla,
                 groupValue: mevcutTema,
                 onChanged: (AppTheme? value) {
                   if (value != null) {
@@ -93,13 +117,18 @@ class AyarlarEkrani extends ConsumerWidget {
 
   Widget _buildSectionHeader(BuildContext context, String title) {
     return Padding(
-      padding: const EdgeInsets.only(top: 24.0, bottom: 8.0, left: 16.0, right: 16.0),
+      padding: const EdgeInsets.only(
+        top: 24.0,
+        bottom: 8.0,
+        left: 16.0,
+        right: 16.0,
+      ),
       child: Text(
         title,
         style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              color: Theme.of(context).colorScheme.primary,
-              fontWeight: FontWeight.bold,
-            ),
+          color: Theme.of(context).colorScheme.primary,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }
@@ -128,7 +157,8 @@ class AyarlarEkrani extends ConsumerWidget {
                   leading: const Icon(Icons.edit_outlined),
                   title: Text(l10n.editProfile),
                   onTap: () {
-                    if (userProfileAsync.hasValue && !userProfileAsync.isLoading) {
+                    if (userProfileAsync.hasValue &&
+                        !userProfileAsync.isLoading) {
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (_) => ProfilDuzenleEkrani(
@@ -151,16 +181,22 @@ class AyarlarEkrani extends ConsumerWidget {
                 ListTile(
                   leading: const Icon(Icons.palette_outlined),
                   title: Text(l10n.appTheme),
-                  subtitle: Text(
-                    mevcutTema == AppTheme.firtinaYesili ? l10n.themeFirtinaYesili : l10n.themeKackarSisi,
-                  ),
+                  subtitle: Text(switch (mevcutTema) {
+                    AppTheme.firtinaYesili => l10n.themeFirtinaYesili,
+                    AppTheme.kackarSisi => l10n.themeKackarSisi,
+                    AppTheme.zumrutYayla => l10n.themeZumrutYayla,
+                    AppTheme.lazHoronu => l10n.themeLazHoronu,
+                  }),
+
                   onTap: () => _temaSecimiGoster(context, ref),
                 ),
                 ListTile(
                   leading: const Icon(Icons.language_outlined),
                   title: Text(l10n.language),
                   subtitle: Text(
-                    mevcutDil.languageCode == 'tr' ? l10n.turkish : l10n.english,
+                    mevcutDil.languageCode == 'tr'
+                        ? l10n.turkish
+                        : l10n.english,
                   ),
                   onTap: () => _dilSecimiGoster(context, ref),
                 ),
