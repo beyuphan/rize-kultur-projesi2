@@ -16,14 +16,29 @@ async function mesafeleriHesaplaVeGuncelle(rotaId) {
       return;
     }
 
-    for (let i = 0; i < rota.duraklar.length - 1; i++) {
-      const baslangic = rota.duraklar[i].mekanId.konum.coordinates;
-      const bitis = rota.duraklar[i + 1].mekanId.konum.coordinates;
+    console.log("Koordinatlar okunuyor...");
 
+    for (let i = 0; i < rota.duraklar.length - 1; i++) {
+      
+      // --- ANA DÜZELTME: KOORDİNATLARI DOĞRU YERDEN OKUMA ---
+      const baslangic_enlem = rota.duraklar[i].mekanId.konum.enlem;
+      const baslangic_boylam = rota.duraklar[i].mekanId.konum.boylam;
+      
+      const bitis_enlem = rota.duraklar[i + 1].mekanId.konum.enlem;
+      const bitis_boylam = rota.duraklar[i + 1].mekanId.konum.boylam;
+
+      console.log(`Durak ${i}: ${baslangic_enlem}, ${baslangic_boylam} -> Durak ${i+1}: ${bitis_enlem}, ${bitis_boylam}`);
+
+      if (!baslangic_enlem || !bitis_enlem) {
+        console.error("HATA: Enlem veya boylam bilgisi eksik, bu durak atlanıyor.");
+        continue; // Bu durağı atla, döngüye devam et
+      }
+      
       const request = {
         params: {
-          origin: { lat: baslangic[1], lng: baslangic[0] },
-          destination: { lat: bitis[1], lng: bitis[0] },
+          // Google Maps'in istediği formatta { lat: ..., lng: ... } gönderiyoruz.
+          origin: { lat: baslangic_enlem, lng: baslangic_boylam },
+          destination: { lat: bitis_enlem, lng: bitis_boylam },
           mode: 'DRIVING',
           key: process.env.Maps_API_KEY,
         },
@@ -31,23 +46,26 @@ async function mesafeleriHesaplaVeGuncelle(rotaId) {
       
       const response = await googleMapsClient.directions(request);
       
-      if (response.data.routes.length > 0) {
+      if (response.data.routes.length > 0 && response.data.routes[0].legs.length > 0) {
         const leg = response.data.routes[0].legs[0];
+        // Hesaplanan veriyi ilgili durağın içine yazıyoruz.
         rota.duraklar[i].sonrakiDuragaMesafe = leg.distance.text;
         rota.duraklar[i].sonrakiDuragaSure = leg.duration.text;
+        console.log(` -> Mesafe: ${leg.distance.text}, Süre: ${leg.duration.text}`);
+      } else {
+        console.log(` -> Google Maps'ten bu iki nokta için rota bulunamadı.`);
       }
     }
 
-    // --- KRİTİK DÜZELTME BURADA ---
-    // Mongoose'a 'duraklar' dizisinin değiştiğini manuel olarak bildiriyoruz.
+    // Değişikliği Mongoose'a bildiriyoruz.
     rota.markModified('duraklar');
-
-    // Artık değişiklikler doğru bir şekilde kaydedilecek.
+    // Ve kaydediyoruz.
     await rota.save();
-    console.log(`'${rota.ad.tr}' rotası için mesafeler başarıyla güncellendi.`);
+    console.log(`'${rota.ad.tr}' rotası için mesafeler başarıyla güncellendi ve kaydedildi.`);
 
   } catch (error) {
-    console.error("Mesafe hesaplama hatası:", error);
+    // Hatayı daha detaylı loglayalım
+    console.error("Mesafe hesaplama fonksiyonunda büyük bir hata oluştu:", error.response ? error.response.data : error.message);
   }
 }
 // @route   GET api/rotalar
