@@ -4,7 +4,6 @@ const express = require('express');
 const router = express.Router();
 const Rota = require('../models/Rota');
 const { Client } = require("@googlemaps/google-maps-services-js");
-const Rota = require('../models/Rota'); // Rota modelini import et
 
 // Rota durakları arasındaki mesafeyi ve süreyi hesaplayıp güncelleyen fonksiyon
 async function mesafeleriHesaplaVeGuncelle(rotaId) {
