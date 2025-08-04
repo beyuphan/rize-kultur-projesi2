@@ -81,10 +81,6 @@ class ApiService {
   }
   // --- GÜNCELLEME BİTTİ ---
 
-  //
-  // --- DİĞER FONKSİYONLARIN AYNI ŞEKİLDE KALIYOR ---
-  //
-  
   Future<MekanModel> getMekanDetay(String mekanId) async {
     final url = '$_baseUrl/mekanlar/$mekanId';
     debugPrint('Mekan detayı isteniyor: $url');
@@ -222,6 +218,8 @@ class ApiService {
       throw Exception('Kullanıcı profili yüklenemedi. Hata Kodu: ${response.statusCode}');
     }
   }
+
+
 
  // Tüm rotaların listesini çeker
   Future<List<RotaModel>> getRotalar() async {

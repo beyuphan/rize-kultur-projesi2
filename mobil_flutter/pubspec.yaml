@@ -22,6 +22,8 @@ dependencies:
   widget_marker_google_maps_flutter: ^1.0.2
   image_picker: ^1.1.2
   google_maps_flutter: ^2.12.3
+  flutter_launcher_icons: ^0.13.1 
+  rename: ^3.0.1
 
 dev_dependencies:
   flutter_test:
@@ -31,3 +33,12 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   generate: true
+  assets:
+  - assets/images/
+
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/logo.png" # Yüksek çözünürlüklü logonun yolu
+  min_sdk_android: 21 # Android için minimum SDK versiyonu

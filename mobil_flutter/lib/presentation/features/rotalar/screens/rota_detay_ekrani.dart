@@ -13,6 +13,7 @@ import '../widgets/rota_bilgi_karti.dart';
 import '../widgets/rota_duraklari_tab.dart';
 import '../widgets/rota_mekanlar_tab.dart';
 import '../widgets/rota_bilgiler_tab.dart';
+import 'package:mobil_flutter/data/services/harita_service.dart';  
 
 class RotaDetayEkrani extends ConsumerWidget {
   final String rotaId;
@@ -22,7 +23,9 @@ class RotaDetayEkrani extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final rotaDetayAsync = ref.watch(rotaDetayProvider(rotaId));
     final l10n = AppLocalizations.of(context)!;
-    
+    final HaritaService haritaService = HaritaService();
+
+
     return Scaffold(
       body: rotaDetayAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -74,7 +77,12 @@ class RotaDetayEkrani extends ConsumerWidget {
         },
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showStartRouteDialog(context, l10n),
+        onPressed: () {
+          // Butona basıldığında, o anki rota verisiyle birlikte servisi çağır.
+          rotaDetayAsync.whenData((rota) {
+             haritaService.launchGoogleMapsNavigation(context, rota);
+          });
+        },
         icon: const Icon(Icons.play_arrow),
         label: Text(l10n.startRoute),
       ),
