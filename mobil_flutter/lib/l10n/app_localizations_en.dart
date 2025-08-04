@@ -403,4 +403,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get themeZumrutYayla => 'Emerald Plateau';
+
+  @override
+  String get profile => 'Profile';
 }

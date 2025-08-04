@@ -6,29 +6,30 @@ class PuanGostergesi extends StatelessWidget {
     required this.puan,
     this.iconSize = 20.0,
     this.maxPuan = 5,
+    this.aktifRenk, // <-- 1. YENİ PARAMETRE: Aktif ikonlar için isteğe bağlı renk
   });
 
   final double puan;
   final double iconSize;
   final int maxPuan;
+  final Color? aktifRenk; // <-- Parametrenin tanımı
 
   @override
   Widget build(BuildContext context) {
     const cayYapragiIkonu = Icons.eco;
     final tema = Theme.of(context);
-    final aktifRenk = tema.colorScheme.secondary;
-    final pasifRenk = tema.dividerColor.withOpacity(0.5);
+
+    // <-- 2. GÜNCELLEME: Rengi belirleme mantığı
+    // Eğer dışarıdan bir `aktifRenk` verildiyse onu kullan, verilmediyse temadan al.
+    final Color secilenAktifRenk = aktifRenk ?? tema.colorScheme.secondary;
+    final Color pasifRenk = tema.dividerColor.withOpacity(0.5);
 
     // Tek bir ikon sırası oluşturan yardımcı bir fonksiyon
     Row buildIconRow(Color renk) {
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: List.generate(maxPuan, (index) {
-          return Icon(
-            cayYapragiIkonu,
-            color: renk,
-            size: iconSize,
-          );
+          return Icon(cayYapragiIkonu, color: renk, size: iconSize);
         }),
       );
     }
@@ -40,7 +41,8 @@ class PuanGostergesi extends StatelessWidget {
         // 2. Katman: Kırpılmış dolu ikonlar
         ClipRect(
           clipper: _PuanClipper(puan: puan, maxPuan: maxPuan),
-          child: buildIconRow(aktifRenk),
+          // <-- 3. GÜNCELLEME: Seçilen rengi burada kullan
+          child: buildIconRow(secilenAktifRenk),
         ),
       ],
     );
@@ -50,7 +52,7 @@ class PuanGostergesi extends StatelessWidget {
 // Bu yardımcı sınıf, üstteki widget'ı doğru oranda kırpmamızı sağlar
 class _PuanClipper extends CustomClipper<Rect> {
   _PuanClipper({required this.puan, required this.maxPuan});
-  
+
   final double puan;
   final int maxPuan;
 

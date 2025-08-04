@@ -404,4 +404,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get themeZumrutYayla => 'Zümrüt Yayla';
+
+  @override
+  String get profile => 'Profilim';
 }

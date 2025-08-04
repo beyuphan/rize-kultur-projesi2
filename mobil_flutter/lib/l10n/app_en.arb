@@ -136,5 +136,6 @@
   "start": "Start",
   "routeStarting": "Starting route... Opening GPS.",
   "themeLazHoronu": "Laz Horon",
-  "themeZumrutYayla": "Emerald Plateau"
+  "themeZumrutYayla": "Emerald Plateau",
+  "profile": "Profile"
 }
