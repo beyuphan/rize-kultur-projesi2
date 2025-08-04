@@ -12,7 +12,7 @@ async function mesafeleriHesaplaVeGuncelle(rotaId) {
     const googleMapsClient = new Client({});
     
     console.log(`[1] Rota aranıyor... ID: ${rotaId}`);
-    const rota = await Rota.findById(rotaId).populate('duraklar.mekanId');
+    const rota = await Rota.findById(rotaId).populate('duraklar.mekanId').lean();
 
     if (!rota) {
       console.error("!!!! HATA: Rota veritabanında bulunamadı. !!!!");
