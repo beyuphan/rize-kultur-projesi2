@@ -5,8 +5,6 @@ import 'package:mobil_flutter/presentation/features/venue/widgets/ana_detay_sayf
 import 'package:mobil_flutter/presentation/features/venue/widgets/yorumlar_sayfasi.dart';
 import 'package:mobil_flutter/presentation/features/venue/widgets/bilgi_sayfasi.dart'; // Yeni sayfayı import et
 
-
-
 //--- ANA WIDGET: SAYFA GEÇİŞİNİ YÖNETİR ---
 class MekanDetayEkrani extends ConsumerStatefulWidget {
   final String mekanId;
@@ -17,7 +15,7 @@ class MekanDetayEkrani extends ConsumerStatefulWidget {
 }
 
 class _MekanDetayEkraniState extends ConsumerState<MekanDetayEkrani> {
-    // Başlangıç sayfasını 1 yap (0: Bilgi, 1: Ana Detay, 2: Yorumlar)
+  // Başlangıç sayfasını 1 yap (0: Bilgi, 1: Ana Detay, 2: Yorumlar)
   final PageController _pageController = PageController(initialPage: 1);
   int _currentPage = 1;
 
@@ -50,7 +48,9 @@ class _MekanDetayEkraniState extends ConsumerState<MekanDetayEkrani> {
         error: (err, stack) => Center(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: SingleChildScrollView(child: Text('Mekan yüklenemedi: $err')),
+            child: SingleChildScrollView(
+              child: Text('Mekan yüklenemedi: $err'),
+            ),
           ),
         ),
         data: (mekan) {
@@ -70,7 +70,10 @@ class _MekanDetayEkraniState extends ConsumerState<MekanDetayEkrani> {
                 right: 0,
                 child: Center(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.black.withOpacity(0.3),
                       borderRadius: BorderRadius.circular(20),
@@ -85,7 +88,9 @@ class _MekanDetayEkraniState extends ConsumerState<MekanDetayEkrani> {
                           height: 8,
                           width: _currentPage == index ? 24 : 8,
                           decoration: BoxDecoration(
-                            color: _currentPage == index ? Colors.white : Colors.white.withOpacity(0.5),
+                            color: _currentPage == index
+                                ? Colors.white
+                                : Colors.white.withOpacity(0.5),
                             borderRadius: BorderRadius.circular(12),
                           ),
                         );
@@ -101,4 +106,3 @@ class _MekanDetayEkraniState extends ConsumerState<MekanDetayEkrani> {
     );
   }
 }
-

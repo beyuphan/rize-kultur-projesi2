@@ -24,9 +24,7 @@ class AnaDetaySayfasi extends ConsumerStatefulWidget {
 }
 
 class _AnaDetaySayfasiState extends ConsumerState<AnaDetaySayfasi> {
-  
-
- Future<void> _haritayiAc(double lat, double lon) async {
+  Future<void> _haritayiAc(double lat, double lon) async {
     final Uri mapsUri = Uri.parse('geo:$lat,$lon');
     try {
       if (await canLaunchUrl(mapsUri)) {
@@ -46,15 +44,14 @@ class _AnaDetaySayfasiState extends ConsumerState<AnaDetaySayfasi> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
     final langCode = Localizations.localeOf(context).languageCode;
-    
+
     // --- GÜVENLİK DÜZELTMESİ BURADA BAŞLIYOR ---
-    
+
     // 1. Önce giriş durumunu kontrol et
     final authState = ref.watch(authProvider);
     final bool girisYapildi = authState == AuthStatus.girisYapildi;
@@ -63,20 +60,24 @@ class _AnaDetaySayfasiState extends ConsumerState<AnaDetaySayfasi> {
     final userAsync = girisYapildi ? ref.watch(userProfileProvider) : null;
     final user = userAsync?.value;
     final userId = user?.id;
-    
+
     // --- GÜVENLİK DÜZELTMESİ BİTTİ ---
 
-     final YorumModel? kullaniciYorumu;
+    final YorumModel? kullaniciYorumu;
     if (girisYapildi && userId != null) {
       // 'where' kullanarak güvenli bir şekilde arama yapıyoruz.
-      final eslesenYorumlar = widget.mekan.yorumlar.where((yorum) => yorum.yazar.id == userId);
-      kullaniciYorumu = eslesenYorumlar.isNotEmpty ? eslesenYorumlar.first : null;
+      final eslesenYorumlar = widget.mekan.yorumlar.where(
+        (yorum) => yorum.yazar.id == userId,
+      );
+      kullaniciYorumu = eslesenYorumlar.isNotEmpty
+          ? eslesenYorumlar.first
+          : null;
     } else {
       kullaniciYorumu = null;
     }
     final double mevcutKullaniciPuani = kullaniciYorumu?.puan ?? 0.0;
 
-       ref.listen<AsyncValue<void>>(yorumSubmitProvider, (_, state) {
+    ref.listen<AsyncValue<void>>(yorumSubmitProvider, (_, state) {
       if (!mounted) return;
       if (state is AsyncError) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -109,7 +110,9 @@ class _AnaDetaySayfasiState extends ConsumerState<AnaDetaySayfasi> {
                 fit: StackFit.expand,
                 children: [
                   Image.network(
-                    widget.mekan.fotograflar.isNotEmpty ? widget.mekan.fotograflar[0] : 'https://placehold.co/600x400',
+                    widget.mekan.fotograflar.isNotEmpty
+                        ? widget.mekan.fotograflar[0]
+                        : 'https://placehold.co/600x400',
                     fit: BoxFit.cover,
                   ),
                   const DecoratedBox(
@@ -126,7 +129,11 @@ class _AnaDetaySayfasiState extends ConsumerState<AnaDetaySayfasi> {
               ),
               title: Text(
                 langCode == 'tr' ? widget.mekan.isim.tr : widget.mekan.isim.en,
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, shadows: [Shadow(blurRadius: 2.0)]),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  shadows: [Shadow(blurRadius: 2.0)],
+                ),
               ),
               titlePadding: const EdgeInsets.only(left: 50, bottom: 16),
             ),
@@ -134,21 +141,36 @@ class _AnaDetaySayfasiState extends ConsumerState<AnaDetaySayfasi> {
             actions: [
               IconButton(
                 icon: Icon(
-                  (girisYapildi && user != null && user.favoriMekanlar.contains(widget.mekan.id))
-                      ? Icons.favorite : Icons.favorite_border,
-                  color: (girisYapildi && user != null && user.favoriMekanlar.contains(widget.mekan.id))
-                      ? Colors.redAccent : Colors.white,
+                  (girisYapildi &&
+                          user != null &&
+                          user.favoriMekanlar.contains(widget.mekan.id))
+                      ? Icons.favorite
+                      : Icons.favorite_border,
+                  color:
+                      (girisYapildi &&
+                          user != null &&
+                          user.favoriMekanlar.contains(widget.mekan.id))
+                      ? Colors.redAccent
+                      : Colors.white,
                 ),
                 onPressed: () {
                   if (girisYapildi) {
-                    ref.read(userProfileProvider.notifier).toggleFavorite(widget.mekan.id);
+                    ref
+                        .read(userProfileProvider.notifier)
+                        .toggleFavorite(widget.mekan.id);
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: const Text('Bu özelliği kullanmak için giriş yapmalısınız.'),
+                        content: const Text(
+                          'Bu özelliği kullanmak için giriş yapmalısınız.',
+                        ),
                         action: SnackBarAction(
                           label: 'Giriş Yap',
-                          onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const GirisEkrani())),
+                          onPressed: () => Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const GirisEkrani(),
+                            ),
+                          ),
                         ),
                       ),
                     );
@@ -168,9 +190,15 @@ class _AnaDetaySayfasiState extends ConsumerState<AnaDetaySayfasi> {
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: Row(
                       children: [
-                        Text(l10n.averageRating, style: theme.textTheme.labelLarge),
+                        Text(
+                          l10n.averageRating,
+                          style: theme.textTheme.labelLarge,
+                        ),
                         const SizedBox(width: 8),
-                        PuanGostergesi(puan: widget.mekan.ortalamaPuan, iconSize: 22),
+                        PuanGostergesi(
+                          puan: widget.mekan.ortalamaPuan,
+                          iconSize: 22,
+                        ),
                         const SizedBox(width: 8),
                         Text(
                           '${widget.mekan.ortalamaPuan.toStringAsFixed(1)} (${widget.mekan.yorumlar.length})',
@@ -179,14 +207,17 @@ class _AnaDetaySayfasiState extends ConsumerState<AnaDetaySayfasi> {
                       ],
                     ),
                   ),
-                  
+
                   // --- KULLANICININ KENDİ PUANLAMA ALANI (AKILLI HALE GETİRİLDİ) ---
                   if (girisYapildi)
                     Padding(
                       padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
                       child: Column(
                         children: [
-                          Text(l10n.yourRating, style: theme.textTheme.titleSmall),
+                          Text(
+                            l10n.yourRating,
+                            style: theme.textTheme.titleSmall,
+                          ),
                           const SizedBox(height: 8),
                           if (yorumState.isLoading)
                             const CircularProgressIndicator()
@@ -195,7 +226,9 @@ class _AnaDetaySayfasiState extends ConsumerState<AnaDetaySayfasi> {
                               baslangicPuani: mevcutKullaniciPuani,
                               iconBoyutu: 36,
                               onPuanDegisti: (yeniPuan) {
-                                ref.read(yorumSubmitProvider.notifier).gonder(
+                                ref
+                                    .read(yorumSubmitProvider.notifier)
+                                    .gonder(
                                       mekanId: widget.mekan.id,
                                       puan: yeniPuan,
                                     );
@@ -210,7 +243,11 @@ class _AnaDetaySayfasiState extends ConsumerState<AnaDetaySayfasi> {
                       child: Center(
                         child: TextButton(
                           child: Text("Puan vermek için giriş yapın"),
-                          onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const GirisEkrani())),
+                          onPressed: () => Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const GirisEkrani(),
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -219,7 +256,9 @@ class _AnaDetaySayfasiState extends ConsumerState<AnaDetaySayfasi> {
                   const Divider(),
                   const SizedBox(height: 16),
                   Text(
-                    langCode == 'tr' ? widget.mekan.aciklama.tr : widget.mekan.aciklama.en,
+                    langCode == 'tr'
+                        ? widget.mekan.aciklama.tr
+                        : widget.mekan.aciklama.en,
                     style: theme.textTheme.bodyLarge,
                   ),
                   const SizedBox(height: 24),
@@ -228,8 +267,13 @@ class _AnaDetaySayfasiState extends ConsumerState<AnaDetaySayfasi> {
                     child: ElevatedButton.icon(
                       icon: const Icon(Icons.directions_outlined),
                       label: Text(l10n.getDirections),
-                      onPressed: () => _haritayiAc(widget.mekan.konum.enlem, widget.mekan.konum.boylam),
-                      style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
+                      onPressed: () => _haritayiAc(
+                        widget.mekan.konum.enlem,
+                        widget.mekan.konum.boylam,
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
                     ),
                   ),
                 ],
@@ -250,7 +294,7 @@ class _AnaDetaySayfasiState extends ConsumerState<AnaDetaySayfasi> {
     );
   }
 
-    Widget _buildSectionHeader(ThemeData theme, String title) {
+  Widget _buildSectionHeader(ThemeData theme, String title) {
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20.0, 24.0, 20.0, 16.0),

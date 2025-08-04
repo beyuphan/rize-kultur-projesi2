@@ -51,21 +51,21 @@ class _MainNavigationScreenState extends ConsumerState<MainNavigationScreen> {
         ProfilSayfasi(), // Kendi profilini gösterir
       ];
       items = [
-        const BottomNavigationBarItem(
+        BottomNavigationBarItem(
           icon: Icon(Icons.explore_outlined),
-          label: 'Keşfet',
+          label: AppLocalizations.of(context)!.explore,
         ),
-        const BottomNavigationBarItem(
+        BottomNavigationBarItem(
           icon: Icon(Icons.map_outlined),
-          label: 'Harita',
+          label: AppLocalizations.of(context)!.map,
         ),
-        const BottomNavigationBarItem(
+        BottomNavigationBarItem(
           icon: Icon(Icons.route_outlined),
-          label: 'Rotalar',
+          label: AppLocalizations.of(context)!.routes,
         ),
-        const BottomNavigationBarItem(
+        BottomNavigationBarItem(
           icon: Icon(Icons.person_outline),
-          label: 'Profilim',
+          label: AppLocalizations.of(context)!.profile,
         ),
       ];
     } else {
