@@ -5,68 +5,90 @@ const router = express.Router();
 const Rota = require('../models/Rota');
 const { Client } = require("@googlemaps/google-maps-services-js");
 
-// Rota durakları arasındaki mesafeyi ve süreyi hesaplayıp güncelleyen fonksiyon
+// Rota durakları arasındaki mesafeyi ve süreyi hesaplayıp güncelleyen fonksiyon (SÜPER DEBUG VERSİYONU)
 async function mesafeleriHesaplaVeGuncelle(rotaId) {
+  console.log("--- HESAPLAMA FONKSİYONU BAŞLADI ---");
   try {
     const googleMapsClient = new Client({});
+    
+    console.log(`[1] Rota aranıyor... ID: ${rotaId}`);
     const rota = await Rota.findById(rotaId).populate('duraklar.mekanId');
 
-    if (!rota || rota.duraklar.length < 2) {
-      console.log('Mesafe hesaplaması için en az 2 durak gerekli.');
+    if (!rota) {
+      console.error("!!!! HATA: Rota veritabanında bulunamadı. !!!!");
+      return;
+    }
+    console.log(`[2] Rota bulundu: '${rota.ad.tr}'. Durak sayısı: ${rota.duraklar.length}`);
+
+    if (rota.duraklar.length < 2) {
+      console.log("[!] Mesafe hesaplaması için en az 2 durak gerekli. İşlem sonlandırıldı.");
       return;
     }
 
-    console.log("Koordinatlar okunuyor...");
-
+    console.log("[3] Duraklar arası mesafe hesaplama döngüsü başlıyor...");
     for (let i = 0; i < rota.duraklar.length - 1; i++) {
+      console.log(`\n  -> Döngü Adımı: ${i}`);
       
-      // --- ANA DÜZELTME: KOORDİNATLARI DOĞRU YERDEN OKUMA ---
-      const baslangic_enlem = rota.duraklar[i].mekanId.konum.enlem;
-      const baslangic_boylam = rota.duraklar[i].mekanId.konum.boylam;
-      
-      const bitis_enlem = rota.duraklar[i + 1].mekanId.konum.enlem;
-      const bitis_boylam = rota.duraklar[i + 1].mekanId.konum.boylam;
+      const baslangicDurak = rota.duraklar[i];
+      const bitisDurak = rota.duraklar[i+1];
 
-      console.log(`Durak ${i}: ${baslangic_enlem}, ${baslangic_boylam} -> Durak ${i+1}: ${bitis_enlem}, ${bitis_boylam}`);
+      if (!baslangicDurak.mekanId || !bitisDurak.mekanId) {
+          console.error(`  !!!! HATA: Durak ${i} veya ${i+1} için mekan bilgisi (mekanId) populate edilememiş. Atlanıyor.`);
+          continue;
+      }
+      if (!baslangicDurak.mekanId.konum || !bitisDurak.mekanId.konum) {
+          console.error(`  !!!! HATA: Durak ${i} veya ${i+1} için 'konum' objesi eksik. Atlanıyor.`);
+          continue;
+      }
 
-      if (!baslangic_enlem || !bitis_enlem) {
-        console.error("HATA: Enlem veya boylam bilgisi eksik, bu durak atlanıyor.");
-        continue; // Bu durağı atla, döngüye devam et
+      const baslangic_enlem = baslangicDurak.mekanId.konum.enlem;
+      const baslangic_boylam = baslangicDurak.mekanId.konum.boylam;
+      const bitis_enlem = bitisDurak.mekanId.konum.enlem;
+      const bitis_boylam = bitisDurak.mekanId.konum.boylam;
+
+      console.log(`  [A] Koordinatlar okundu: BAŞLANGIÇ(${baslangic_enlem}, ${baslangic_boylam}) -> BİTİŞ(${bitis_enlem}, ${bitis_boylam})`);
+
+      if (!baslangic_enlem || !baslangic_boylam || !bitis_enlem || !bitis_boylam) {
+        console.error("  !!!! HATA: Enlem veya boylam değerlerinden biri boş (null/undefined). Bu adım atlanıyor.");
+        continue;
       }
       
-      const request = {
-        params: {
-          // Google Maps'in istediği formatta { lat: ..., lng: ... } gönderiyoruz.
-          origin: { lat: baslangic_enlem, lng: baslangic_boylam },
-          destination: { lat: bitis_enlem, lng: bitis_boylam },
-          mode: 'DRIVING',
-          key: process.env.Maps_API_KEY,
-        },
+      const requestParams = {
+        origin: { lat: baslangic_enlem, lng: baslangic_boylam },
+        destination: { lat: bitis_enlem, lng: bitis_boylam },
+        mode: 'DRIVING',
+        key: '... senin API anahtarının son 4 hanesi ...', // API anahtarını buraya loglama, sadece kontrol et
       };
       
-      const response = await googleMapsClient.directions(request);
-      
-      if (response.data.routes.length > 0 && response.data.routes[0].legs.length > 0) {
-        const leg = response.data.routes[0].legs[0];
-        // Hesaplanan veriyi ilgili durağın içine yazıyoruz.
-        rota.duraklar[i].sonrakiDuragaMesafe = leg.distance.text;
-        rota.duraklar[i].sonrakiDuragaSure = leg.duration.text;
-        console.log(` -> Mesafe: ${leg.distance.text}, Süre: ${leg.duration.text}`);
-      } else {
-        console.log(` -> Google Maps'ten bu iki nokta için rota bulunamadı.`);
+      console.log("  [B] Google Maps'e istek gönderiliyor...");
+      try {
+        const response = await googleMapsClient.directions({ params: requestParams });
+        
+        if (response.data.status === 'OK' && response.data.routes.length > 0) {
+          const leg = response.data.routes[0].legs[0];
+          baslangicDurak.sonrakiDuragaMesafe = leg.distance.text;
+          baslangicDurak.sonrakiDuragaSure = leg.duration.text;
+          console.log(`  [C] BAŞARILI: Mesafe=${leg.distance.text}, Süre=${leg.duration.text}. Veri modele yazıldı.`);
+        } else {
+          console.error(`  !!!! GOOGLE API HATASI: Status: ${response.data.status}. Hata Mesajı: ${response.data.error_message || 'Yok'}`);
+        }
+
+      } catch (apiError) {
+         console.error(`  !!!! GOOGLE API ÇAĞRISINDA KRİTİK HATA !!!!`);
+         console.error(apiError.response ? apiError.response.data : apiError.message);
       }
     }
 
-    // Değişikliği Mongoose'a bildiriyoruz.
+    console.log("\n[4] Döngü bitti. Veritabanına kaydetme işlemi deneniyor...");
     rota.markModified('duraklar');
-    // Ve kaydediyoruz.
     await rota.save();
-    console.log(`'${rota.ad.tr}' rotası için mesafeler başarıyla güncellendi ve kaydedildi.`);
+    console.log("[5] BAŞARILI: Değişiklikler veritabanına kaydedildi.");
 
   } catch (error) {
-    // Hatayı daha detaylı loglayalım
-    console.error("Mesafe hesaplama fonksiyonunda büyük bir hata oluştu:", error.response ? error.response.data : error.message);
+    console.error("--- FONKSİYONDA YAKALANAMAYAN BÜYÜK HATA ---");
+    console.error(error);
   }
+  console.log("--- HESAPLAMA FONKSİYONU BİTTİ ---");
 }
 // @route   GET api/rotalar
 // @desc    Tüm rotaların listesini getirir
