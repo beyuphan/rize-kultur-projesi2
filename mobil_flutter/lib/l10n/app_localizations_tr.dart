@@ -84,6 +84,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get categoryNature => 'Doğa';
 
   @override
+  String get categoryActivities => 'Aktivite';
+
+  @override
   String get getDirections => 'Yol Tarifi Al';
 
   @override
@@ -242,6 +245,39 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get tagHikingTrail => 'Yürüyüş Yolu';
+
+  @override
+  String get tagDifficultCarAccess => 'Araç Ulaşımı Zor';
+
+  @override
+  String get tagNotWinterFriendly => 'Kışa Uygun Değil';
+
+  @override
+  String get tagFreeEntry => 'Giriş Ücretsiz';
+
+  @override
+  String get tagCamping => 'Kampa Uygun';
+
+  @override
+  String get tagAccommodation => 'Konaklama İmkanı Var';
+
+  @override
+  String get tagFoodFacility => 'Yemek Tesisi Var';
+
+  @override
+  String get tagWildlife => 'Yaban Hayatı';
+
+  @override
+  String get tagScenic => 'Manzaralı';
+
+  @override
+  String get tagSwing => 'Salıncak';
+
+  @override
+  String get tagPhotoSpot => 'Fotoğraf Çekim Noktası';
+
+  @override
+  String get tagDefault => 'Etiket';
 
   @override
   String get discoverRoutesTitle => 'Keşfedilecek Rotalar';

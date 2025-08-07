@@ -84,6 +84,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get categoryNature => 'Nature';
 
   @override
+  String get categoryActivities => 'Activity';
+
+  @override
   String get getDirections => 'Get Directions';
 
   @override
@@ -242,6 +245,39 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tagHikingTrail => 'Hiking Trail';
+
+  @override
+  String get tagDifficultCarAccess => 'Difficult Car Access';
+
+  @override
+  String get tagNotWinterFriendly => 'Not Winter Friendly';
+
+  @override
+  String get tagFreeEntry => 'Free Entry';
+
+  @override
+  String get tagCamping => 'Camping';
+
+  @override
+  String get tagAccommodation => 'Accommodation';
+
+  @override
+  String get tagFoodFacility => 'Food Facility';
+
+  @override
+  String get tagWildlife => 'Wildlife';
+
+  @override
+  String get tagScenic => 'Scenic';
+
+  @override
+  String get tagSwing => 'Swing';
+
+  @override
+  String get tagPhotoSpot => 'Photo Spot';
+
+  @override
+  String get tagDefault => 'Etiket';
 
   @override
   String get discoverRoutesTitle => 'Routes to Discover';

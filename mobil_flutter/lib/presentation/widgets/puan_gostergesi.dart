@@ -6,7 +6,7 @@ class PuanGostergesi extends StatelessWidget {
     required this.puan,
     this.iconSize = 20.0,
     this.maxPuan = 5,
-    this.aktifRenk, // <-- 1. YENİ PARAMETRE: Aktif ikonlar için isteğe bağlı renk
+    this.aktifRenk = const Color.fromARGB(115, 143, 125, 23), // <-- 1. YENİ PARAMETRE: Aktif ikonlar için isteğe bağlı renk
   });
 
   final double puan;

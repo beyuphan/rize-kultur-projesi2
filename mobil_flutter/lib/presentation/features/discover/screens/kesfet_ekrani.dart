@@ -221,6 +221,8 @@ class _CategoryList extends ConsumerWidget {
       Category(key: 'categoryWaterfalls', icon: Icons.waterfall_chart),
       Category(key: 'categoryRestaurants', icon: Icons.restaurant),
       Category(key: 'categoryHistorical', icon: Icons.account_balance),
+      Category(key: 'categoryActivities', icon: Icons.directions_run),
+      Category(key: 'categoryNature', icon: Icons.nature_people),
     ];
 
       String getTranslatedCategory(String key) {
@@ -246,7 +248,15 @@ class _CategoryList extends ConsumerWidget {
         case 'categoryHistorical':
 
           return l10n.categoryHistorical;
+        
+        case 'categoryActivities':
 
+          return l10n.categoryActivities;
+
+        case 'categoryNature':
+
+          return l10n.categoryNature;
+          
         default:
 
           return key;

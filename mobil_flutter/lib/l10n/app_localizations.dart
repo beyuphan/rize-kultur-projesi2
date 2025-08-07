@@ -248,6 +248,12 @@ abstract class AppLocalizations {
   /// **'Nature'**
   String get categoryNature;
 
+  /// No description provided for @categoryActivities.
+  ///
+  /// In en, this message translates to:
+  /// **'Activity'**
+  String get categoryActivities;
+
   /// No description provided for @getDirections.
   ///
   /// In en, this message translates to:
@@ -559,6 +565,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Hiking Trail'**
   String get tagHikingTrail;
+
+  /// No description provided for @tagDifficultCarAccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Difficult Car Access'**
+  String get tagDifficultCarAccess;
+
+  /// No description provided for @tagNotWinterFriendly.
+  ///
+  /// In en, this message translates to:
+  /// **'Not Winter Friendly'**
+  String get tagNotWinterFriendly;
+
+  /// No description provided for @tagFreeEntry.
+  ///
+  /// In en, this message translates to:
+  /// **'Free Entry'**
+  String get tagFreeEntry;
+
+  /// No description provided for @tagCamping.
+  ///
+  /// In en, this message translates to:
+  /// **'Camping'**
+  String get tagCamping;
+
+  /// No description provided for @tagAccommodation.
+  ///
+  /// In en, this message translates to:
+  /// **'Accommodation'**
+  String get tagAccommodation;
+
+  /// No description provided for @tagFoodFacility.
+  ///
+  /// In en, this message translates to:
+  /// **'Food Facility'**
+  String get tagFoodFacility;
+
+  /// No description provided for @tagWildlife.
+  ///
+  /// In en, this message translates to:
+  /// **'Wildlife'**
+  String get tagWildlife;
+
+  /// No description provided for @tagScenic.
+  ///
+  /// In en, this message translates to:
+  /// **'Scenic'**
+  String get tagScenic;
+
+  /// No description provided for @tagSwing.
+  ///
+  /// In en, this message translates to:
+  /// **'Swing'**
+  String get tagSwing;
+
+  /// No description provided for @tagPhotoSpot.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo Spot'**
+  String get tagPhotoSpot;
+
+  /// No description provided for @tagDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Etiket'**
+  String get tagDefault;
 
   /// No description provided for @discoverRoutesTitle.
   ///
