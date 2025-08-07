@@ -20,10 +20,37 @@ class MekanKarti extends StatelessWidget {
     this.onTap,
   });
 
+  String? _getOptimizedImageUrl(String? originalUrl) {
+    // Eğer orijinal URL yoksa, null döndür
+    if (originalUrl == null || originalUrl.isEmpty) {
+      return null;
+    }
+
+    // URL'nin Cloudinary'e ait olup olmadığını kontrol edelim
+    if (!originalUrl.contains('res.cloudinary.com')) {
+      return originalUrl; // Değilse, olduğu gibi kullan
+    }
+    
+    // Kartımızın genişliği 220, resim yüksekliği 140.
+    // İyi bir görüntü kalitesi için bu değerlerin 2 katını isteyelim (retina ekranlar için)
+    // c_fill: Resmi kırparak tam olarak bu boyutlara sığdırır.
+    // q_auto: En iyi kalite seviyesini otomatik ayarlar.
+    // f_auto: En uygun formatı (örn: WebP) otomatik seçer.
+    const transformations = 'w_440,h_280,c_fill,q_auto,f_auto';
+
+    // URL'yi "upload/" kelimesinden bölüyoruz.
+    final parts = originalUrl.split('upload/');
+    if (parts.length != 2) return originalUrl; // Beklenmedik format
+
+    // Yeni, optimize URL'yi birleştirip döndürüyoruz.
+    return '${parts[0]}upload/$transformations/${parts[1]}';
+  }
+
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
+    final optimizedUrl = _getOptimizedImageUrl(imageUrl);
     // YENİ: Çeviri mantığı artık kartın kendi içinde
     String getTranslatedCategory(String key) {
       switch (key) {
@@ -37,6 +64,8 @@ class MekanKarti extends StatelessWidget {
           return l10n.categoryRestaurants;
         case 'categoryHistorical':
           return l10n.categoryHistorical;
+        case 'categoryNature':
+          return l10n.categoryNature;
         default:
           return key; // Bilinmeyen bir key gelirse, olduğu gibi göster
       }
@@ -69,9 +98,9 @@ class MekanKarti extends StatelessWidget {
                   topRight: Radius.circular(20),
                 ),
                 // --- İŞTE DÜZELTME BURADA ---
-                child: (imageUrl != null && imageUrl!.isNotEmpty)
+                child: (optimizedUrl != null && optimizedUrl!.isNotEmpty)
                     ? Image.network(
-                        imageUrl!.trim(), // Artık '!' ile güvenli
+                        optimizedUrl, // Artık '!' ile güvenli
                         height: 140,
                         width: double.infinity,
                         fit: BoxFit.cover,

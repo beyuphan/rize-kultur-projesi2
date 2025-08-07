@@ -56,19 +56,7 @@ class AyarlarEkraniMisafir extends ConsumerWidget {
   // --- YARDIMCI METOTLAR ---
   // Bu metotlar, orijinal AyarlarEkrani'ndakilerle birebir aynı.
 
-  Widget _buildSectionHeader(BuildContext context, String title) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16.0, 24.0, 16.0, 8.0),
-      child: Text(
-        title,
-        style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              color: Theme.of(context).colorScheme.primary,
-              fontWeight: FontWeight.bold,
-            ),
-      ),
-    );
-  }
-
+ 
   void _temaSecimiGoster(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final mevcutTema = ref.watch(themeProvider);
@@ -94,6 +82,31 @@ class AyarlarEkraniMisafir extends ConsumerWidget {
               RadioListTile<AppTheme>(
                 title: Text(l10n.themeKackarSisi),
                 value: AppTheme.kackarSisi,
+                groupValue: mevcutTema,
+                onChanged: (AppTheme? value) {
+                  if (value != null) {
+                    ref.read(themeProvider.notifier).state = value;
+                    Navigator.pop(context);
+                  }
+                },
+              ),
+
+              RadioListTile<AppTheme>(
+                title: Text(
+                  l10n.themeLazHoronu,
+                ), // 👈 çeviri dosyanda bu olmalı
+                value: AppTheme.lazHoronu,
+                groupValue: mevcutTema,
+                onChanged: (AppTheme? value) {
+                  if (value != null) {
+                    ref.read(themeProvider.notifier).state = value;
+                    Navigator.pop(context);
+                  }
+                },
+              ),
+              RadioListTile<AppTheme>(
+                title: Text(l10n.themeZumrutYayla),
+                value: AppTheme.zumrutYayla,
                 groupValue: mevcutTema,
                 onChanged: (AppTheme? value) {
                   if (value != null) {
@@ -148,4 +161,23 @@ class AyarlarEkraniMisafir extends ConsumerWidget {
       },
     );
   }
+
+  Widget _buildSectionHeader(BuildContext context, String title) {
+    return Padding(
+      padding: const EdgeInsets.only(
+        top: 24.0,
+        bottom: 8.0,
+        left: 16.0,
+        right: 16.0,
+      ),
+      child: Text(
+        title,
+        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+          color: Theme.of(context).colorScheme.primary,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
 }

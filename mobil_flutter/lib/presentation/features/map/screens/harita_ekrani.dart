@@ -1,26 +1,18 @@
-// lib/presentation/screens/harita_ekrani.dart
-
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart'; 
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mobil_flutter/data/models/mekan_model.dart';
 import 'package:mobil_flutter/presentation/providers/api_service_provider.dart';
-import 'package:mobil_flutter/presentation/providers/mekan_providers.dart';
 import 'package:mobil_flutter/presentation/features/venue/screens/mekan_detay_ekrani.dart';
-import 'package:mobil_flutter/l10n/app_localizations.dart';
 
+// --- PROVIDER'LAR ---
 
-// --- Provider'lar ---
-// Bu provider'lar bu ekrana hizmet eder, burada kalmaları temiz bir yapı sağlar.
-
-// 1. Konum servislerini ve izinlerini yöneten provider
 final konumProvider = FutureProvider.autoDispose<Position>((ref) async {
   bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  if (!serviceEnabled) {
-    throw Exception('Lütfen konum servislerini açın.');
-  }
+  if (!serviceEnabled) throw Exception('Lütfen konum servislerini açın.');
 
   LocationPermission permission = await Geolocator.checkPermission();
   if (permission == LocationPermission.denied) {
@@ -35,42 +27,40 @@ final konumProvider = FutureProvider.autoDispose<Position>((ref) async {
   return await Geolocator.getCurrentPosition();
 });
 
-// 2. Haritanın durumunu ve mekanları yöneten StateNotifier
+// YENİ: Arama yarıçapını (metre cinsinden) tutan provider
+final searchRadiusProvider = StateProvider<double>((ref) => 10000.0); // Varsayılan 10km
+
 final haritaProvider = StateNotifierProvider.autoDispose<HaritaNotifier, AsyncValue<List<MekanModel>>>((ref) {
   return HaritaNotifier(ref);
 });
 
 class HaritaNotifier extends StateNotifier<AsyncValue<List<MekanModel>>> {
-  HaritaNotifier(this.ref) : super(const AsyncLoading()) {
-    _init();
-  }
+  HaritaNotifier(this.ref) : super(const AsyncData([]));
   final Ref ref;
+  bool _isFetching = false;
 
-  // Başlangıçta kullanıcının konumuna göre mekanları getirir
-  Future<void> _init() async {
+  Future<void> fetchMekanlar(LatLng merkez) async {
+    if (_isFetching) return;
+    _isFetching = true;
+    state = AsyncLoading<List<MekanModel>>().copyWithPrevious(state);
     try {
-      final position = await ref.read(konumProvider.future);
-      await fetchYakindakiMekanlar(enlem: position.latitude, boylam: position.longitude);
-    } catch (e, stack) {
-      state = AsyncError(e, stack);
-    }
-  }
-
-  // Belirli bir konuma göre mekanları getiren fonksiyon
-  Future<void> fetchYakindakiMekanlar({required double enlem, required double boylam}) async {
-    state = const AsyncLoading();
-    try {
-      final mesafe = ref.read(mesafeCapiProvider);
       final apiService = ref.read(apiServiceProvider);
-      final mekanlar = await apiService.getYakindakiMekanlar(enlem: enlem, boylam: boylam, mesafe: mesafe);
+      final radius = ref.read(searchRadiusProvider);
+      final mekanlar = await apiService.getYakindakiMekanlar(
+        enlem: merkez.latitude,
+        boylam: merkez.longitude,
+        mesafe: radius,
+      );
       state = AsyncData(mekanlar);
     } catch (e, stack) {
       state = AsyncError(e, stack);
+    } finally {
+      _isFetching = false;
     }
   }
 }
 
-// --- Ana Arayüz Widget'ı ---
+// --- ANA ARAYÜZ WIDGET'I ---
 class HaritaEkrani extends ConsumerStatefulWidget {
   const HaritaEkrani({super.key});
 
@@ -80,48 +70,125 @@ class HaritaEkrani extends ConsumerStatefulWidget {
 
 class _HaritaEkraniState extends ConsumerState<HaritaEkrani> {
   final Completer<GoogleMapController> _mapController = Completer();
-  LatLng? _haritaMerkezi;
-  bool _aramaButonuGoster = false;
+  final PageController _pageController = PageController(viewportFraction: 0.85);
+
+  Set<Marker> _markers = {};
+  int _selectedIndex = -1;
+  Timer? _debounce;
+  bool _isProgrammaticMove = false;
+  LatLng _currentMapCenter = const LatLng(41.0201, 40.5235);
+
+  BitmapDescriptor? _markerIconDefault;
+  BitmapDescriptor? _markerIconSelected;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMarkerIcons();
+  }
+
+  Future<void> _loadMarkerIcons() async {
+    _markerIconDefault = await BitmapDescriptor.fromAssetImage(
+        const ImageConfiguration(size: Size(128, 128)), 'assets/images/marker_default.png');
+    _markerIconSelected = await BitmapDescriptor.fromAssetImage(
+        const ImageConfiguration(size: Size(128, 128)), 'assets/images/marker_selected.png');
+    setState(() {}); // İkonlar yüklenince marker'ları yeniden çizmek için
+  }
+
+  void _updateMarkers(List<MekanModel> mekanlar) {
+    if (!mounted) return;
+    final langCode = Localizations.localeOf(context).languageCode;
+    final newMarkers = mekanlar.asMap().entries.map((entry) {
+      final index = entry.key;
+      final mekan = entry.value;
+      return Marker(
+        markerId: MarkerId(mekan.id),
+        position: LatLng(mekan.konum.enlem, mekan.konum.boylam),
+        icon: index == _selectedIndex ? (_markerIconSelected ?? BitmapDescriptor.defaultMarker) : (_markerIconDefault ?? BitmapDescriptor.defaultMarker),
+        infoWindow: InfoWindow(title: langCode == 'tr' ? mekan.isim.tr : mekan.isim.en),
+        onTap: () {
+          if (_selectedIndex != index) {
+            _onMarkerTapped(index);
+          }
+        },
+      );
+    }).toSet();
+
+    setState(() {
+      _markers = newMarkers;
+    });
+  }
+
+  void _onMarkerTapped(int index) {
+    if (!mounted) return;
+    setState(() {
+      _selectedIndex = index;
+    });
+    _updateMarkers(ref.read(haritaProvider).value ?? []);
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  void _onPageChanged(int index) async {
+    if (_selectedIndex == index) return;
+
+    if (!mounted) return;
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    _updateMarkers(ref.read(haritaProvider).value ?? []);
+
+    _isProgrammaticMove = true;
+    final controller = await _mapController.future;
+    final mekan = ref.read(haritaProvider).value![index];
+    controller.animateCamera(
+      CameraUpdate.newLatLng(LatLng(mekan.konum.enlem, mekan.konum.boylam)),
+    );
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  String _getOptimizedImageUrl(String? originalUrl) {
+    if (originalUrl == null || originalUrl.isEmpty || !originalUrl.contains('res.cloudinary.com')) {
+      return 'https://placehold.co/600x400/CCCCCC/4f4f4f?text=G%C3%B6rsel+Yok';
+    }
+    const transformations = 'w_400,h_400,c_fill,q_auto,f_auto';
+    final parts = originalUrl.split('upload/');
+    if (parts.length != 2) return originalUrl;
+    return '${parts[0]}upload/$transformations/${parts[1]}';
+  }
 
   @override
   Widget build(BuildContext context) {
     final konumAsync = ref.watch(konumProvider);
-    final theme = Theme.of(context);
-
+     ref.listen<AsyncValue<List<MekanModel>>>(haritaProvider, (_, state) {
+      state.whenOrNull(
+        data: (mekanlar) => _updateMarkers(mekanlar),
+        error: (e, s) => ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(SnackBar(content: Text("Mekanlar yüklenemedi: $e"))),
+      );
+    });
+    
     return Scaffold(
-      // AppBar'ı kaldırıp, geri butonunu Stack içine ekleyerek tam ekran hissi veriyoruz
       body: konumAsync.when(
-        loading: () => const Center(child: Text("Konum alınıyor...")),
-        error: (err, stack) => Center(child: Text('Konum alınamadı: $err')),
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, stack) => Center(child: Text('Konum hatası: $err')),
         data: (position) {
-          _haritaMerkezi ??= LatLng(position.latitude, position.longitude);
-
           return Stack(
             children: [
-              // KATMAN 1: HARİTA
-              _buildGoogleMap(),
-
-              // KATMAN 2: ÜST KONTROL PANELİ (SLIDER)
-              _buildTopControlPanel(theme),
-
-              // KATMAN 3: ORTADAKİ ARAMA BUTONU
-              if (_aramaButonuGoster) _buildCenterSearchButton(),
-
-              // KATMAN 4: ALT SONUÇ PANELİ
-              _buildBottomResultsPanel(context, theme),
-              
-              // KATMAN 5: GERİ BUTONU
-              Positioned(
-                top: 40,
-                left: 16,
-                child: CircleAvatar(
-                  backgroundColor: theme.colorScheme.surface.withOpacity(0.8),
-                  child: IconButton(
-                    icon: Icon(Icons.arrow_back, color: theme.colorScheme.onSurface),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ),
-              ),
+              _buildGoogleMap(position),
+              _buildFilterButton(),
+              _buildBottomResultsPanel(position),
             ],
           );
         },
@@ -129,114 +196,120 @@ class _HaritaEkraniState extends ConsumerState<HaritaEkrani> {
     );
   }
 
-  Widget _buildGoogleMap() {
-    final mekanlarAsync = ref.watch(haritaProvider);
-    final langCode = Localizations.localeOf(context).languageCode;
-    final seciliMesafe = ref.watch(mesafeCapiProvider);
-
+  Widget _buildGoogleMap(Position initialPosition) {
     return GoogleMap(
-      initialCameraPosition: CameraPosition(target: _haritaMerkezi!, zoom: 11),
-      onMapCreated: (controller) {
-        if (!_mapController.isCompleted) _mapController.complete(controller);
+      initialCameraPosition: CameraPosition(
+        target: LatLng(initialPosition.latitude, initialPosition.longitude),
+        zoom: 12.0,
+      ),
+      onMapCreated: (controller) async {
+        if (!_mapController.isCompleted) {
+          _mapController.complete(controller);
+          try {
+            String style = await rootBundle.loadString('assets/map_style.json');
+            controller.setMapStyle(style);
+          } catch (e) {
+            print("Harita stili yüklenemedi: $e");
+          }
+          final center = LatLng(initialPosition.latitude, initialPosition.longitude);
+          setState(() { _currentMapCenter = center; });
+          ref.read(haritaProvider.notifier).fetchMekanlar(center);
+        }
       },
+      markers: _markers,
       myLocationEnabled: true,
-      myLocationButtonEnabled: false, // Kendi butonumuzu kullanacağız
+      myLocationButtonEnabled: true,
       zoomControlsEnabled: false,
       mapToolbarEnabled: false,
-      padding: const EdgeInsets.only(top: 140, bottom: 200),
-      markers: mekanlarAsync.maybeWhen(
-        data: (mekanlar) => mekanlar.map((mekan) => Marker(
-              markerId: MarkerId(mekan.id),
-              position: LatLng(mekan.konum.enlem, mekan.konum.boylam),
-              infoWindow: InfoWindow(
-                title: langCode == 'tr' ? mekan.isim.tr : mekan.isim.en,
-                onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => MekanDetayEkrani(mekanId: mekan.id))),
-              ),
-            )).toSet(),
-        orElse: () => {},
-      ),
-      onCameraMove: (pos) => _haritaMerkezi = pos.target,
-      onCameraIdle: () => setState(() => _aramaButonuGoster = true),
-      circles: {
-        Circle(
-          circleId: const CircleId('arama_capi_id'),
-          center: _haritaMerkezi!,
-          radius: seciliMesafe,
-          fillColor: Colors.blue.withOpacity(0.1),
-          strokeColor: Colors.blue.withOpacity(0.5),
-          strokeWidth: 1,
-        ),
+      padding: const EdgeInsets.only(bottom: 180, top: 100),
+      onCameraMove: (position) {
+        setState(() {
+          _currentMapCenter = position.target;
+        });
+      },
+      onCameraIdle: () {
+        if (_isProgrammaticMove) {
+          _isProgrammaticMove = false;
+          return;
+        }
+        if (_debounce?.isActive ?? false) _debounce!.cancel();
+        _debounce = Timer(const Duration(milliseconds: 1200), () {
+          if (_currentMapCenter != null) {
+            ref.read(haritaProvider.notifier).fetchMekanlar(_currentMapCenter!);
+          }
+        });
       },
     );
   }
 
-  Widget _buildTopControlPanel(ThemeData theme) {
-    final seciliMesafe = ref.watch(mesafeCapiProvider);
-    
+  Widget _buildFilterButton() {
     return Positioned(
-      top: 80,
-      left: 16,
+      top: 50,
       right: 16,
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface.withOpacity(0.9),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10)],
-        ),
-        child: Column(
-          children: [
-            Text("Arama Yarıçapı: ${(seciliMesafe / 1000).toStringAsFixed(1)} km", style: theme.textTheme.labelLarge),
-            Slider(
-              value: seciliMesafe,
-              min: 1000, max: 50000,
-              divisions: 49,
-              label: "${(seciliMesafe / 1000).round()} km",
-              onChanged: (yeniDeger) => ref.read(mesafeCapiProvider.notifier).state = yeniDeger,
-              onChangeEnd: (yeniDeger) { // Slider bırakılınca otomatik ara
-                if (_haritaMerkezi != null) {
-                  ref.read(haritaProvider.notifier).fetchYakindakiMekanlar(
-                        enlem: _haritaMerkezi!.latitude,
-                        boylam: _haritaMerkezi!.longitude,
-                      );
-                  setState(() => _aramaButonuGoster = false);
-                }
-              },
-            ),
-          ],
-        ),
+      child: FloatingActionButton.small(
+        heroTag: 'filterButton', // Aynı ekranda birden fazla FAB varsa heroTag eklenmeli
+        onPressed: _showFilterSheet,
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        elevation: 4,
+        child: Icon(Icons.tune, color: Theme.of(context).colorScheme.primary),
       ),
     );
   }
-  
-  Widget _buildCenterSearchButton() {
-     final seciliMesafe = ref.watch(mesafeCapiProvider);
-     return Center(
-       child: ElevatedButton.icon(
-          icon: const Icon(Icons.refresh),
-          // BUTONUN ÜZERİNDE NE KADARLIK ALANDA ARAYACAĞI YAZIYOR
-          label: Text("Bu Alanda Ara (${(seciliMesafe / 1000).toStringAsFixed(0)} km)"),
-          style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            shape: const StadiumBorder(),
-          ),
-          onPressed: () {
-            if (_haritaMerkezi != null) {
-              ref.read(haritaProvider.notifier).fetchYakindakiMekanlar(
-                enlem: _haritaMerkezi!.latitude,
-                boylam: _haritaMerkezi!.longitude,
-              );
-              setState(() => _aramaButonuGoster = false);
-            }
-          },
-        ),
-     );
+
+  void _showFilterSheet() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Consumer(
+        builder: (context, ref, child) {
+          final radius = ref.watch(searchRadiusProvider);
+          return Container(
+            height: 220,
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(24),
+                topRight: Radius.circular(24),
+              ),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text("Arama Yarıçapı: ${(radius / 1000).toStringAsFixed(1)} km", style: Theme.of(context).textTheme.titleMedium),
+                Slider(
+                  value: radius,
+                  min: 1000, max: 50000,
+                  divisions: 49,
+                  label: "${(radius / 1000).round()} km",
+                  onChanged: (yeniDeger) => ref.read(searchRadiusProvider.notifier).state = yeniDeger,
+                ),
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.search),
+                  label: const Text("Bu Alanda Ara"),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12)
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    if (_currentMapCenter != null) {
+                       ref.read(haritaProvider.notifier).fetchMekanlar(_currentMapCenter!);
+                    }
+                  },
+                )
+              ],
+            ),
+          );
+        },
+      ),
+    );
   }
 
-  Widget _buildBottomResultsPanel(BuildContext context, ThemeData theme) {
+  Widget _buildBottomResultsPanel(Position currentUserPosition) {
     final mekanlarAsync = ref.watch(haritaProvider);
     final langCode = Localizations.localeOf(context).languageCode;
-    
+    final theme = Theme.of(context);
+
     return Positioned(
       bottom: 0,
       left: 0,
@@ -248,68 +321,89 @@ class _HaritaEkraniState extends ConsumerState<HaritaEkrani> {
             begin: Alignment.bottomCenter,
             end: Alignment.topCenter,
             colors: [
-              theme.scaffoldBackgroundColor,
-              theme.scaffoldBackgroundColor,
+              theme.scaffoldBackgroundColor.withOpacity(1),
+              theme.scaffoldBackgroundColor.withOpacity(1),
               theme.scaffoldBackgroundColor.withOpacity(0),
             ],
-            stops: const [0.0, 0.7, 1.0],
+            stops: const [0.0, 0.4, 1.0],
           ),
         ),
-        child: mekanlarAsync.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e,s) => Center(child: Text("Hata: $e")),
-          data: (mekanlar) => mekanlar.isEmpty
-              ? const Center(child: Text("Yakınlarda mekan bulunamadı."))
-              : PageView.builder(
-                  itemCount: mekanlar.length,
-                  itemBuilder: (context, index) {
-                    final mekan = mekanlar[index];
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-                      child: Card(
-                        clipBehavior: Clip.antiAlias,
-                        elevation: 6,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                        child: InkWell(
-                          onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => MekanDetayEkrani(mekanId: mekan.id))),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                flex: 2,
-                                child: Image.network(
-                                  mekan.fotograflar.isNotEmpty ? mekan.fotograflar[0] : 'https://placehold.co/600x400',
-                                  fit: BoxFit.cover,
-                                  height: double.infinity,
-                                ),
-                              ),
-                              Expanded(
-                                flex: 3,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(12.0),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                       Text(
-                                        langCode == 'tr' ? mekan.isim.tr : mekan.isim.en,
-                                        style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        "Mesafe: [Hesaplanacak] km", // İleride eklenebilir
-                                        style: theme.textTheme.bodySmall,
-                                      ),
-                                    ],
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          child: mekanlarAsync.when(
+            loading: () => const Center(key: ValueKey('loading'), child: CircularProgressIndicator()),
+            error: (e,s) => Center(key: const ValueKey('error'), child: Text("Hata: $e")),
+            data: (mekanlar) => mekanlar.isEmpty
+                ? Center(key: const ValueKey('empty'), child: Text("Bu alanda mekan bulunamadı.", style: theme.textTheme.bodyLarge))
+                : PageView.builder(
+                    key: const ValueKey('data'),
+                    controller: _pageController,
+                    itemCount: mekanlar.length,
+                    onPageChanged: _onPageChanged,
+                    itemBuilder: (context, index) {
+                      final mekan = mekanlar[index];
+                      final distance = Geolocator.distanceBetween(
+                        _currentMapCenter?.latitude ?? currentUserPosition.latitude,
+                        _currentMapCenter?.longitude ?? currentUserPosition.longitude,
+                        mekan.konum.enlem,
+                        mekan.konum.boylam,
+                      );
+
+                      return Padding(
+                        padding: const EdgeInsets.fromLTRB(10, 10, 10, 30),
+                        child: Card(
+                          clipBehavior: Clip.antiAlias,
+                          elevation: 8,
+                          shadowColor: Colors.black.withOpacity(0.3),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          child: InkWell(
+                            onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => MekanDetayEkrani(mekanId: mekan.id))),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  flex: 2,
+                                  child: Image.network(
+                                    _getOptimizedImageUrl(mekan.fotograflar.isNotEmpty ? mekan.fotograflar[0] : null),
+                                    fit: BoxFit.cover,
+                                    height: double.infinity,
                                   ),
                                 ),
-                              ),
-                            ],
+                                Expanded(
+                                  flex: 3,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        Text(
+                                          langCode == 'tr' ? mekan.isim.tr : mekan.isim.en,
+                                          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        Row(
+                                          children: [
+                                            Icon(Icons.social_distance_rounded, size: 16, color: theme.colorScheme.primary),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              "${(distance / 1000).toStringAsFixed(1)} km uzakta",
+                                              style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.primary),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    );
-                  },
-                ),
+                      );
+                    },
+                  ),
+          ),
         ),
       ),
     );

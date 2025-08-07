@@ -221,7 +221,6 @@ class _CategoryList extends ConsumerWidget {
       Category(key: 'categoryWaterfalls', icon: Icons.waterfall_chart),
       Category(key: 'categoryRestaurants', icon: Icons.restaurant),
       Category(key: 'categoryHistorical', icon: Icons.account_balance),
-      Category(key: 'categoryActivities', icon: Icons.directions_run),
       Category(key: 'categoryNature', icon: Icons.nature_people),
     ];
 
@@ -242,19 +241,13 @@ class _CategoryList extends ConsumerWidget {
           return l10n.categoryWaterfalls;
 
         case 'categoryRestaurants':
-
           return l10n.categoryRestaurants;
 
         case 'categoryHistorical':
 
           return l10n.categoryHistorical;
-        
-        case 'categoryActivities':
 
-          return l10n.categoryActivities;
-
-        case 'categoryNature':
-
+        case 'categoryNature' :
           return l10n.categoryNature;
           
         default:

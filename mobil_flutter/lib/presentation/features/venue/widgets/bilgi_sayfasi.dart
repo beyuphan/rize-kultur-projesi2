@@ -117,74 +117,61 @@ class _EtiketChip extends StatelessWidget {
     text = l10n.tagDifficultCarAccess;
     color = Colors.indigo;
     break;
-
       case 'kis-mevsimine-uygun':
         icon = Icons.ac_unit;
         text = l10n.tagWinterFriendly;
         color = Colors.cyan;
         break;
-
           case 'kis-mevsimine-uygun-degil':
     icon = Icons.snowing;
     text = l10n.tagNotWinterFriendly;
     color = Colors.grey;
     break;
-
-
       case 'giris-ucretli':
         icon = Icons.attach_money;
         text = l10n.tagEntryFee;
         color = Colors.green;
         break;
-
          case 'giris-ucretsiz':
     icon = Icons.money_off;
     text = l10n.tagFreeEntry;
     color = Colors.lightGreen;
     break;
-
       case 'yuruyus-parkuru-var':
         icon = Icons.hiking;
         text = l10n.tagHikingTrail;
         color = Colors.orange;
         break;
-
         case 'kamp-yapilir':
     icon = Icons.park;
     text = l10n.tagCamping;
     color = Colors.brown;
     break;
-
   case 'konaklama-tesisi-var':
     icon = Icons.hotel;
     text = l10n.tagAccommodation;
     color = Colors.teal;
     break;
-
   case 'yeme-icme-tesisi-var':
     icon = Icons.restaurant;
     text = l10n.tagFoodFacility;
     color = Colors.redAccent;
     break;
-
 case 'yaban-hayati':
     icon = Icons.pets;
     text = l10n.tagWildlife;
     color = Colors.lightGreen;
     break;
-
   case 'manzarali':
     icon = Icons.landscape;
     text = l10n.tagScenic;
     color = Colors.blueAccent;
     break;
-
   case 'salincak':
     icon = Icons.chair_alt;
     text = l10n.tagSwing;
     color = Colors.pinkAccent;
     break;
-
   case 'fotograf-cekim-noktasi':
     icon = Icons.camera_alt;
     text = l10n.tagPhotoSpot;

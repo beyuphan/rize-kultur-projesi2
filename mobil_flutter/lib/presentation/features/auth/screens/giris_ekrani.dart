@@ -1,10 +1,12 @@
-// lib/presentation/features/auth/screens/giris_ekrani.dart
-
+import 'dart:ui'; // BackdropFilter için gerekli
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:mobil_flutter/l10n/app_localizations.dart';
 import 'package:mobil_flutter/presentation/providers/auth_providers.dart';
 import 'package:mobil_flutter/presentation/features/auth/screens/kayit_ol_ekrani.dart';
+// Ortak widget'ları import ediyoruz
+import 'package:mobil_flutter/presentation/features/auth/widgets/helper.dart';
 
 class GirisEkrani extends ConsumerStatefulWidget {
   const GirisEkrani({super.key});
@@ -30,22 +32,22 @@ class _GirisEkraniState extends ConsumerState<GirisEkrani> {
     if (!_formKey.currentState!.validate()) return;
 
     final hataMesaji = await ref.read(authProvider.notifier).girisYap(
-          _emailController.text.trim(),
-          _passwordController.text.trim(),
-        );
+      _emailController.text.trim(),
+      _passwordController.text.trim(),
+    );
 
-      // Bu kontrol, işlem bittiğinde sayfa kapatılmışsa hata almayı önler.
     if (!mounted) return;
 
     if (hataMesaji == null) {
-      // GİRİŞ BAŞARILI: Bu ekranı kapat ve ana ekrana dön.
-      Navigator.of(context).pop();
-    } else {
-      // GİRİŞ BAŞARISIZ: Hata mesajını göster.
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(hataMesaji), backgroundColor: Colors.red),
-      );
-    }
+    // GİRİŞ BAŞARILI! Hata mesajı yok demektir.
+    // Bu ekranı kapat ve alttaki ana ekrana dön.
+    Navigator.of(context).pop();
+  } else {
+    // GİRİŞ BAŞARISIZ! Hata mesajını göster.
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(hataMesaji), backgroundColor: Colors.red),
+    );
+  }
   }
 
   @override
@@ -60,78 +62,105 @@ class _GirisEkraniState extends ConsumerState<GirisEkrani> {
         children: [
           // ARKA PLAN GÖRSELİ
           Image.network(
-            'https://celebiakbiyik.wordpress.com/wp-content/uploads/2020/12/hss.jpg',
+            'https://res.cloudinary.com/dafoavskw/image/upload/v1754548869/Gemini_Generated_Image_tslm08tslm08tslm_jk3dus.png', // Daha soyut bir görsel
             fit: BoxFit.cover,
-            color: Colors.black.withOpacity(0.5), // Resmi karart
-            colorBlendMode: BlendMode.darken,
           ),
+          // BUZLU CAM EFEKTİ
+          BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+            child: Container(
+              color: Colors.black.withOpacity(0.3),
+            ),
+          ),
+          
           SafeArea(
             child: Center(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(32.0),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // BAŞLIK
-                      Text(
-                        l10n.loginTitle,
-                        style: theme.textTheme.headlineLarge?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+                padding: const EdgeInsets.all(24.0),
+                child: Container(
+                  padding: const EdgeInsets.all(24.0),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.white.withOpacity(0.2)),
+                  ),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // LOGO
+                        Image.asset(
+                          'assets/images/logo.png', // Logo dosyanızın yolu
+                          height: 80,
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        l10n.loginSubtitle,
-                        style: theme.textTheme.bodyLarge?.copyWith(color: Colors.white70),
-                      ),
-                      const SizedBox(height: 48),
-
-                      // E-POSTA ALANI
-                      TextFormField(
-                        controller: _emailController,
-                        keyboardType: TextInputType.emailAddress,
-                                                style: const TextStyle(color: Colors.white), // <-- YENİ EKLENEN SATIR
-                        decoration: _buildInputDecoration(l10n.email, Icons.email_outlined),
-                        validator: (value) => (value == null || !value.contains('@')) ? l10n.emailValidation : null,
-                      ),
-                      const SizedBox(height: 20),
-
-                      // ŞİFRE ALANI
-                      TextFormField(
-                        controller: _passwordController,
-                        obscureText: true,
-                                                style: const TextStyle(color: Colors.white), // <-- YENİ EKLENEN SATIR
-                        decoration: _buildInputDecoration(l10n.password, Icons.lock_outline),
-                        validator: (value) => (value == null || value.trim().isEmpty) ? l10n.passwordValidation : null,
-                      ),
-                      const SizedBox(height: 32),
-
-                      // GİRİŞ YAP BUTONU
-                      SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: ElevatedButton(
-                          onPressed: authState == AuthStatus.loading ? null : _signIn,
-                          child: authState == AuthStatus.loading
-                              ? const CircularProgressIndicator(color: Colors.white)
-                              : Text(l10n.loginButton),
+                        const SizedBox(height: 24),
+                        
+                        // BAŞLIK
+                        Text(
+                          l10n.loginTitle,
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 24),
-
-                      // KAYIT OL EKRANINA YÖNLENDİRME
-                      _buildRichTextNavigation(
-                        context: context,
-                        text1: "${l10n.dontHaveAccount} ",
-                        text2: l10n.registerButton,
-                        onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) => const KayitEkrani()),
+                        const SizedBox(height: 8),
+                        Text(
+                          l10n.loginSubtitle,
+                          style: GoogleFonts.poppins(color: Colors.white70),
+                          textAlign: TextAlign.center,
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 32),
+
+                        // E-POSTA ALANI
+                        TextFormField(
+                          controller: _emailController,
+                          keyboardType: TextInputType.emailAddress,
+                          style: GoogleFonts.poppins(color: Colors.white),
+                          decoration: buildAuthInputDecoration(label: l10n.email, icon: Icons.email_outlined),
+                          validator: (value) => (value == null || !value.contains('@')) ? l10n.emailValidation : null,
+                        ),
+                        const SizedBox(height: 20),
+
+                        // ŞİFRE ALANI
+                        TextFormField(
+                          controller: _passwordController,
+                          obscureText: true,
+                          style: GoogleFonts.poppins(color: Colors.white),
+                          decoration: buildAuthInputDecoration(label: l10n.password, icon: Icons.lock_outline),
+                          validator: (value) => (value == null || value.trim().isEmpty) ? l10n.passwordValidation : null,
+                        ),
+                        const SizedBox(height: 32),
+
+                        // GİRİŞ YAP BUTONU
+                        SizedBox(
+                          width: double.infinity,
+                          height: 50,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: theme.colorScheme.primary,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                            onPressed: authState == AuthStatus.loading ? null : _signIn,
+                            child: authState == AuthStatus.loading
+                                ? const CircularProgressIndicator(color: Colors.white)
+                                : Text(l10n.loginButton, style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white)),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+
+                        // KAYIT OL EKRANINA YÖNLENDİRME
+                        buildAuthRichTextNavigation(
+                          context: context,
+                          text1: "${l10n.dontHaveAccount} ",
+                          text2: l10n.registerButton,
+                          onTap: () => Navigator.of(context).push(
+                            MaterialPageRoute(builder: (context) => const KayitEkrani()),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -141,48 +170,4 @@ class _GirisEkraniState extends ConsumerState<GirisEkrani> {
       ),
     );
   }
-}
-
-// --- YARDIMCI METOTLAR ---
-// Bu metotları sınıfın dışına veya içine koyabilirsin.
-
-InputDecoration _buildInputDecoration(String label, IconData icon) {
-  return InputDecoration(
-    labelText: label,
-    prefixIcon: Icon(icon, color: Colors.white),
-    labelStyle: const TextStyle(color: Colors.white),
-    filled: true,
-    fillColor: Colors.black.withOpacity(0.2),
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
-      borderSide: BorderSide.none,
-    ),
-  );
-}
-
-Widget _buildRichTextNavigation({
-  required BuildContext context,
-  required String text1,
-  required String text2,
-  required VoidCallback onTap,
-}) {
-  final theme = Theme.of(context);
-  return GestureDetector(
-    onTap: onTap,
-    child: RichText(
-      text: TextSpan(
-        style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white),
-        children: [
-          TextSpan(text: text1),
-          TextSpan(
-            text: text2,
-            style: TextStyle(
-              color: theme.colorScheme.secondary,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
 }

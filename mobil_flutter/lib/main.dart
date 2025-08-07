@@ -5,6 +5,9 @@ import 'package:mobil_flutter/common/theme/app_themes.dart';
 import 'package:mobil_flutter/presentation/features/splash/splash_ekrani.dart';
 import 'package:mobil_flutter/presentation/features/home/widgets/auth_yonlendirici.dart';
 import 'package:mobil_flutter/l10n/app_localizations.dart';
+import 'package:google_maps_flutter_android/google_maps_flutter_android.dart';
+import 'package:google_maps_flutter_platform_interface/google_maps_flutter_platform_interface.dart';
+
 import 'dart:io';
 
 
@@ -24,7 +27,15 @@ class MyHttpOverrides extends HttpOverrides {
 }
 
 // ===== KODUN DOĞRU HALİ =====
-void main() async {
+void main() {
+
+   final GoogleMapsFlutterPlatform mapsImplementation =
+      GoogleMapsFlutterPlatform.instance;
+  if (mapsImplementation is GoogleMapsFlutterAndroid) {
+    // Force Hybrid Composition mode.
+    mapsImplementation.useAndroidViewSurface = true;
+  }
+
   WidgetsFlutterBinding.ensureInitialized();
     HttpOverrides.global = MyHttpOverrides();
   runApp(const ProviderScope(child: RizeKulturProjesi()));
